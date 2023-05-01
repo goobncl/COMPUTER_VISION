@@ -2,6 +2,7 @@
 
 #include "stdafx.h"
 #include "ui_COMPUTER_VISION.h"
+#include "ImageProcessor.h"
 #include <QTimer>
 #include <QLabel>
 
@@ -24,6 +25,8 @@ private:
 
     QPushButton* claheBtn;
     bool isGrayscaleEnabled;
+    
+    ImageProcessor* imageProcessor;
 
     double getFPS();
     void updateFrame();
@@ -31,4 +34,5 @@ private:
 
 private slots:
     void onClaheBtnClicked();
+    void onImageProcessed();
 };

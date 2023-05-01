@@ -7,6 +7,7 @@ COMPUTER_VISION::COMPUTER_VISION(QWidget* parent)
 {
     ui.setupUi(this);
     imageArray = new unsigned char[640 * 480];
+    imageProcessor = new ImageProcessor(this);
 
     cap.set(cv::CAP_PROP_FRAME_WIDTH, 640);
     cap.set(cv::CAP_PROP_FRAME_HEIGHT, 480);
@@ -18,6 +19,7 @@ COMPUTER_VISION::COMPUTER_VISION(QWidget* parent)
 
     connect(timer, &QTimer::timeout, this, &COMPUTER_VISION::updateFrame);
     connect(claheBtn, &QPushButton::clicked, this, &COMPUTER_VISION::onClaheBtnClicked);
+    connect(imageProcessor, &ImageProcessor::imageProcessed, this, &COMPUTER_VISION::onImageProcessed);
 
     cap.open(0);
     timer->start(0);
@@ -60,7 +62,8 @@ void COMPUTER_VISION::updateFrame()
     memcpy(imageArray, grayFrame.data, 640 * 480);
 
     // TODO: image processing with imageArray
-
+    imageProcessor->setInputImage(imageArray, 640, 480);
+    imageProcessor->processImage();
 
     // Image Display
     QImage qFrame = QImage(imageArray, 640, 480, QImage::Format_Grayscale8).copy();
@@ -90,4 +93,14 @@ void COMPUTER_VISION::setGrayscaleEnabled(bool isEnabled)
 void COMPUTER_VISION::onClaheBtnClicked()
 {
     setGrayscaleEnabled(!isGrayscaleEnabled);
+}
+
+void COMPUTER_VISION::onImageProcessed()
+{
+    unsigned char* outputImage = imageProcessor->getOutputImage();
+    if (outputImage != nullptr)
+    {
+        memcpy(imageArray, outputImage, 640 * 480);
+        delete[] outputImage;
+    }
 }

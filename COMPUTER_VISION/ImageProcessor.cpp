@@ -44,11 +44,8 @@ void ImageProcessor::processImage()
 
 void ImageProcessor::exampleImageProcessingAlgorithm()
 {
+    qDebug() << "***Processing on thread ID:" << QThread::currentThreadId();
+
     // Your image processing algorithm goes here.
     // For example:
-    outputImage = new unsigned char[width * height];
-    for (int i = 0; i < width * height; i++)
-    {
-        outputImage[i] = static_cast<unsigned char>(inputImage[i] / 2);
-    }
 }

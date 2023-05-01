@@ -6,6 +6,8 @@
 #include <QObject>
 #include <QThread>
 #include <QMutex>
+#include <QDebug>
+
 
 class ImageProcessor : public QObject
 {
