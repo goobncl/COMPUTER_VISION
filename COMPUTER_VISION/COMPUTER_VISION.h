@@ -18,16 +18,17 @@ private:
     unsigned char* imageArray;
 
     Ui::COMPUTER_VISIONClass ui;
-    QLabel* webcamLabel;
+    QLabel* displayLabel;
     QTimer* timer;
     cv::VideoCapture cap;
 
-    QPushButton* grayscaleBtn;
+    QPushButton* claheBtn;
     bool isGrayscaleEnabled;
 
+    double getFPS();
     void updateFrame();
     void setGrayscaleEnabled(bool isEnabled);
 
 private slots:
-    void onGrayscaleBtnClicked();
+    void onClaheBtnClicked();
 };

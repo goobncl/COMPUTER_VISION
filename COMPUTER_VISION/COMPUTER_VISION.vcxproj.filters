@@ -13,11 +13,8 @@
       <UniqueIdentifier>{99349809-55BA-4b9d-BF79-8FDBB0286EB3}</UniqueIdentifier>
       <Extensions>ui</Extensions>
     </Filter>
-    <Filter Include="Image Process Files">
+    <Filter Include="Algorithm Files">
       <UniqueIdentifier>{834c02c5-d853-4181-ad9d-0c8d06c29f8b}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Image Process Files\Grayscale">
-      <UniqueIdentifier>{5b5b6270-c93f-44e1-ba9f-db581d6ee8cf}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>

@@ -48,7 +48,7 @@
      <string/>
     </property>
    </widget>
-   <widget class="QPushButton" name="grayscaleBtn">
+   <widget class="QPushButton" name="claheBtn">
     <property name="geometry">
      <rect>
       <x>10</x>
@@ -58,7 +58,7 @@
      </rect>
     </property>
     <property name="text">
-     <string>GRAY SCALE</string>
+     <string>CLAHE</string>
     </property>
    </widget>
   </widget>

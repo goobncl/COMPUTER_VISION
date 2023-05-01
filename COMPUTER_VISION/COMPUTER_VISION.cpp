@@ -11,21 +11,36 @@ COMPUTER_VISION::COMPUTER_VISION(QWidget* parent)
     cap.set(cv::CAP_PROP_FRAME_WIDTH, 640);
     cap.set(cv::CAP_PROP_FRAME_HEIGHT, 480);
 
-    webcamLabel = findChild<QLabel*>("videoLabel");
-    grayscaleBtn = findChild<QPushButton*>("grayscaleBtn");
+    displayLabel = findChild<QLabel*>("videoLabel");
+    claheBtn = findChild<QPushButton*>("claheBtn");
     isGrayscaleEnabled = false;
     timer = new QTimer(this);
 
     connect(timer, &QTimer::timeout, this, &COMPUTER_VISION::updateFrame);
-    connect(grayscaleBtn, &QPushButton::clicked, this, &COMPUTER_VISION::onGrayscaleBtnClicked);
+    connect(claheBtn, &QPushButton::clicked, this, &COMPUTER_VISION::onClaheBtnClicked);
 
     cap.open(0);
-    timer->start(33);
+    timer->start(0);
 }
 
 COMPUTER_VISION::~COMPUTER_VISION()
 {
     delete[] imageArray;
+}
+
+double COMPUTER_VISION::getFPS() {
+    static double fps = 0.0;
+    static std::chrono::steady_clock::time_point lastTime = std::chrono::steady_clock::now();
+    static int frames = 0;
+    frames++;
+    auto now = std::chrono::steady_clock::now();
+    std::chrono::duration<double> duration = now - lastTime;
+    if (duration.count() >= 1.0) {
+        fps = frames / duration.count();
+        frames = 0;
+        lastTime = now;
+    }
+    return fps;
 }
 
 void COMPUTER_VISION::updateFrame()
@@ -39,13 +54,20 @@ void COMPUTER_VISION::updateFrame()
         return;
     }
 
+    // Image Acquisition
     cv::Mat grayFrame;
     cv::cvtColor(frame, grayFrame, cv::COLOR_BGR2GRAY);
-
     memcpy(imageArray, grayFrame.data, 640 * 480);
 
-    QImage qFrame = QImage(static_cast<const unsigned char*>(grayFrame.data), 640, 480, QImage::Format_Grayscale8).copy();
-    webcamLabel->setPixmap(QPixmap::fromImage(qFrame));
+    // TODO: image processing with imageArray
+
+
+    // Image Display
+    QImage qFrame = QImage(imageArray, 640, 480, QImage::Format_Grayscale8).copy();
+    displayLabel->setPixmap(QPixmap::fromImage(qFrame));
+
+    QString fpsString = QString::number(getFPS(), 'f', 2);
+    statusBar()->showMessage("FPS: " + fpsString);
 }
 
 
@@ -53,7 +75,7 @@ void COMPUTER_VISION::setGrayscaleEnabled(bool isEnabled)
 {
     isGrayscaleEnabled = isEnabled;
 
-    QFont font = grayscaleBtn->font();
+    QFont font = claheBtn->font();
     if (isGrayscaleEnabled)
     {
         font.setWeight(QFont::Bold);
@@ -62,10 +84,10 @@ void COMPUTER_VISION::setGrayscaleEnabled(bool isEnabled)
     {
         font.setWeight(QFont::Normal);
     }
-    grayscaleBtn->setFont(font);
+    claheBtn->setFont(font);
 }
 
-void COMPUTER_VISION::onGrayscaleBtnClicked()
+void COMPUTER_VISION::onClaheBtnClicked()
 {
     setGrayscaleEnabled(!isGrayscaleEnabled);
 }
