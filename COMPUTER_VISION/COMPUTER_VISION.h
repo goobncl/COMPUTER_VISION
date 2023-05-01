@@ -25,7 +25,6 @@ private:
     QPushButton* grayscaleBtn;
     bool isGrayscaleEnabled;
 
-    QImage getQImageFromArray(const unsigned char* array, int width, int height);
     void updateFrame();
     void setGrayscaleEnabled(bool isEnabled);
 

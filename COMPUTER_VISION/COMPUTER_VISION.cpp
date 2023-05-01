@@ -6,7 +6,7 @@ COMPUTER_VISION::COMPUTER_VISION(QWidget* parent)
     : QMainWindow(parent)
 {
     ui.setupUi(this);
-    imageArray = new unsigned char[640 * 480 * 3];
+    imageArray = new unsigned char[640 * 480];
 
     cap.set(cv::CAP_PROP_FRAME_WIDTH, 640);
     cap.set(cv::CAP_PROP_FRAME_HEIGHT, 480);
@@ -28,16 +28,6 @@ COMPUTER_VISION::~COMPUTER_VISION()
     delete[] imageArray;
 }
 
-QImage COMPUTER_VISION::getQImageFromArray(const unsigned char* array, int width, int height)
-{
-    cv::Mat frameBGR(height, width, CV_8UC3, const_cast<unsigned char*>(array));
-    cv::Mat frameRGB;
-    cv::cvtColor(frameBGR, frameRGB, cv::COLOR_BGR2RGB);
-
-    QImage qFrame = QImage(static_cast<const unsigned char*>(frameRGB.data), width, height, QImage::Format_RGB888).copy();
-    return qFrame;
-}
-
 void COMPUTER_VISION::updateFrame()
 {
     cv::Mat frame;
@@ -49,11 +39,15 @@ void COMPUTER_VISION::updateFrame()
         return;
     }
 
-    memcpy(imageArray, frame.data, 640 * 480 * 3);
+    cv::Mat grayFrame;
+    cv::cvtColor(frame, grayFrame, cv::COLOR_BGR2GRAY);
 
-    QImage qFrame = getQImageFromArray(imageArray, 640, 480);
+    memcpy(imageArray, grayFrame.data, 640 * 480);
+
+    QImage qFrame = QImage(static_cast<const unsigned char*>(grayFrame.data), 640, 480, QImage::Format_Grayscale8).copy();
     webcamLabel->setPixmap(QPixmap::fromImage(qFrame));
 }
+
 
 void COMPUTER_VISION::setGrayscaleEnabled(bool isEnabled)
 {
