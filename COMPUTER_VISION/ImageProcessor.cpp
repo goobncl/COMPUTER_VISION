@@ -44,10 +44,10 @@ void ImageProcessor::processImage()
 
 void ImageProcessor::exampleImageProcessingAlgorithm()
 {
-    qDebug() << "[1] Start on thread ID:" << QThread::currentThreadId();
+    qDebug() << "[1] -- Start on thread ID:" << QThread::currentThreadId();
 
     // Your image processing algorithm goes here.
     // For example:
 
-    qDebug() << "[2] Finish on thread ID:" << QThread::currentThreadId();
+    qDebug() << "[2] @@ Finish on thread ID:" << QThread::currentThreadId();
 }

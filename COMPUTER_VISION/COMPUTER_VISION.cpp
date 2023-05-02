@@ -14,7 +14,7 @@ COMPUTER_VISION::COMPUTER_VISION(QWidget* parent)
 
     displayLabel = findChild<QLabel*>("videoLabel");
     claheBtn = findChild<QPushButton*>("claheBtn");
-    isGrayscaleEnabled = false;
+    algorithmEnabled = false;
     timer = new QTimer(this);
 
     connect(timer, &QTimer::timeout, this, &COMPUTER_VISION::updateFrame);
@@ -63,7 +63,9 @@ void COMPUTER_VISION::updateFrame()
 
     // TODO: image processing with imageArray
     imageProcessor->setInputImage(imageArray, 640, 480);
-    imageProcessor->processImage();
+    if (algorithmEnabled) {
+        imageProcessor->processImage();
+    }
 
     // Image Display
     QImage qFrame = QImage(imageArray, 640, 480, QImage::Format_Grayscale8).copy();
@@ -74,12 +76,12 @@ void COMPUTER_VISION::updateFrame()
 }
 
 
-void COMPUTER_VISION::setGrayscaleEnabled(bool isEnabled)
+void COMPUTER_VISION::onClaheBtnClicked()
 {
-    isGrayscaleEnabled = isEnabled;
+    algorithmEnabled = !algorithmEnabled;
 
     QFont font = claheBtn->font();
-    if (isGrayscaleEnabled)
+    if (algorithmEnabled)
     {
         font.setWeight(QFont::Bold);
     }
@@ -88,11 +90,6 @@ void COMPUTER_VISION::setGrayscaleEnabled(bool isEnabled)
         font.setWeight(QFont::Normal);
     }
     claheBtn->setFont(font);
-}
-
-void COMPUTER_VISION::onClaheBtnClicked()
-{
-    setGrayscaleEnabled(!isGrayscaleEnabled);
 }
 
 void COMPUTER_VISION::onImageProcessed()

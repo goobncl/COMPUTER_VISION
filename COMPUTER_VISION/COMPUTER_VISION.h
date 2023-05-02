@@ -24,13 +24,12 @@ private:
     cv::VideoCapture cap;
 
     QPushButton* claheBtn;
-    bool isGrayscaleEnabled;
+    bool algorithmEnabled;
     
     ImageProcessor* imageProcessor;
 
     double getFPS();
     void updateFrame();
-    void setGrayscaleEnabled(bool isEnabled);
 
 private slots:
     void onClaheBtnClicked();
