@@ -7,7 +7,7 @@ COMPUTER_VISION::COMPUTER_VISION(QWidget* parent)
 {
     ui.setupUi(this);
     imageArray = new unsigned char[640 * 480];
-    imageProcessor = new ImageProcessor(this);
+    imageProcessor = new ImageProcessor(imageArray, this);
 
     cap.set(cv::CAP_PROP_FRAME_WIDTH, 640);
     cap.set(cv::CAP_PROP_FRAME_HEIGHT, 480);

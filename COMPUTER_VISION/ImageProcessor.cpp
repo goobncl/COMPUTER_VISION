@@ -2,8 +2,8 @@
 #include "ImageProcessor.h"
 
 
-ImageProcessor::ImageProcessor(QObject* parent)
-    : QObject(parent), inputImage(nullptr), outputImage(nullptr), width(0), height(0)
+ImageProcessor::ImageProcessor(unsigned char* sharedImageArray, QObject* parent)
+    : QObject(parent), sharedImageArray(sharedImageArray), inputImage(nullptr), outputImage(nullptr), width(0), height(0)
 {
     moveToThread(&workerThread);
     workerThread.start();
@@ -48,6 +48,10 @@ void ImageProcessor::exampleImageProcessingAlgorithm()
 
     // Your image processing algorithm goes here.
     // For example:
+    for (int i = 0; i < width * height; ++i)
+    {
+        sharedImageArray[i] = 255 - sharedImageArray[i];
+    }
 
     qDebug() << "[2] @@ Finish on thread ID:" << QThread::currentThreadId();
 }
