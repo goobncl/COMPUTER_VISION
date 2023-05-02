@@ -16,6 +16,9 @@
     <Filter Include="Algorithm Files">
       <UniqueIdentifier>{834c02c5-d853-4181-ad9d-0c8d06c29f8b}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Algorithm Files\Histogram Equalization">
+      <UniqueIdentifier>{2aa748b7-8ed0-45c9-a961-e93a8f6ffde7}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <QtRcc Include="COMPUTER_VISION.qrc">

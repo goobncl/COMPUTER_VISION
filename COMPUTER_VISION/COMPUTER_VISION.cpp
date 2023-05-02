@@ -75,7 +75,6 @@ void COMPUTER_VISION::updateFrame()
     statusBar()->showMessage("FPS: " + fpsString);
 }
 
-
 void COMPUTER_VISION::onClaheBtnClicked()
 {
     algorithmEnabled = !algorithmEnabled;
