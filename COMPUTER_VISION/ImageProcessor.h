@@ -26,7 +26,7 @@ public slots:
     void processImage();
 
 private:
-    unsigned char* sharedImageArray;
+    unsigned char* targetImageArray;
     QThread workerThread;
     QMutex mutex;
     unsigned char* inputImage;

@@ -3,7 +3,7 @@
 
 
 ImageProcessor::ImageProcessor(unsigned char* sharedImageArray, QObject* parent)
-    : QObject(parent), sharedImageArray(sharedImageArray), inputImage(nullptr), outputImage(nullptr), width(0), height(0)
+    : QObject(parent), targetImageArray(sharedImageArray), inputImage(nullptr), outputImage(nullptr), width(0), height(0)
 {
     moveToThread(&workerThread);
     workerThread.start();
@@ -50,7 +50,7 @@ void ImageProcessor::exampleImageProcessingAlgorithm()
     // For example:
     for (int i = 0; i < width * height; ++i)
     {
-        sharedImageArray[i] = 255 - sharedImageArray[i];
+        targetImageArray[i] = 255 - targetImageArray[i];
     }
 
     qDebug() << "[2] @@ Finish on thread ID:" << QThread::currentThreadId();
