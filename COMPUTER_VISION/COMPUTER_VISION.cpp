@@ -61,9 +61,9 @@ void COMPUTER_VISION::updateFrame()
     cv::cvtColor(frame, grayFrame, cv::COLOR_BGR2GRAY);
     memcpy(imageArray, grayFrame.data, 640 * 480);
 
-    // TODO: image processing with imageArray
-    imageProcessor->setInputImage(imageArray, 640, 480);
+    // TODO: image processing with imageArray    
     if (algorithmEnabled) {
+        imageProcessor->setInputImage(imageArray, 640, 480);
         imageProcessor->processImage();
     }
 

@@ -19,13 +19,14 @@ private:
     unsigned char* imageArray;
 
     Ui::COMPUTER_VISIONClass ui;
-    QLabel* displayLabel;
+    
     QTimer* timer;
     cv::VideoCapture cap;
 
     QPushButton* claheBtn;
-    bool algorithmEnabled;
+    QLabel* displayLabel;
     
+    bool algorithmEnabled;    
     ImageProcessor* imageProcessor;
 
     double getFPS();
