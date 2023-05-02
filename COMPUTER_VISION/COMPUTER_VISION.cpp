@@ -62,7 +62,8 @@ void COMPUTER_VISION::updateFrame()
     memcpy(imageArray, grayFrame.data, 640 * 480);
 
     // TODO: image processing with imageArray    
-    if (algorithmEnabled) {
+    if (algorithmEnabled) 
+    {
         imageProcessor->setInputImage(imageArray, 640, 480);
         imageProcessor->processImage();
     }
