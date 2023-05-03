@@ -39,5 +39,4 @@ void ImageProcessor::processImage()
         }
         invertColors(inputImage, width, height);
     }
-    emit imageProcessed();
 }
