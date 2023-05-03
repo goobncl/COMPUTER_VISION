@@ -20,19 +20,18 @@ void histogramEqualization(unsigned char* input, int width, int height) {
     }
 
     int cdf[256] = { 0 };
-    cdf[0] = histogram[0];
-    for (int i = 1; i < num_bins; ++i) {
-        cdf[i] = cdf[i - 1] + histogram[i];
-    }
-
     int cdf_min = INT_MAX;
     int cdf_max = INT_MIN;
-    for (int i = 0; i < num_bins; ++i) {
-        
+
+    cdf[0] = histogram[0];
+    cdf_min = cdf[0];
+    cdf_max = cdf[0];
+
+    for (int i = 1; i < num_bins; ++i) {
+        cdf[i] = cdf[i - 1] + histogram[i];
         if (cdf[i] < cdf_min) {
             cdf_min = cdf[i];
         }
-
         if (cdf[i] > cdf_max) {
             cdf_max = cdf[i];
         }
