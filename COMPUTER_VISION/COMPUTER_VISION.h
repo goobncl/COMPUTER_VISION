@@ -34,5 +34,4 @@ private:
 
 private slots:
     void onClaheBtnClicked();
-    void onImageProcessed();
 };

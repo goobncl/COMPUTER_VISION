@@ -19,7 +19,6 @@ COMPUTER_VISION::COMPUTER_VISION(QWidget* parent)
 
     connect(timer, &QTimer::timeout, this, &COMPUTER_VISION::updateFrame);
     connect(claheBtn, &QPushButton::clicked, this, &COMPUTER_VISION::onClaheBtnClicked);
-    connect(imageProcessor, &ImageProcessor::imageProcessed, this, &COMPUTER_VISION::onImageProcessed);
 
     cap.open(0);
     timer->start(0);
@@ -90,14 +89,4 @@ void COMPUTER_VISION::onClaheBtnClicked()
         font.setWeight(QFont::Normal);
     }
     claheBtn->setFont(font);
-}
-
-void COMPUTER_VISION::onImageProcessed()
-{
-    unsigned char* outputImage = imageProcessor->getOutputImage();
-    if (outputImage != nullptr)
-    {
-        memcpy(imageArray, outputImage, 640 * 480);
-        delete[] outputImage;
-    }
 }
