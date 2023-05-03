@@ -3,11 +3,14 @@
 
 void invertColors(unsigned char* input, int width, int height) {
 
+	// just for debugging: start
 	qDebug() << "[1] -*- Start on thread ID:" << QThread::currentThreadId();
 
+	// actual image processing
 	for (int i = 0; i < width * height; ++i) {
 		input[i] = 255 - input[i];
 	}
 
+	// just for debugging: finish
 	qDebug() << "[2] @*@ Finish on thread ID:" << QThread::currentThreadId();
 }
