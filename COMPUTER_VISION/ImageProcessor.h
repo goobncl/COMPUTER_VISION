@@ -16,20 +16,21 @@ class ImageProcessor : public QObject
 public:
     QMutex mutex;
 
-    explicit ImageProcessor(unsigned char* sharedImageArray, QObject* parent = nullptr);
+    explicit ImageProcessor(unsigned char* sharedImageArray, QObject* parent = Q_NULLPTR);
     ~ImageProcessor();
-    void setInputImage(unsigned char* inputImage, int width, int height);
-
-public slots:
-    void processImage();
+    
+    void setImageAndProcess(unsigned char* inputImage, int width, int height);
 
 private:
     unsigned char* targetImageArray;
-    QThread workerThread;    
+    QThread workerThread;
     unsigned char* inputImage;
     unsigned char* outputImage;
     int width;
     int height;
+
+    void setInputImage(unsigned char* inputImage, int width, int height);
+    void applyProcessing();
 };
 
 #endif // IMAGEPROCESSOR_H

@@ -3,7 +3,7 @@
 
 
 ImageProcessor::ImageProcessor(unsigned char* sharedImageArray, QObject* parent)
-    : QObject(parent), targetImageArray(sharedImageArray), inputImage(nullptr), outputImage(nullptr), width(0), height(0)
+    : QObject(parent), targetImageArray(sharedImageArray), inputImage(Q_NULLPTR), outputImage(Q_NULLPTR), width(0), height(0)
 {
     moveToThread(&workerThread);
     workerThread.start();
@@ -15,24 +15,27 @@ ImageProcessor::~ImageProcessor()
     workerThread.wait();
 }
 
-void ImageProcessor::setInputImage(unsigned char* inputImage, int width, int height)
+void ImageProcessor::setImageAndProcess(unsigned char* inputImage, int width, int height)
 {
     {
         QMutexLocker locker(&mutex);
-        this->inputImage = inputImage;
-        this->width = width;
-        this->height = height;
+        setInputImage(inputImage, width, height);
+        applyProcessing();
     }
 }
 
-void ImageProcessor::processImage()
+void ImageProcessor::setInputImage(unsigned char* inputImage, int width, int height)
 {
+    this->inputImage = inputImage;
+    this->width = width;
+    this->height = height;
+}
+
+void ImageProcessor::applyProcessing()
+{
+    if (inputImage == Q_NULLPTR)
     {
-        QMutexLocker locker(&mutex);
-        if (inputImage == nullptr)
-        {
-            return;
-        }
-        invertColors(inputImage, width, height);
+        return;
     }
+    invertColors(inputImage, width, height);
 }

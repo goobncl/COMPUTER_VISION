@@ -11,6 +11,6 @@ void invertColors(unsigned char* input, int width, int height) {
 		input[i] = 255 - input[i];
 	}
 
-	// just for debugging: finish
-	qDebug() << "[2] @*@ Finish on thread ID:" << QThread::currentThreadId();
+	// just for debugging: Stop
+	qDebug() << "[2] @*@ Stop on thread ID:" << QThread::currentThreadId();
 }

@@ -67,8 +67,7 @@ void COMPUTER_VISION::updateFrame()
     // TODO: image processing with imageArray    
     if (algorithmEnabled) 
     {
-        imageProcessor->setInputImage(imageArray, 640, 480);
-        imageProcessor->processImage();
+        imageProcessor->setImageAndProcess(imageArray, 640, 480);
     }
 
     // Image Display
