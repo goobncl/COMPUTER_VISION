@@ -23,12 +23,6 @@ void ImageProcessor::setInputImage(unsigned char* inputImage, int width, int hei
     this->height = height;
 }
 
-unsigned char* ImageProcessor::getOutputImage()
-{
-    QMutexLocker locker(&mutex);
-    return outputImage;
-}
-
 void ImageProcessor::processImage()
 {
     {

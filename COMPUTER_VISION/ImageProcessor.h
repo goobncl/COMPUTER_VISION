@@ -17,7 +17,6 @@ public:
     explicit ImageProcessor(unsigned char* sharedImageArray, QObject* parent = nullptr);
     ~ImageProcessor();
     void setInputImage(unsigned char* inputImage, int width, int height);
-    unsigned char* getOutputImage();
 
 signals:
     void imageProcessed();
