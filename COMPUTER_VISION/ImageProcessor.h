@@ -20,9 +20,6 @@ public:
     ~ImageProcessor();
     void setInputImage(unsigned char* inputImage, int width, int height);
 
-signals:
-    void imageProcessed();
-
 public slots:
     void processImage();
 
