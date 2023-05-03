@@ -7,5 +7,6 @@
 
 
 void invertColors(unsigned char* input, int width, int height);
+void histogramEqualization(unsigned char* input, int width, int height);
 
 #endif // IMG_PROC_H

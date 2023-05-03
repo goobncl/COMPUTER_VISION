@@ -37,5 +37,5 @@ void ImageProcessor::applyProcessing()
     {
         return;
     }
-    invertColors(inputImage, width, height);
+    histogramEqualization(inputImage, width, height);
 }
