@@ -14,6 +14,8 @@ class ImageProcessor : public QObject
     Q_OBJECT
 
 public:
+    QMutex mutex;
+
     explicit ImageProcessor(unsigned char* sharedImageArray, QObject* parent = nullptr);
     ~ImageProcessor();
     void setInputImage(unsigned char* inputImage, int width, int height);
@@ -26,8 +28,7 @@ public slots:
 
 private:
     unsigned char* targetImageArray;
-    QThread workerThread;
-    QMutex mutex;
+    QThread workerThread;    
     unsigned char* inputImage;
     unsigned char* outputImage;
     int width;

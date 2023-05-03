@@ -58,7 +58,11 @@ void COMPUTER_VISION::updateFrame()
     // Image Acquisition
     cv::Mat grayFrame;
     cv::cvtColor(frame, grayFrame, cv::COLOR_BGR2GRAY);
-    memcpy(imageArray, grayFrame.data, 640 * 480);
+
+    {
+        QMutexLocker locker(&imageProcessor->mutex);
+        memcpy(imageArray, grayFrame.data, 640 * 480);
+    }
 
     // TODO: image processing with imageArray    
     if (algorithmEnabled) 

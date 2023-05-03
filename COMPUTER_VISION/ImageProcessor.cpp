@@ -17,10 +17,12 @@ ImageProcessor::~ImageProcessor()
 
 void ImageProcessor::setInputImage(unsigned char* inputImage, int width, int height)
 {
-    QMutexLocker locker(&mutex);
-    this->inputImage = inputImage;
-    this->width = width;
-    this->height = height;
+    {
+        QMutexLocker locker(&mutex);
+        this->inputImage = inputImage;
+        this->width = width;
+        this->height = height;
+    }
 }
 
 void ImageProcessor::processImage()
