@@ -47,6 +47,9 @@
     <ClCompile Include="ImageProcessor.cpp">
       <Filter>Algorithm Files</Filter>
     </ClCompile>
+    <ClCompile Include="img_proc.cpp">
+      <Filter>Algorithm Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <QtMoc Include="COMPUTER_VISION.h">
@@ -59,6 +62,9 @@
   <ItemGroup>
     <ClInclude Include="stdafx.h">
       <Filter>Source Files</Filter>
+    </ClInclude>
+    <ClInclude Include="img_proc.h">
+      <Filter>Algorithm Files</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

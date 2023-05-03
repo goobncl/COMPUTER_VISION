@@ -37,21 +37,7 @@ void ImageProcessor::processImage()
         {
             return;
         }
-        exampleImageProcessingAlgorithm();
+        invertColors(inputImage, width, height);
     }
     emit imageProcessed();
-}
-
-void ImageProcessor::exampleImageProcessingAlgorithm()
-{
-    qDebug() << "[1] -- Start on thread ID:" << QThread::currentThreadId();
-
-    // Your image processing algorithm goes here.
-    // For example:
-    for (int i = 0; i < width * height; ++i)
-    {
-        targetImageArray[i] = 255 - targetImageArray[i];
-    }
-
-    qDebug() << "[2] @@ Finish on thread ID:" << QThread::currentThreadId();
 }

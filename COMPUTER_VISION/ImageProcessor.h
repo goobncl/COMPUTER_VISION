@@ -6,7 +6,7 @@
 #include <QObject>
 #include <QThread>
 #include <QMutex>
-#include <QDebug>
+#include "img_proc.h"
 
 
 class ImageProcessor : public QObject
@@ -33,8 +33,6 @@ private:
     unsigned char* outputImage;
     int width;
     int height;
-
-    void exampleImageProcessingAlgorithm();
 };
 
 #endif // IMAGEPROCESSOR_H
