@@ -84,6 +84,7 @@ void gridHistogramEqualization(unsigned char* input, int width, int height) {
 
     for (int row = 0; row < 5; ++row) {
         for (int col = 0; col < 7; ++col) {
+
             int histogram[256] = { 0 };
             int Nb = subWidth * subHeight;
             int L = num_bins;
