@@ -74,25 +74,6 @@ void histogramEqualization(unsigned char* input, int width, int height) {
     }
 }
 
-double calc_sqrt(double x) {
-    if (x <= 0) {
-        return 0;
-    }
-
-    double approx = x;
-    double epsilon = 1e-6;
-
-    while (1) {
-        double next_approx = (approx + x / approx) / 2;
-        if (next_approx - approx < epsilon && approx - next_approx < epsilon) {
-            break;
-        }
-        approx = next_approx;
-    }
-
-    return approx;
-}
-
 void gridHistogramEqualization(unsigned char* input, int width, int height) {
 
     int size = width * height;
