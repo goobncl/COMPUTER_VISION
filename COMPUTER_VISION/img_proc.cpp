@@ -75,6 +75,7 @@ void histogramEqualization(unsigned char* input, int width, int height) {
 }
 
 void computeHistogram(unsigned char* input, int width, int subWidth, int subHeight, int row, int col, int histogram[256]) {
+    
     for (int i = row * subHeight; i < (row + 1) * subHeight; ++i) {
         for (int j = col * subWidth; j < (col + 1) * subWidth; ++j) {
             int pixel_value = input[i * width + j];
@@ -84,6 +85,7 @@ void computeHistogram(unsigned char* input, int width, int subWidth, int subHeig
 }
 
 void redistributeExcess(int histogram[256], int num_bins, int clipValue) {
+    
     int excess = 0;
     for (int i = 0; i < num_bins; ++i) {
         int excess_value = histogram[i] - clipValue;
@@ -100,6 +102,7 @@ void redistributeExcess(int histogram[256], int num_bins, int clipValue) {
 }
 
 void computeCDF(int histogram[256], int cdf[256], int num_bins, int* cdf_min, int* cdf_max) {
+    
     cdf[0] = histogram[0];
     *cdf_min = cdf[0];
     *cdf_max = cdf[0];
@@ -115,6 +118,7 @@ void computeCDF(int histogram[256], int cdf[256], int num_bins, int* cdf_min, in
 }
 
 void applyMapping(unsigned char* input, int width, int subWidth, int subHeight, int row, int col, int cdf[256], int cdf_min, int cdf_range) {
+    
     for (int i = row * subHeight; i < (row + 1) * subHeight; ++i) {
         for (int j = col * subWidth; j < (col + 1) * subWidth; ++j) {
             input[i * width + j] = (unsigned char)(((cdf[input[i * width + j]] - cdf_min) * 255) / cdf_range);
