@@ -139,47 +139,47 @@ void gridHistogramEqualization(unsigned char* input, int width, int height) {
         }
     }
 
-    for (int y = 0; y < height; ++y) {
-        for (int x = 0; x < width; ++x) {
-            
-            int row = y / subHeight;
-            int col = x / subWidth;
-            
-            int O1_x = col * subWidth;
-            int O1_y = row * subHeight;
-            int O2_x = (col + 1) * subWidth;
-            int O2_y = row * subHeight;
-            int O3_x = col * subWidth;
-            int O3_y = (row + 1) * subHeight;
-            int O4_x = (col + 1) * subWidth;
-            int O4_y = (row + 1) * subHeight;
-            
-            int dx1 = x - O1_x;
-            int dy1 = y - O1_y;
-            double d1 = (double)(dx1 * dx1 + dy1 * dy1);
-    
-            int dx2 = x - O2_x;
-            int dy2 = y - O2_y;
-            double d2 = (double)(dx2 * dx2 + dy2 * dy2);
-    
-            int dx3 = x - O3_x;
-            int dy3 = y - O3_y;
-            double d3 = (double)(dx3 * dx3 + dy3 * dy3);
-    
-            int dx4 = x - O4_x;
-            int dy4 = y - O4_y;
-            double d4 = (double)(dx4 * dx4 + dy4 * dy4);
-            
-            int pixel_value = input[y * width + x];
-            double T1 = mapping_functions[row][col][pixel_value];
-            double T2 = mapping_functions[row][col + 1][pixel_value];
-            double T3 = mapping_functions[row + 1][col][pixel_value];
-            double T4 = mapping_functions[row + 1][col + 1][pixel_value];
-            
-            double Tp = (d3 * d4 * T1 + d1 * d4 * T2 + d1 * d2 * T3 + d2 * d3 * T4) / ((d1 + d3) * (d2 + d4));
-            input[y * width + x] = (unsigned char)(Tp);
-        }
-    }
+    //for (int y = 0; y < height; ++y) {
+    //    for (int x = 0; x < width; ++x) {
+    //        
+    //        int row = y / subHeight;
+    //        int col = x / subWidth;
+    //        
+    //        int O1_x = col * subWidth;
+    //        int O1_y = row * subHeight;
+    //        int O2_x = (col + 1) * subWidth;
+    //        int O2_y = row * subHeight;
+    //        int O3_x = col * subWidth;
+    //        int O3_y = (row + 1) * subHeight;
+    //        int O4_x = (col + 1) * subWidth;
+    //        int O4_y = (row + 1) * subHeight;
+    //        
+    //        int dx1 = x - O1_x;
+    //        int dy1 = y - O1_y;
+    //        double d1 = (double)(dx1 * dx1 + dy1 * dy1);
+    //
+    //        int dx2 = x - O2_x;
+    //        int dy2 = y - O2_y;
+    //        double d2 = (double)(dx2 * dx2 + dy2 * dy2);
+    //
+    //        int dx3 = x - O3_x;
+    //        int dy3 = y - O3_y;
+    //        double d3 = (double)(dx3 * dx3 + dy3 * dy3);
+    //
+    //        int dx4 = x - O4_x;
+    //        int dy4 = y - O4_y;
+    //        double d4 = (double)(dx4 * dx4 + dy4 * dy4);
+    //        
+    //        int pixel_value = input[y * width + x];
+    //        double T1 = mapping_functions[row][col][pixel_value];
+    //        double T2 = mapping_functions[row][col + 1][pixel_value];
+    //        double T3 = mapping_functions[row + 1][col][pixel_value];
+    //        double T4 = mapping_functions[row + 1][col + 1][pixel_value];
+    //        
+    //        double Tp = (d3 * d4 * T1 + d1 * d4 * T2 + d1 * d2 * T3 + d2 * d3 * T4) / ((d1 + d3) * (d2 + d4));
+    //        input[y * width + x] = (unsigned char)(Tp);
+    //    }
+    //}
 }
 
 void prototype(unsigned char* input, int width, int height) {
