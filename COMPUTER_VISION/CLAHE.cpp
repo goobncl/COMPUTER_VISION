@@ -2,8 +2,8 @@
 #include "CLAHE.h"
 
 #define GRAY_LVL 256
-#define SUB_W 8
-#define SUB_H 6
+#define SUB_W 10
+#define SUB_H 8
 #define ALPHA 0.0001
 
 
