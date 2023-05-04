@@ -6,8 +6,7 @@
 #include <QObject>
 #include <QThread>
 #include <QMutex>
-#include "img_proc.h"
-
+#include "CLAHE.h"
 
 class ImageProcessor : public QObject
 {

@@ -2,6 +2,7 @@
 #include "ImageProcessor.h"
 
 
+
 ImageProcessor::ImageProcessor(unsigned char* sharedImageArray, QObject* parent)
     : QObject(parent), targetImageArray(sharedImageArray), inputImage(Q_NULLPTR), outputImage(Q_NULLPTR), width(0), height(0)
 {

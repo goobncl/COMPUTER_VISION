@@ -50,6 +50,9 @@
     <ClCompile Include="img_proc.cpp">
       <Filter>Algorithm Files</Filter>
     </ClCompile>
+    <ClCompile Include="CLAHE.cpp">
+      <Filter>Algorithm Files\Histogram Equalization</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <QtMoc Include="COMPUTER_VISION.h">
@@ -65,6 +68,9 @@
     </ClInclude>
     <ClInclude Include="img_proc.h">
       <Filter>Algorithm Files</Filter>
+    </ClInclude>
+    <ClInclude Include="CLAHE.h">
+      <Filter>Algorithm Files\Histogram Equalization</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>
