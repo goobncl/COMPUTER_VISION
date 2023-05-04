@@ -74,7 +74,7 @@ void COMPUTER_VISION::updateFrame()
     QImage qFrame = QImage(imageArray, 640, 480, QImage::Format_Grayscale8).copy();
     displayLabel->setPixmap(QPixmap::fromImage(qFrame));
 
-    QString fpsString = QString::number(getFPS(), 'f', 2);
+    QString fpsString = QString::number(getFPS(), 'f', 4);
     statusBar()->showMessage("FPS: " + fpsString);
 }
 
