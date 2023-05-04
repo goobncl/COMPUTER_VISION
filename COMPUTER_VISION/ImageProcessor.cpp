@@ -37,5 +37,5 @@ void ImageProcessor::applyProcessing()
     {
         return;
     }
-    histogramEqualization(inputImage, width, height);
+    gridHistogramEqualization(inputImage, width, height);
 }

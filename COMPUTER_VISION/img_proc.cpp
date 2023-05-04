@@ -9,11 +9,26 @@ void invertColors(unsigned char* input, int width, int height) {
 	}
 }
 
+void applyContrastAndNoise(unsigned char* input, int width, int height) {
+    float contrast_factor = 1.5f;
+    for (int i = 0; i < width * height; ++i) {
+        input[i] = (unsigned char)((input[i] * contrast_factor) > 255 ? 255 : (input[i] * contrast_factor) < 0 ? 0 : (input[i] * contrast_factor));
+    }
+
+    srand((unsigned)time(NULL));
+    int noise_range = 10;
+
+    for (int i = 0; i < width * height; ++i) {
+        int noise = (rand() % (2 * noise_range + 1)) - noise_range;
+        input[i] = (unsigned char)((input[i] + noise) > 255 ? 255 : (input[i] + noise) < 0 ? 0 : (input[i] + noise));
+    }
+}
+
 void histogramEqualization(unsigned char* input, int width, int height) {
 
     int size = width * height;
     int num_bins = 256;
-    int clipValue = 255;
+    int clipValue = 100;
 
     int histogram[256] = { 0 };
     for (int i = 0; i < size; ++i) {
@@ -28,7 +43,9 @@ void histogramEqualization(unsigned char* input, int width, int height) {
             histogram[i] = clipValue;
         }
     }
+    
     int redistribute = excess / num_bins;
+    
     for (int i = 0; i < num_bins; ++i) {
         histogram[i] += redistribute;
     }
@@ -36,6 +53,8 @@ void histogramEqualization(unsigned char* input, int width, int height) {
     int cdf[256] = { 0 };
     int cdf_min = histogram[0];
     int cdf_max = histogram[0];
+    //int cdf_min = INT_MAX;
+    //int cdf_max = INT_MIN;
 
     cdf[0] = histogram[0];
 
@@ -61,7 +80,7 @@ void gridHistogramEqualization(unsigned char* input, int width, int height) {
     int num_bins = 256;
     int subWidth = width / 7;
     int subHeight = height / 5;
-    int clipValue = 23; 
+    double alpha = 0.0001; 
 
     for (int row = 0; row < 5; ++row) {
         for (int col = 0; col < 7; ++col) {
@@ -72,6 +91,10 @@ void gridHistogramEqualization(unsigned char* input, int width, int height) {
                     histogram[input[i * width + j]]++;
                 }
             }
+
+            int Nb = subWidth * subHeight;
+            int L = num_bins;
+            int clipValue = static_cast<int>((Nb / L) + alpha * (Nb - Nb / L));
 
             int excess = 0;
             for (int i = 0; i < num_bins; ++i) {

@@ -7,6 +7,7 @@
 
 
 void invertColors(unsigned char* input, int width, int height);
+void applyContrastAndNoise(unsigned char* input, int width, int height);
 void histogramEqualization(unsigned char* input, int width, int height);
 void gridHistogramEqualization(unsigned char* input, int width, int height);
 void prototype(unsigned char* input, int width, int height);
