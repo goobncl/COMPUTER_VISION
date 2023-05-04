@@ -78,17 +78,18 @@ void gridHistogramEqualization(unsigned char* input, int width, int height) {
 
     int size = width * height;
     int num_bins = 256;
-    int subWidth = width / 7;
-    int subHeight = height / 5;
+    int subWidth = width / 8;
+    int subHeight = height / 6;
     double alpha = 0.0001;
+    int mapping_functions[8][6][256] = { 0 };
 
-    for (int row = 0; row < 5; ++row) {
-        for (int col = 0; col < 7; ++col) {
+    for (int row = 0; row < 6; ++row) {
+        for (int col = 0; col < 8; ++col) {
 
             int histogram[256] = { 0 };
             int Nb = subWidth * subHeight;
             int L = num_bins;
-            int clipValue = static_cast<int>((Nb / L) + alpha * (Nb - Nb / L));
+            int clipValue = (int)((Nb / L) + alpha * (Nb - Nb / L));
             int cdf[256] = { 0 };
 
             for (int i = row * subHeight; i < (row + 1) * subHeight; ++i) {
@@ -131,6 +132,52 @@ void gridHistogramEqualization(unsigned char* input, int width, int height) {
                     input[i * width + j] = (unsigned char)(((cdf[input[i * width + j]] - cdf_min) * 255) / cdf_range);
                 }
             }
+
+            for (int i = 0; i < num_bins; ++i) {
+                mapping_functions[row][col][i] = ((cdf[i] - cdf_min) * 255) / cdf_range;
+            }
+        }
+    }
+
+    for (int y = 0; y < height; ++y) {
+        for (int x = 0; x < width; ++x) {
+            
+            int row = y / subHeight;
+            int col = x / subWidth;
+            
+            int O1_x = col * subWidth;
+            int O1_y = row * subHeight;
+            int O2_x = (col + 1) * subWidth;
+            int O2_y = row * subHeight;
+            int O3_x = col * subWidth;
+            int O3_y = (row + 1) * subHeight;
+            int O4_x = (col + 1) * subWidth;
+            int O4_y = (row + 1) * subHeight;
+            
+            int dx1 = x - O1_x;
+            int dy1 = y - O1_y;
+            double d1 = (double)(dx1 * dx1 + dy1 * dy1);
+    
+            int dx2 = x - O2_x;
+            int dy2 = y - O2_y;
+            double d2 = (double)(dx2 * dx2 + dy2 * dy2);
+    
+            int dx3 = x - O3_x;
+            int dy3 = y - O3_y;
+            double d3 = (double)(dx3 * dx3 + dy3 * dy3);
+    
+            int dx4 = x - O4_x;
+            int dy4 = y - O4_y;
+            double d4 = (double)(dx4 * dx4 + dy4 * dy4);
+            
+            int pixel_value = input[y * width + x];
+            double T1 = mapping_functions[row][col][pixel_value];
+            double T2 = mapping_functions[row][col + 1][pixel_value];
+            double T3 = mapping_functions[row + 1][col][pixel_value];
+            double T4 = mapping_functions[row + 1][col + 1][pixel_value];
+            
+            double Tp = (d3 * d4 * T1 + d1 * d4 * T2 + d1 * d2 * T3 + d2 * d3 * T4) / ((d1 + d3) * (d2 + d4));
+            input[y * width + x] = (unsigned char)(Tp);
         }
     }
 }
