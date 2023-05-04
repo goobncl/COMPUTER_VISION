@@ -37,5 +37,5 @@ void ImageProcessor::applyProcessing()
     {
         return;
     }
-    prototype(inputImage, width, height);
+    histogramEqualization(inputImage, width, height);
 }
