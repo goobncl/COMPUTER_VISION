@@ -80,21 +80,22 @@ void gridHistogramEqualization(unsigned char* input, int width, int height) {
     int num_bins = 256;
     int subWidth = width / 7;
     int subHeight = height / 5;
-    double alpha = 0.0001; 
+    double alpha = 0.0001;
 
     for (int row = 0; row < 5; ++row) {
         for (int col = 0; col < 7; ++col) {
-
             int histogram[256] = { 0 };
-            for (int i = row * subHeight; i < (row + 1) * subHeight; ++i) {
-                for (int j = col * subWidth; j < (col + 1) * subWidth; ++j) {
-                    histogram[input[i * width + j]]++;
-                }
-            }
-
             int Nb = subWidth * subHeight;
             int L = num_bins;
             int clipValue = static_cast<int>((Nb / L) + alpha * (Nb - Nb / L));
+            int cdf[256] = { 0 };
+
+            for (int i = row * subHeight; i < (row + 1) * subHeight; ++i) {
+                for (int j = col * subWidth; j < (col + 1) * subWidth; ++j) {
+                    int pixel_value = input[i * width + j];
+                    histogram[pixel_value]++;
+                }
+            }
 
             int excess = 0;
             for (int i = 0; i < num_bins; ++i) {
@@ -110,12 +111,9 @@ void gridHistogramEqualization(unsigned char* input, int width, int height) {
                 histogram[i] += redistribute;
             }
 
-            int cdf[256] = { 0 };
-            int cdf_min = histogram[0];
-            int cdf_max = histogram[0];
-
             cdf[0] = histogram[0];
-
+            int cdf_min = cdf[0];
+            int cdf_max = cdf[0];
             for (int i = 1; i < num_bins; ++i) {
                 cdf[i] = cdf[i - 1] + histogram[i];
                 if (cdf[i] < cdf_min) {
