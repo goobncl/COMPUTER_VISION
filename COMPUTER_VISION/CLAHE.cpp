@@ -1,14 +1,11 @@
 #include "stdafx.h"
 #include "CLAHE.h"
 
-#define GRAY_LVL 256
-#define SUB_W 10
-#define SUB_H 8
-#define ALPHA 0.0001
 
+int mapping_functions[SUB_H][SUB_W][GRAY_LVL] = { 0 };
 
 void computeHistogram(unsigned char* input, int width, int subWidth, int subHeight, int row, int col, int histogram[GRAY_LVL]) {
-
+    
     for (int i = row * subHeight; i < (row + 1) * subHeight; ++i) {
         for (int j = col * subWidth; j < (col + 1) * subWidth; ++j) {
             int pixel_value = input[i * width + j];
@@ -59,13 +56,41 @@ void applyMapping(unsigned char* input, int width, int subWidth, int subHeight, 
     }
 }
 
+void bilinearInterpolation(unsigned char* input, int width, int height, int subWidth, int subHeight, int mapping_functions[SUB_H][SUB_W][GRAY_LVL]) {
+
+    for (int i = 0; i < height; ++i) {
+        for (int j = 0; j < width; ++j) {
+            int row = i / subHeight;
+            int col = j / subWidth;
+            double y_ratio = (double)(i % subHeight) / subHeight;
+            double x_ratio = (double)(j % subWidth) / subWidth;
+
+            int pixel_value = input[i * width + j];
+
+            int T1 = mapping_functions[row][col][pixel_value];
+            int T2 = col + 1 < SUB_W ? mapping_functions[row][col + 1][pixel_value] : T1;
+            int T3 = row + 1 < SUB_H ? mapping_functions[row + 1][col][pixel_value] : T1;
+            int T4 = (row + 1 < SUB_H && col + 1 < SUB_W) ? mapping_functions[row + 1][col + 1][pixel_value] : T1;
+
+            double d1 = 1 - x_ratio;
+            double d2 = x_ratio;
+            double d3 = 1 - y_ratio;
+            double d4 = y_ratio;
+
+            int top = (int)(T1 * d1 * d3 + T2 * d2 * d3);
+            int bottom = (int)(T3 * d1 * d4 + T4 * d2 * d4);
+
+            input[i * width + j] = (unsigned char)(top + bottom);
+        }
+    }
+}
+
 void gridHistogramEqualization(unsigned char* input, int width, int height) {
 
     int size = width * height;
     int subWidth = width / SUB_W;
     int subHeight = height / SUB_H;
-    int mapping_functions[SUB_W][SUB_H][GRAY_LVL] = { 0 };
-
+    
     for (int row = 0; row < SUB_H; ++row) {
         for (int col = 0; col < SUB_W; ++col) {
 
@@ -88,4 +113,6 @@ void gridHistogramEqualization(unsigned char* input, int width, int height) {
             }
         }
     }
+
+    bilinearInterpolation(input, width, height, subWidth, subHeight, mapping_functions);
 }
