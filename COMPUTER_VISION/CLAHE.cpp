@@ -111,12 +111,12 @@ void gridHistogramEqualization(unsigned char* input, int width, int height) {
 
             int cdf_range = cdf_max - cdf_min;
             applyMapping(input, width, subWidth, subHeight, row, col, cdf, cdf_min, cdf_range);
-
-            for (int i = 0; i < GRAY_LVL; ++i) {
-                mapping_functions[row][col][i] = ((cdf[i] - cdf_min) * 255) / cdf_range;
-            }
+            
+            //for (int i = 0; i < GRAY_LVL; ++i) {
+            //    mapping_functions[row][col][i] = ((cdf[i] - cdf_min) * 255) / cdf_range;
+            //}
         }
     }
 
-    bilinearInterpolation(input, width, height, subWidth, subHeight, mapping_functions);
+    //bilinearInterpolation(input, width, height, subWidth, subHeight, mapping_functions);
 }
