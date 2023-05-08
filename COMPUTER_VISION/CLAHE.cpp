@@ -60,8 +60,10 @@ void bilinearInterpolation(unsigned char* input, int width, int height, int subW
 
     for (int i = 0; i < height; ++i) {
         for (int j = 0; j < width; ++j) {
+            
             int row = i / subHeight;
             int col = j / subWidth;
+            
             double y_ratio = (double)(i % subHeight) / subHeight;
             double x_ratio = (double)(j % subWidth) / subWidth;
 
