@@ -50,6 +50,9 @@
     <ClCompile Include="img_proc.cpp">
       <Filter>Algorithm Files</Filter>
     </ClCompile>
+    <ClCompile Include="proto_CLAHE.cpp">
+      <Filter>Algorithm Files\Histogram Equalization</Filter>
+    </ClCompile>
     <ClCompile Include="CLAHE.cpp">
       <Filter>Algorithm Files\Histogram Equalization</Filter>
     </ClCompile>
@@ -68,6 +71,9 @@
     </ClInclude>
     <ClInclude Include="img_proc.h">
       <Filter>Algorithm Files</Filter>
+    </ClInclude>
+    <ClInclude Include="proto_CLAHE.h">
+      <Filter>Algorithm Files\Histogram Equalization</Filter>
     </ClInclude>
     <ClInclude Include="CLAHE.h">
       <Filter>Algorithm Files\Histogram Equalization</Filter>

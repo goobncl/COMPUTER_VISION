@@ -38,5 +38,5 @@ void ImageProcessor::applyProcessing()
     {
         return;
     }
-    gridHistogramEqualization(inputImage, width, height);
+    CLAHE(inputImage, width, height);
 }

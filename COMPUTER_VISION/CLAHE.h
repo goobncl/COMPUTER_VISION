@@ -1,23 +1,23 @@
 #pragma once
 
-#ifndef CLAHE_H
-#define CLAHE_H
+#ifndef GITHUB_CLAHE_H
+#define GITHUB_CLAHE_H
 
-#include <QDebug>
+typedef unsigned char kz_pixel_t;
+#define uiNR_OF_GREY (256)
 
-#define GRAY_LVL 256
-#define SUB_W 16
-#define SUB_H 12
-#define ALPHA 0.0001
+int _CLAHE(	
+	kz_pixel_t* pImage, 
+	unsigned int uiXRes, 
+	unsigned int uiYRes, 
+	kz_pixel_t Min,
+	kz_pixel_t Max, 
+	unsigned int uiNrX, 
+	unsigned int uiNrY,
+	unsigned int uiNrBins, 
+	float fCliplimit
+);
 
+int CLAHE(kz_pixel_t* input, unsigned int width, unsigned int height);
 
-extern int mapping_functions[SUB_H][SUB_W][GRAY_LVL];
-
-void computeHistogram(unsigned char* input, int width, int subWidth, int subHeight, int row, int col, int histogram[GRAY_LVL]);
-void redistributeExcess(int histogram[GRAY_LVL], int num_bins, int clipValue);
-void computeCDF(int histogram[GRAY_LVL], int cdf[GRAY_LVL], int num_bins, int* cdf_min, int* cdf_max);
-void applyMapping(unsigned char* input, int width, int subWidth, int subHeight, int row, int col, int cdf[GRAY_LVL], int cdf_min, int cdf_range);
-void bilinearInterpolation(unsigned char* input, int width, int height, int subWidth, int subHeight, int mapping_functions[SUB_H][SUB_W][GRAY_LVL]);
-void gridHistogramEqualization(unsigned char* input, int width, int height);
-
-#endif
+#endif // GITHUB_CLAHE_H
