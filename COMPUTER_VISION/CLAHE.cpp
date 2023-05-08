@@ -62,10 +62,12 @@ void bilinearInterpolation(unsigned char* input, int width, int height, int subW
         for (int j = 0; j < width; ++j) {
             
             int row = i / subHeight;
-            int col = j / subWidth;
-            
+            int col = j / subWidth;            
             double y_ratio = (double)(i % subHeight) / subHeight;
             double x_ratio = (double)(j % subWidth) / subWidth;
+
+            y_ratio = y_ratio * y_ratio * (3 - 2 * y_ratio);
+            x_ratio = x_ratio * x_ratio * (3 - 2 * x_ratio);
 
             int pixel_value = input[i * width + j];
 
