@@ -176,6 +176,7 @@ void Interpolate(
 }
 
 int _CLAHE(
+    
     kz_pixel_t* pImage, 
     unsigned int uiXRes, 
     unsigned int uiYRes,
@@ -317,7 +318,7 @@ int CLAHE(kz_pixel_t* input, unsigned int width, unsigned int height)
     kz_pixel_t Min = 0;
     kz_pixel_t Max = uiNR_OF_GREY - 1;
     unsigned int uiNrX = 8;
-    unsigned int uiNrY = 8;
+    unsigned int uiNrY = 6;
     unsigned int uiNrBins = uiNR_OF_GREY;
     float fCliplimit = 4.0;
 

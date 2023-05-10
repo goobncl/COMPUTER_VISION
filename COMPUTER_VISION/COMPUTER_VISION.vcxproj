@@ -104,21 +104,21 @@
     </QtMoc>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClInclude Include="bayesian_filter.hpp" />
     <QtRcc Include="COMPUTER_VISION.qrc" />
     <QtUic Include="COMPUTER_VISION.ui" />
     <QtMoc Include="COMPUTER_VISION.h" />
-    <ClCompile Include="proto_CLAHE.cpp" />
     <ClCompile Include="COMPUTER_VISION.cpp" />
     <ClCompile Include="CLAHE.cpp" />
     <ClCompile Include="ImageProcessor.cpp" />
-    <ClCompile Include="img_proc.cpp" />
+    <ClCompile Include="proto_img_proc.cpp" />
     <ClCompile Include="main.cpp" />
     <None Include="COMPUTER_VISION.ico" />
     <ResourceCompile Include="COMPUTER_VISION.rc" />
     <QtMoc Include="ImageProcessor.h" />
-    <ClInclude Include="proto_CLAHE.h" />
+    <ClInclude Include="bayesian_filter_exception.hpp" />
     <ClInclude Include="CLAHE.h" />
-    <ClInclude Include="img_proc.h" />
+    <ClInclude Include="proto_img_proc.h" />
     <ClInclude Include="stdafx.h" />
     <ClCompile Include="stdafx.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)' == 'Debug|x64'">Create</PrecompiledHeader>

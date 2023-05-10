@@ -1,5 +1,5 @@
 #include "stdafx.h"
-#include "img_proc.h"
+#include "proto_img_proc.h"
 
 
 void invertColors(unsigned char* input, int width, int height) {

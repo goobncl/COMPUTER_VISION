@@ -19,6 +19,9 @@
     <Filter Include="Algorithm Files\Histogram Equalization">
       <UniqueIdentifier>{2aa748b7-8ed0-45c9-a961-e93a8f6ffde7}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Algorithm Files\Particle Filter">
+      <UniqueIdentifier>{1f33f96c-443d-4fc5-b33e-293eced3cb9e}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <QtRcc Include="COMPUTER_VISION.qrc">
@@ -47,11 +50,8 @@
     <ClCompile Include="ImageProcessor.cpp">
       <Filter>Algorithm Files</Filter>
     </ClCompile>
-    <ClCompile Include="img_proc.cpp">
+    <ClCompile Include="proto_img_proc.cpp">
       <Filter>Algorithm Files</Filter>
-    </ClCompile>
-    <ClCompile Include="proto_CLAHE.cpp">
-      <Filter>Algorithm Files\Histogram Equalization</Filter>
     </ClCompile>
     <ClCompile Include="CLAHE.cpp">
       <Filter>Algorithm Files\Histogram Equalization</Filter>
@@ -69,14 +69,17 @@
     <ClInclude Include="stdafx.h">
       <Filter>Source Files</Filter>
     </ClInclude>
-    <ClInclude Include="img_proc.h">
+    <ClInclude Include="proto_img_proc.h">
       <Filter>Algorithm Files</Filter>
-    </ClInclude>
-    <ClInclude Include="proto_CLAHE.h">
-      <Filter>Algorithm Files\Histogram Equalization</Filter>
     </ClInclude>
     <ClInclude Include="CLAHE.h">
       <Filter>Algorithm Files\Histogram Equalization</Filter>
+    </ClInclude>
+    <ClInclude Include="bayesian_filter.hpp">
+      <Filter>Algorithm Files\Particle Filter</Filter>
+    </ClInclude>
+    <ClInclude Include="bayesian_filter_exception.hpp">
+      <Filter>Algorithm Files\Particle Filter</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>
