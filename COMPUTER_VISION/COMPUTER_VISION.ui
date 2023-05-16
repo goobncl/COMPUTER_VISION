@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>800</width>
+    <width>661</width>
     <height>600</height>
    </rect>
   </property>
@@ -64,8 +64,6 @@
   </widget>
  </widget>
  <layoutdefault spacing="6" margin="11"/>
- <resources>
-  <include location="COMPUTER_VISION.qrc"/>
- </resources>
+ <resources/>
  <connections/>
 </ui>

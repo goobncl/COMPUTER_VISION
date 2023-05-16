@@ -8,6 +8,7 @@
 #include <QMutex>
 #include "CLAHE.h"
 
+
 class ImageProcessor : public QObject
 {
     Q_OBJECT

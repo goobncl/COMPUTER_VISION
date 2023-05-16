@@ -76,7 +76,7 @@ void COMPUTER_VISION::updateFrame()
 
     QString fpsString = QString::number(getFPS(), 'f', 8);
     statusBar()->showMessage("FPS: " + fpsString);
-}
+}   
 
 void COMPUTER_VISION::onClaheBtnClicked()
 {
