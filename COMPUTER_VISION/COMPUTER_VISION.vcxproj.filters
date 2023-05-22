@@ -59,7 +59,7 @@
     <ClCompile Include="clahe.cpp">
       <Filter>Algorithm Files\Histogram Equalization</Filter>
     </ClCompile>
-    <ClCompile Include="proto_img_proc.cpp">
+    <ClCompile Include="prototype.cpp">
       <Filter>Algorithm Files\Prototype</Filter>
     </ClCompile>
     <ClCompile Include="gaussianBlur.cpp">
@@ -87,7 +87,7 @@
     <ClInclude Include="bayesian_filter_exception.hpp">
       <Filter>Algorithm Files\Particle Filter</Filter>
     </ClInclude>
-    <ClInclude Include="proto_img_proc.h">
+    <ClInclude Include="prototype.h">
       <Filter>Algorithm Files\Prototype</Filter>
     </ClInclude>
     <ClInclude Include="gaussianBlur.h">

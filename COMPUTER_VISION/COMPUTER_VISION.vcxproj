@@ -112,7 +112,7 @@
     <ClCompile Include="clahe.cpp" />
     <ClCompile Include="gaussianBlur.cpp" />
     <ClCompile Include="ImageProcessor.cpp" />
-    <ClCompile Include="proto_img_proc.cpp" />
+    <ClCompile Include="prototype.cpp" />
     <ClCompile Include="main.cpp" />
     <None Include="COMPUTER_VISION.ico" />
     <ResourceCompile Include="COMPUTER_VISION.rc" />
@@ -120,7 +120,7 @@
     <ClInclude Include="bayesian_filter_exception.hpp" />
     <ClInclude Include="clahe.h" />
     <ClInclude Include="gaussianBlur.h" />
-    <ClInclude Include="proto_img_proc.h" />
+    <ClInclude Include="prototype.h" />
     <ClInclude Include="stdafx.h" />
     <ClCompile Include="stdafx.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)' == 'Debug|x64'">Create</PrecompiledHeader>
