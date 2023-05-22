@@ -12,10 +12,12 @@
 
 typedef int Bool;
 
-typedef struct _size {
+struct Size {
     int width;
     int height;
-} Size;
+    Size() : width(0), height(0) {}
+    Size(int w, int h) : width(w), height(h) {}
+};
 
 typedef struct _dtreenode {
     int featureIdx;

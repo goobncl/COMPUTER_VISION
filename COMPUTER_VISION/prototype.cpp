@@ -1,6 +1,5 @@
 #include "stdafx.h"
-#include "proto_img_proc.h"
-#include "GAUSSIAN_BLUR.h"
+#include "prototype.h"
 
 
 void invertColors(unsigned char* input, int width, int height) {

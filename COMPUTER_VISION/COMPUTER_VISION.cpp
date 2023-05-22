@@ -6,8 +6,7 @@ COMPUTER_VISION::COMPUTER_VISION(QWidget* parent)
     : QMainWindow(parent)
 {
     ui.setupUi(this);
-    imageArray = new unsigned char[640 * 480];
-    imageProcessor = new ImgProc(imageArray, this);
+    initImgProc();
 
     cap.set(cv::CAP_PROP_FRAME_WIDTH, 640);
     cap.set(cv::CAP_PROP_FRAME_HEIGHT, 480);
@@ -33,6 +32,45 @@ COMPUTER_VISION::~COMPUTER_VISION()
 {
     delete[] imageArray;
 }
+
+void COMPUTER_VISION::initImgProc()
+{
+    // TODO: Haar Feature metadata
+    imgSz = Size(640, 480);
+    origWinSz = Size(24, 24);
+    minObjSz = Size(30, 30);
+    maxObjSz = imgSz;
+
+    QVector<double> allScales;
+    QVector<double> scales;
+
+    for (double factor = 1; ; factor *= 1.1f) {
+        Size winSz = Size(
+            doubleRound(origWinSz.width * factor), 
+            doubleRound(origWinSz.height * factor));
+        if (winSz.width > imgSz.width || winSz.height > imgSz.height) {
+            break;
+        }
+        allScales.append(factor);
+    }
+
+    for (size_t index = 0; index < allScales.size(); index++) {
+        Size winSz = Size(
+            doubleRound(origWinSz.width * allScales[index]),
+            doubleRound(origWinSz.height * allScales[index]));
+        if (winSz.width > maxObjSz.width || winSz.height > maxObjSz.height) {
+            break;
+        }
+        if (winSz.width < minObjSz.width || winSz.height < minObjSz.height) {
+            continue;
+        }
+        scales.append(allScales[index]);
+    }
+
+    imageArray = new unsigned char[imgSz.width * imgSz.height];
+    imageProcessor = new ImgProc(imageArray, this);
+}
+
 
 double COMPUTER_VISION::getFPS() {
     static double fps = 0.0;

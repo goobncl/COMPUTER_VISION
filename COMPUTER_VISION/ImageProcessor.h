@@ -6,8 +6,8 @@
 #include <QObject>
 #include <QThread>
 #include <QMutex>
-#include "CLAHE.h"
-#include "GAUSSIAN_BLUR.h"
+#include "clahe.h"
+#include "gaussianBlur.h"
 
 
 class ImgProc : public QObject

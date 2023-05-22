@@ -3,6 +3,7 @@
 #include "stdafx.h"
 #include "ui_COMPUTER_VISION.h"
 #include "ImageProcessor.h"
+#include "haarFeature.h"
 #include <QTimer>
 #include <QLabel>
 
@@ -17,6 +18,12 @@ public:
 
 private:
     unsigned char* imageArray;
+    
+    // TODO: Haar Feature metadata
+    Size imgSz;
+    Size origWinSz;
+    Size minObjSz;
+    Size maxObjSz;
 
     Ui::COMPUTER_VISIONClass ui;
     
@@ -31,8 +38,9 @@ private:
     bool blurEnabled;
     ImgProc* imageProcessor;
 
+    void initImgProc();
     double getFPS();
-    void updateFrame();
+    void updateFrame();    
 
 private slots:
     void onClaheBtnClicked();
