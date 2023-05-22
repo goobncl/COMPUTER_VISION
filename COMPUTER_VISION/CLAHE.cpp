@@ -313,7 +313,7 @@ int _CLAHE(
     return 0;
 }
 
-int CLAHE(kz_pixel_t* input, unsigned int width, unsigned int height) 
+int clahe(kz_pixel_t* input, unsigned int width, unsigned int height) 
 {
     kz_pixel_t Min = 0;
     kz_pixel_t Max = uiNR_OF_GREY - 1;

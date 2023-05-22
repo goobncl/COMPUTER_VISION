@@ -27,8 +27,9 @@ private:
     QPushButton* blurBtn;
     QLabel* displayLabel;
     
-    bool algorithmEnabled;    
-    ImageProcessor* imageProcessor;
+    bool claheEnabled;
+    bool blurEnabled;
+    ImgProc* imageProcessor;
 
     double getFPS();
     void updateFrame();

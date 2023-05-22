@@ -7,7 +7,7 @@ COMPUTER_VISION::COMPUTER_VISION(QWidget* parent)
 {
     ui.setupUi(this);
     imageArray = new unsigned char[640 * 480];
-    imageProcessor = new ImageProcessor(imageArray, this);
+    imageProcessor = new ImgProc(imageArray, this);
 
     cap.set(cv::CAP_PROP_FRAME_WIDTH, 640);
     cap.set(cv::CAP_PROP_FRAME_HEIGHT, 480);
@@ -15,7 +15,10 @@ COMPUTER_VISION::COMPUTER_VISION(QWidget* parent)
     displayLabel = findChild<QLabel*>("videoLabel");
     claheBtn = findChild<QPushButton*>("claheBtn");
     blurBtn = findChild<QPushButton*>("blurBtn");
-    algorithmEnabled = false;
+    
+    claheEnabled = false;
+    blurEnabled = false;
+
     timer = new QTimer(this);
 
     connect(timer, &QTimer::timeout, this, &COMPUTER_VISION::updateFrame);
@@ -67,9 +70,13 @@ void COMPUTER_VISION::updateFrame()
     }
 
     // Image processing
-    if (algorithmEnabled) 
+    if (claheEnabled) 
     {
-        imageProcessor->setImageAndProcess(imageArray, 640, 480);
+        imageProcessor->setImageAndProcess(imageArray, 640, 480, ImgProc::AlgType::Clahe);
+    }
+
+    if (blurEnabled) {
+        imageProcessor->setImageAndProcess(imageArray, 640, 480, ImgProc::AlgType::Blur);
     }
 
     // Image Display
@@ -82,10 +89,10 @@ void COMPUTER_VISION::updateFrame()
 
 void COMPUTER_VISION::onClaheBtnClicked()
 {
-    algorithmEnabled = !algorithmEnabled;
+    claheEnabled = !claheEnabled;
 
     QFont font = claheBtn->font();
-    if (algorithmEnabled)
+    if (claheEnabled)
     {
         font.setWeight(QFont::Bold);
     }
@@ -98,15 +105,15 @@ void COMPUTER_VISION::onClaheBtnClicked()
 
 void COMPUTER_VISION::onBlurBtnClicked()
 {
-    //algorithmEnabled = !algorithmEnabled;
-	//QFont font = blurBtn->font();
-    //if (algorithmEnabled)
-    //{
-	//	font.setWeight(QFont::Bold);
-	//}
-    //else
-    //{
-	//	font.setWeight(QFont::Normal);
-	//}
-	//blurBtn->setFont(font);
+    blurEnabled = !blurEnabled;
+	QFont font = blurBtn->font();
+    if (blurEnabled)
+    {
+		font.setWeight(QFont::Bold);
+	}
+    else
+    {
+		font.setWeight(QFont::Normal);
+	}
+	blurBtn->setFont(font);
 }

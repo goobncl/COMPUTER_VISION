@@ -10,17 +10,23 @@
 #include "GAUSSIAN_BLUR.h"
 
 
-class ImageProcessor : public QObject
+class ImgProc : public QObject
 {
     Q_OBJECT
 
 public:
     QMutex mutex;
 
-    explicit ImageProcessor(unsigned char* sharedImageArray, QObject* parent = Q_NULLPTR);
-    ~ImageProcessor();
+    enum class AlgType
+    {
+        Clahe,
+        Blur
+    };
+
+    explicit ImgProc(unsigned char* sharedImageArray, QObject* parent = Q_NULLPTR);
+    ~ImgProc();
     
-    void setImageAndProcess(unsigned char* inputImage, int width, int height);
+    void setImageAndProcess(unsigned char* inputImage, int width, int height, AlgType type);
 
 private:
     unsigned char* targetImageArray;
@@ -29,9 +35,6 @@ private:
     unsigned char* outputImage;
     int width;
     int height;
-
-    void setInputImage(unsigned char* inputImage, int width, int height);
-    void applyProcessing();
 };
 
 #endif // IMAGEPROCESSOR_H

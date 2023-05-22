@@ -6,7 +6,7 @@ double doubleRound(double number) {
 }
 
 void gaussianBlur(unsigned char* input, int width, int height) {
-
+    
     int kernel[KERNEL_SIZE][KERNEL_SIZE] = {
         { 1,  4,  6,  4, 1 },
         { 4, 16, 24, 16, 4 },
@@ -18,12 +18,12 @@ void gaussianBlur(unsigned char* input, int width, int height) {
 
     unsigned char* output = (unsigned char*)malloc(width * height * sizeof(unsigned char));
     if (output == NULL) {
-		return;
-	}
+        return;
+    }
     memset(output, 0, width * height * sizeof(unsigned char));
 
     for (int y = 0; y < height; ++y) {
-        for (int x = 0; x < width; ++x) {            
+        for (int x = 0; x < width; ++x) {
             double outputPixel = 0.0;
             for (int ky = -KERNEL_HALF; ky <= KERNEL_HALF; ++ky) {
                 for (int kx = -KERNEL_HALF; kx <= KERNEL_HALF; ++kx) {
@@ -38,7 +38,7 @@ void gaussianBlur(unsigned char* input, int width, int height) {
         }
     }
 
-    if (input != nullptr && output != nullptr) {
+    if (input != NULL && output != NULL) {
         memcpy(input, output, width * height * sizeof(unsigned char));
     }
     free(output);

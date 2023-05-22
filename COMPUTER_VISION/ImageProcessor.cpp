@@ -2,40 +2,43 @@
 #include "ImageProcessor.h"
 
 
-ImageProcessor::ImageProcessor(unsigned char* sharedImageArray, QObject* parent)
+ImgProc::ImgProc(unsigned char* sharedImageArray, QObject* parent)
     : QObject(parent), targetImageArray(sharedImageArray), inputImage(Q_NULLPTR), outputImage(Q_NULLPTR), width(0), height(0)
 {
     moveToThread(&workerThread);
     workerThread.start();
 }
 
-ImageProcessor::~ImageProcessor()
+ImgProc::~ImgProc()
 {
     workerThread.quit();
     workerThread.wait();
 }
 
-void ImageProcessor::setImageAndProcess(unsigned char* inputImage, int width, int height)
+void ImgProc::setImageAndProcess(unsigned char* inputImage, int width, int height, AlgType type)
 {
     {
         QMutexLocker locker(&mutex);
-        setInputImage(inputImage, width, height);
-        applyProcessing();
-    }
-}
 
-void ImageProcessor::setInputImage(unsigned char* inputImage, int width, int height)
-{
-    this->inputImage = inputImage;
-    this->width = width;
-    this->height = height;
-}
+        this->inputImage = inputImage;
+        this->width = width;
+        this->height = height;
 
-void ImageProcessor::applyProcessing()
-{
-    if (inputImage == Q_NULLPTR)
-    {
-        return;
+        if (inputImage == Q_NULLPTR)
+        {
+            return;
+        }
+
+        switch (type)
+        {
+        case AlgType::Clahe:
+            clahe(inputImage, width, height);
+            break;
+        case AlgType::Blur:
+            gaussianBlur(inputImage, width, height);
+            break;
+        default:
+            break;
+        }
     }
-    CLAHE(inputImage, width, height);
 }

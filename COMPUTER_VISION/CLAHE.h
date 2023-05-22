@@ -18,6 +18,6 @@ int _CLAHE(
 	float fCliplimit
 );
 
-int CLAHE(kz_pixel_t* input, unsigned int width, unsigned int height);
+int clahe(kz_pixel_t* input, unsigned int width, unsigned int height);
 
 #endif // CLAHE_H
