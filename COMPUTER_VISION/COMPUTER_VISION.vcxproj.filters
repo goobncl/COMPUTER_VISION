@@ -56,13 +56,13 @@
     <ClCompile Include="ImageProcessor.cpp">
       <Filter>Algorithm Files</Filter>
     </ClCompile>
-    <ClCompile Include="CLAHE.cpp">
+    <ClCompile Include="clahe.cpp">
       <Filter>Algorithm Files\Histogram Equalization</Filter>
     </ClCompile>
     <ClCompile Include="proto_img_proc.cpp">
       <Filter>Algorithm Files\Prototype</Filter>
     </ClCompile>
-    <ClCompile Include="GAUSSIAN_BLUR.cpp">
+    <ClCompile Include="gaussianBlur.cpp">
       <Filter>Algorithm Files\Gaussian Blur</Filter>
     </ClCompile>
   </ItemGroup>
@@ -78,7 +78,7 @@
     <ClInclude Include="stdafx.h">
       <Filter>Source Files</Filter>
     </ClInclude>
-    <ClInclude Include="CLAHE.h">
+    <ClInclude Include="clahe.h">
       <Filter>Algorithm Files\Histogram Equalization</Filter>
     </ClInclude>
     <ClInclude Include="bayesian_filter.hpp">
@@ -90,7 +90,7 @@
     <ClInclude Include="proto_img_proc.h">
       <Filter>Algorithm Files\Prototype</Filter>
     </ClInclude>
-    <ClInclude Include="GAUSSIAN_BLUR.h">
+    <ClInclude Include="gaussianBlur.h">
       <Filter>Algorithm Files\Gaussian Blur</Filter>
     </ClInclude>
   </ItemGroup>

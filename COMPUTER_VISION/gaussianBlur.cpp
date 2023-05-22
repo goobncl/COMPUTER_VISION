@@ -1,5 +1,5 @@
 #include "stdafx.h"
-#include "GAUSSIAN_BLUR.h"
+#include "gaussianBlur.h"
 
 double doubleRound(double number) {
     return (number >= 0) ? (int)(number + 0.5) : (int)(number - 0.5);
