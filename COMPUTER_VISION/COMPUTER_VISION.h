@@ -24,6 +24,7 @@ private:
     cv::VideoCapture cap;
 
     QPushButton* claheBtn;
+    QPushButton* blurBtn;
     QLabel* displayLabel;
     
     bool algorithmEnabled;    
@@ -34,4 +35,5 @@ private:
 
 private slots:
     void onClaheBtnClicked();
+    void onBlurBtnClicked();
 };

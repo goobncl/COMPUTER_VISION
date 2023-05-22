@@ -14,11 +14,13 @@ COMPUTER_VISION::COMPUTER_VISION(QWidget* parent)
 
     displayLabel = findChild<QLabel*>("videoLabel");
     claheBtn = findChild<QPushButton*>("claheBtn");
+    blurBtn = findChild<QPushButton*>("blurBtn");
     algorithmEnabled = false;
     timer = new QTimer(this);
 
     connect(timer, &QTimer::timeout, this, &COMPUTER_VISION::updateFrame);
     connect(claheBtn, &QPushButton::clicked, this, &COMPUTER_VISION::onClaheBtnClicked);
+    connect(blurBtn, &QPushButton::clicked, this, &COMPUTER_VISION::onBlurBtnClicked);
 
     cap.open(0);
     timer->start(0);
@@ -76,7 +78,7 @@ void COMPUTER_VISION::updateFrame()
 
     QString fpsString = QString::number(getFPS(), 'f', 8);
     statusBar()->showMessage("FPS: " + fpsString);
-}   
+}
 
 void COMPUTER_VISION::onClaheBtnClicked()
 {
@@ -92,4 +94,19 @@ void COMPUTER_VISION::onClaheBtnClicked()
         font.setWeight(QFont::Normal);
     }
     claheBtn->setFont(font);
+}
+
+void COMPUTER_VISION::onBlurBtnClicked()
+{
+    //algorithmEnabled = !algorithmEnabled;
+	//QFont font = blurBtn->font();
+    //if (algorithmEnabled)
+    //{
+	//	font.setWeight(QFont::Bold);
+	//}
+    //else
+    //{
+	//	font.setWeight(QFont::Normal);
+	//}
+	//blurBtn->setFont(font);
 }

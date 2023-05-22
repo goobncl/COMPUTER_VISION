@@ -7,6 +7,7 @@
 #include <QThread>
 #include <QMutex>
 #include "CLAHE.h"
+#include "GAUSSIAN_BLUR.h"
 
 
 class ImageProcessor : public QObject
