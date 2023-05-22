@@ -1,7 +1,7 @@
 #pragma once
 
-#ifndef GITHUB_CLAHE_H
-#define GITHUB_CLAHE_H
+#ifndef CLAHE_H
+#define CLAHE_H
 
 typedef unsigned char kz_pixel_t;
 #define uiNR_OF_GREY (256)
@@ -20,4 +20,4 @@ int _CLAHE(
 
 int CLAHE(kz_pixel_t* input, unsigned int width, unsigned int height);
 
-#endif // GITHUB_CLAHE_H
+#endif // CLAHE_H

@@ -110,6 +110,7 @@
     <QtMoc Include="COMPUTER_VISION.h" />
     <ClCompile Include="COMPUTER_VISION.cpp" />
     <ClCompile Include="CLAHE.cpp" />
+    <ClCompile Include="GAUSSIAN_BLUR.cpp" />
     <ClCompile Include="ImageProcessor.cpp" />
     <ClCompile Include="proto_img_proc.cpp" />
     <ClCompile Include="main.cpp" />
@@ -118,6 +119,7 @@
     <QtMoc Include="ImageProcessor.h" />
     <ClInclude Include="bayesian_filter_exception.hpp" />
     <ClInclude Include="CLAHE.h" />
+    <ClInclude Include="GAUSSIAN_BLUR.h" />
     <ClInclude Include="proto_img_proc.h" />
     <ClInclude Include="stdafx.h" />
     <ClCompile Include="stdafx.cpp">

@@ -25,6 +25,9 @@
     <Filter Include="Algorithm Files\Prototype">
       <UniqueIdentifier>{b835507f-148f-40e7-be24-efdac4b365ca}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Algorithm Files\Gaussian Blur">
+      <UniqueIdentifier>{94972405-b528-427c-b571-59b4a92f05f4}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <QtRcc Include="COMPUTER_VISION.qrc">
@@ -59,6 +62,9 @@
     <ClCompile Include="proto_img_proc.cpp">
       <Filter>Algorithm Files\Prototype</Filter>
     </ClCompile>
+    <ClCompile Include="GAUSSIAN_BLUR.cpp">
+      <Filter>Algorithm Files\Gaussian Blur</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <QtMoc Include="COMPUTER_VISION.h">
@@ -83,6 +89,9 @@
     </ClInclude>
     <ClInclude Include="proto_img_proc.h">
       <Filter>Algorithm Files\Prototype</Filter>
+    </ClInclude>
+    <ClInclude Include="GAUSSIAN_BLUR.h">
+      <Filter>Algorithm Files\Gaussian Blur</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>
