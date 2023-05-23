@@ -33,21 +33,13 @@ COMPUTER_VISION::~COMPUTER_VISION()
     delete[] imageArray;
 }
 
-void COMPUTER_VISION::initImgProc()
+void COMPUTER_VISION::calcScales()
 {
-    // TODO: Haar Feature metadata
-    imgSz = Size(640, 480);
-    origWinSz = Size(24, 24);
-    minObjSz = Size(30, 30);
-    maxObjSz = imgSz;
-    sbufSz = Size(0, 0);
-
     QVector<double> allScales;
-    QVector<double> scales;
 
     for (double factor = 1; ; factor *= 1.1f) {
         Size winSz = Size(
-            doubleRound(origWinSz.width * factor), 
+            doubleRound(origWinSz.width * factor),
             doubleRound(origWinSz.height * factor));
         if (winSz.width > imgSz.width || winSz.height > imgSz.height) {
             break;
@@ -67,27 +59,73 @@ void COMPUTER_VISION::initImgProc()
         }
         scales.append(allScales[index]);
     }
+}
 
+bool COMPUTER_VISION::updateScaleData()
+{
     if (scaleData.isEmpty()) {
         scaleData = QVector<ScaleData>();
     }
 
-    size_t i;
     size_t nscales = scales.size();
     bool recalcOptFeatures = (nscales != scaleData.size());
     scaleData.resize(nscales);
 
-    int layer_dy = 0;
-    Point layer_offse(0, 0);
+    int layerDeltaY = 0;
+    Point layerOffset(0, 0);
     Size prevBuffSz = sbufSz;
 
     int alignedWidth = (int)alignSize(doubleRound(imgSz.width / scales[0]) + 31, 32);
     sbufSz.width = (sbufSz.width > alignedWidth) ? sbufSz.width : alignedWidth;
     recalcOptFeatures = recalcOptFeatures || (sbufSz.width != prevBuffSz.width);
 
-    for (i = 0; i < nscales; i++) {
+    for (size_t i = 0; i < nscales; i++) {
 
+        ScaleData& s = scaleData[i];
+
+        if (!recalcOptFeatures && doubleAbs(s.scale - scales[i]) > (FLT_EPSILON * 100 * scales[i])) {
+            recalcOptFeatures = true;
+        }
+
+        double sc = scales[i];
+        Size sz;
+        sz.width = doubleRound(imgSz.width / sc);
+        sz.height = doubleRound(imgSz.height / sc);
+        s.ystep = (sc >= 2) ? (1) : (2);
+        s.scale = sc;
+        s.szi = Size(sz.width + 1, sz.height + 1);
+
+        if (i == 0) {
+            layerDeltaY = s.szi.height;
+        }
+
+        if (layerOffset.x + s.szi.width > sbufSz.width) {
+            layerOffset = Point(0, layerOffset.y + layerDeltaY);
+            layerDeltaY = s.szi.height;
+        }
+
+        s.layer_offset = layerOffset.y * sbufSz.width + layerOffset.x;
+        layerOffset.x += s.szi.width;
     }
+
+    layerOffset.y += layerDeltaY;
+    sbufSz.height = (sbufSz.height > layerOffset.y) ? (sbufSz.height) : (layerOffset.y);
+    recalcOptFeatures = recalcOptFeatures || (sbufSz.height != prevBuffSz.height);
+
+    return recalcOptFeatures;
+}
+
+void COMPUTER_VISION::initImgProc()
+{
+    // TODO: Haar Feature metadata
+    imgSz = Size(640, 480);
+    origWinSz = Size(24, 24);
+    minObjSz = Size(30, 30);
+    maxObjSz = imgSz;
+    sbufSz = Size(0, 0);
+
+    calcScales();
+    bool recalcOptFeatures = updateScaleData();
 
     imageArray = new unsigned char[imgSz.width * imgSz.height];
     imageProcessor = new ImgProc(imageArray, this);
@@ -181,4 +219,9 @@ void COMPUTER_VISION::onBlurBtnClicked()
 size_t COMPUTER_VISION::alignSize(size_t sz, int n)
 {
     return (sz + n - 1) & -n;
+}
+
+double COMPUTER_VISION::doubleAbs(double n)
+{
+    return (n < 0) ? (-n) : (n);
 }

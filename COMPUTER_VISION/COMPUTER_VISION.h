@@ -22,6 +22,7 @@ private:
     Size minObjSz;
     Size maxObjSz;
     Size sbufSz;
+    QVector<double> scales;
     QVector<ScaleData> scaleData;
 
     Ui::COMPUTER_VISIONClass ui;
@@ -37,10 +38,14 @@ private:
     bool blurEnabled;
     ImgProc* imageProcessor;
 
+    void calcScales();
+    bool updateScaleData();
     void initImgProc();
     double getFPS();
     void updateFrame();
     size_t alignSize(size_t sz, int n);
+    double doubleAbs(double n);
+
 
 private slots:
     void onClaheBtnClicked();
