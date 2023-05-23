@@ -19,31 +19,47 @@ struct Size {
     Size(int w, int h) : width(w), height(h) {}
 };
 
-typedef struct _dtreenode {
+struct ScaleData {
+    
+    ScaleData() : scale(0.f), layer_offset(0), ystep(0) {};
+    Size getWorkingSize(Size winSz) const {
+        int widthDifference = szi.width - winSz.width;
+        int heightDifference = szi.height - winSz.height;
+        int workingWidth = widthDifference > 0 ? widthDifference : 0;
+        int workingHeight = heightDifference > 0 ? heightDifference : 0;
+        return Size(workingWidth, workingHeight);
+    }
+    double scale;
+    Size szi;
+    int layer_offset;
+    int ystep;
+};
+
+struct DTreeNode {
     int featureIdx;
     float threshold;
     int left;
     int right;
-} DTreeNode;
+};
 
-typedef struct _dtree {
+struct DTree {
     int nodeCount;
-} DTree;
+};
 
-typedef struct _stage {
+struct Stage {
     int first;
     int ntrees;
     float threshold;
-} Stage;
+};
 
-typedef struct _stump {
+struct Stump {
     int featureIdx;
     float threshold;
     float left;
     float right;
-} Stump;
+};
 
-typedef struct _data {
+struct Data {
     int stageType;
     int featureType;
     int ncategories;
@@ -55,30 +71,29 @@ typedef struct _data {
     float* leaves;
     int* subsets;
     Stump* stumps;
-} Data;
+};
 
-
-typedef struct _rect {
+struct Rect {
     int x;
     int y;
     int width;
     int height;
-} Rect;
+};
 
-typedef struct _feature {
+struct Feature {
     Bool tilted;
     struct {
         Rect r;
         float weight;
     } rect[RECT_NUM];
-} Feature;
+};
 
 typedef struct _opt_feature {
     int offset[RECT_NUM][4];
     float weight[4];
 } OptFeature;
 
-typedef struct _haar_evaluator {
+struct HaarEvaluator {
     Feature* features;
     OptFeature* optfeatures;
     OptFeature* optfeatures_lbuf;
@@ -89,7 +104,7 @@ typedef struct _haar_evaluator {
     const int* pwin;
     OptFeature* optfeaturesPtr;
     float varianceNormFactor;
-} HaarEvaluator;
+};
 
 void Feature_init(Feature* feature);
 void OptFeature_init(OptFeature* opt_feature);

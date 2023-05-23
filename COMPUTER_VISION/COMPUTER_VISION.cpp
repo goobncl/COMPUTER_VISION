@@ -67,6 +67,8 @@ void COMPUTER_VISION::initImgProc()
         scales.append(allScales[index]);
     }
 
+
+
     imageArray = new unsigned char[imgSz.width * imgSz.height];
     imageProcessor = new ImgProc(imageArray, this);
 }
