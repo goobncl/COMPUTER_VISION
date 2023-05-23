@@ -3,9 +3,6 @@
 #include "stdafx.h"
 #include "ui_COMPUTER_VISION.h"
 #include "ImageProcessor.h"
-#include "haarFeature.h"
-#include <QTimer>
-#include <QLabel>
 
 
 class COMPUTER_VISION : public QMainWindow
@@ -24,6 +21,8 @@ private:
     Size origWinSz;
     Size minObjSz;
     Size maxObjSz;
+    Size sbufSz;
+    QVector<ScaleData> scaleData;
 
     Ui::COMPUTER_VISIONClass ui;
     
@@ -40,7 +39,8 @@ private:
 
     void initImgProc();
     double getFPS();
-    void updateFrame();    
+    void updateFrame();
+    size_t alignSize(size_t sz, int n);
 
 private slots:
     void onClaheBtnClicked();

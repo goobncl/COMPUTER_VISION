@@ -40,6 +40,7 @@ void COMPUTER_VISION::initImgProc()
     origWinSz = Size(24, 24);
     minObjSz = Size(30, 30);
     maxObjSz = imgSz;
+    sbufSz = Size(0, 0);
 
     QVector<double> allScales;
     QVector<double> scales;
@@ -67,7 +68,26 @@ void COMPUTER_VISION::initImgProc()
         scales.append(allScales[index]);
     }
 
+    if (scaleData.isEmpty()) {
+        scaleData = QVector<ScaleData>();
+    }
 
+    size_t i;
+    size_t nscales = scales.size();
+    bool recalcOptFeatures = (nscales != scaleData.size());
+    scaleData.resize(nscales);
+
+    int layer_dy = 0;
+    Point layer_offse(0, 0);
+    Size prevBuffSz = sbufSz;
+
+    int alignedWidth = (int)alignSize(doubleRound(imgSz.width / scales[0]) + 31, 32);
+    sbufSz.width = (sbufSz.width > alignedWidth) ? sbufSz.width : alignedWidth;
+    recalcOptFeatures = recalcOptFeatures || (sbufSz.width != prevBuffSz.width);
+
+    for (i = 0; i < nscales; i++) {
+
+    }
 
     imageArray = new unsigned char[imgSz.width * imgSz.height];
     imageProcessor = new ImgProc(imageArray, this);
@@ -156,4 +176,9 @@ void COMPUTER_VISION::onBlurBtnClicked()
 		font.setWeight(QFont::Normal);
 	}
 	blurBtn->setFont(font);
+}
+
+size_t COMPUTER_VISION::alignSize(size_t sz, int n)
+{
+    return (sz + n - 1) & -n;
 }

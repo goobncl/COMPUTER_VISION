@@ -12,6 +12,13 @@
 
 typedef int Bool;
 
+struct Point {
+    int x;
+    int y;
+    Point() : x(0), y(0) {}
+    Point(int x, int y) : x(x), y(y) {}
+};
+
 struct Size {
     int width;
     int height;

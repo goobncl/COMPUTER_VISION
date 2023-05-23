@@ -3,11 +3,9 @@
 #ifndef IMAGEPROCESSOR_H
 #define IMAGEPROCESSOR_H
 
-#include <QObject>
-#include <QThread>
-#include <QMutex>
 #include "clahe.h"
 #include "gaussianBlur.h"
+#include "haarFeature.h"
 
 
 class ImgProc : public QObject

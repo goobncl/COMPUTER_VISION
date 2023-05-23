@@ -2,10 +2,6 @@
 #include "haarFeature.h"
 
 
-int doubuleRound(double value) {
-    return (int)(value + (value >= 0 ? 0.5 : -0.5));
-}
-
 void Feature_init(Feature* feature) {
 
     feature->tilted = FALSE;
