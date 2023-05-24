@@ -17,6 +17,8 @@ private:
     unsigned char* imageArray;
     
     // TODO: Haar Feature metadata
+    Ui::COMPUTER_VISIONClass ui;
+    
     Size imgSz;
     Size origWinSz;
     Size minObjSz;
@@ -24,8 +26,7 @@ private:
     Size sbufSz;
     QVector<double> scales;
     QVector<ScaleData> scaleData;
-
-    Ui::COMPUTER_VISIONClass ui;
+    cv::Mat rbuf, sbuf;
     
     QTimer* timer;
     cv::VideoCapture cap;

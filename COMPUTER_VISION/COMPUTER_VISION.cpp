@@ -185,6 +185,33 @@ void COMPUTER_VISION::updateFrame()
     QImage qFrame = QImage(imageArray, 640, 480, QImage::Format_Grayscale8).copy();
     displayLabel->setPixmap(QPixmap::fromImage(qFrame));
 
+    // Plot Image Pyramid
+    {
+        Size sz0 = scaleData.at(0).szi;
+        int alignedSizeWidth = alignSize(sz0.width, 16);
+        alignedSizeWidth = rbuf.cols > alignedSizeWidth ? rbuf.cols : alignedSizeWidth;
+        int maxHeight = rbuf.rows > sz0.height ? rbuf.rows : sz0.height;
+        sz0 = Size(alignedSizeWidth, maxHeight);
+
+        cv::Mat image(480, 640, CV_8U, imageArray);
+        sbuf.create(sbufSz.height * 2, sbufSz.width, CV_32S);
+        rbuf.create(sz0.height, sz0.width, CV_8U);
+        int nscales = scaleData.size();
+
+        for (int i = 0; i < nscales; i++) {
+            const ScaleData& s = scaleData.at(i);
+            cv::Mat dst(s.szi.height - 1, s.szi.width - 1, CV_8U, rbuf.ptr());
+            cv::resize(image, dst, dst.size(), 1. / s.scale, 1. / s.scale, cv::INTER_LINEAR_EXACT);
+
+            QString windowName = QString("Pyramid: %1").arg(i + 1);
+
+            cv::namedWindow(windowName.toStdString(), cv::WINDOW_KEEPRATIO);
+            cv::resizeWindow(windowName.toStdString(), 640, 480);
+            cv::imshow(windowName.toStdString(), dst);
+            cv::waitKey(0);
+        }
+    }
+
     QString fpsString = QString::number(getFPS(), 'f', 8);
     statusBar()->showMessage("FPS: " + fpsString);
 }
