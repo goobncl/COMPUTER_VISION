@@ -95,18 +95,18 @@ struct Feature {
     } rect[RECT_NUM];
 };
 
-typedef struct _opt_feature {
+struct OptFeature {
     int offset[RECT_NUM][4];
     float weight[4];
-} OptFeature;
+};
 
 struct HaarEvaluator {
     Feature* features;
     OptFeature* optfeatures;
     OptFeature* optfeatures_lbuf;
     Bool hasTiltedFeatures;
-    int tilted_offset, squares_offset;
-    int normalizaed_offset[4];
+    int tilted_offset, sqr_offset;
+    int norm_offset[4];
     Rect normrect;
     const int* pwin;
     OptFeature* optfeaturesPtr;

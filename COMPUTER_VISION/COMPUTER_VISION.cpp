@@ -127,6 +127,10 @@ void COMPUTER_VISION::initImgProc()
     calcScales();
     bool recalcOptFeatures = updateScaleData();
 
+    if (recalcOptFeatures) {
+        //computeOptFeatures();
+    }
+
     imageArray = new unsigned char[imgSz.width * imgSz.height];
     imageProcessor = new ImgProc(imageArray, this);
 }
