@@ -1,9 +1,7 @@
 #include "stdafx.h"
+#include "util.h"
 #include "gaussianBlur.h"
 
-double doubleRound(double number) {
-    return (number >= 0) ? (int)(number + 0.5) : (int)(number - 0.5);
-}
 
 void gaussianBlur(unsigned char* input, int width, int height) {
     

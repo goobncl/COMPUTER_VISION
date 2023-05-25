@@ -2,6 +2,7 @@
 
 #include "stdafx.h"
 #include "ui_COMPUTER_VISION.h"
+#include "util.h"
 #include "ImageProcessor.h"
 
 

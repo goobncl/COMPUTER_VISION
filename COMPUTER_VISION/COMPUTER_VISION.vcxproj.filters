@@ -71,6 +71,9 @@
     <ClCompile Include="haarFeathre.cpp">
       <Filter>Algorithm Files\Haar Feature</Filter>
     </ClCompile>
+    <ClCompile Include="util.cpp">
+      <Filter>Algorithm Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <QtMoc Include="COMPUTER_VISION.h">
@@ -101,6 +104,9 @@
     </ClInclude>
     <ClInclude Include="haarFeature.h">
       <Filter>Algorithm Files\Haar Feature</Filter>
+    </ClInclude>
+    <ClInclude Include="util.h">
+      <Filter>Algorithm Files</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

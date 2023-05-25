@@ -104,7 +104,9 @@
     </QtMoc>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="util.cpp" />
     <ClInclude Include="bayesian_filter.hpp" />
+    <ClInclude Include="util.h" />
     <QtRcc Include="COMPUTER_VISION.qrc" />
     <QtUic Include="COMPUTER_VISION.ui" />
     <QtMoc Include="COMPUTER_VISION.h" />
