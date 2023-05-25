@@ -218,15 +218,7 @@ void COMPUTER_VISION::updateFrame()
             const ScaleData& s = scaleData.at(i);
             int new_w = s.szi.width - 1;
             int new_h = s.szi.height - 1;
-            unsigned char* output = img_resize(imageArray, new_w, new_h);
-            cv::Mat dst(new_h, new_w, CV_8U, output);
-
-            QString windowName = QString("Pyramid: %1").arg(i + 1);
-            cv::namedWindow(windowName.toStdString(), cv::WINDOW_KEEPRATIO);
-            cv::resizeWindow(windowName.toStdString(), 640, 480);
-            cv::imshow(windowName.toStdString(), dst);
-            cv::waitKey(0);
-
+            unsigned char* output = downSampling(imageArray, new_w, new_h);
             delete [] output;
         }
 #endif

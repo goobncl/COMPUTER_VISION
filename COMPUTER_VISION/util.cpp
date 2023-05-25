@@ -6,7 +6,7 @@ double doubleRound(double number) {
     return (number >= 0) ? (int)(number + 0.5) : (int)(number - 0.5);
 }
 
-unsigned char* img_resize(unsigned char* input, int new_width, int new_height) {
+unsigned char* downSampling(unsigned char* input, int new_width, int new_height) {
 
     const int original_width = 640;
     const int original_height = 480;
