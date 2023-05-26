@@ -44,6 +44,7 @@ private:
     void calcScales();
     bool updateScaleData();
     Size clacSz0(Size oriSz, ImgLayer& resizedBuf);
+    void buildPyramid();
     void initImgProc();
     double getFPS();
     void updateFrame();

@@ -123,6 +123,24 @@ Size COMPUTER_VISION::clacSz0(Size oriSz, ImgLayer& rbuf)
     return Size(alignedSizeWidth, maxHeight);
 }
 
+void COMPUTER_VISION::buildPyramid()
+{
+    Size sz0 = clacSz0(scaleData.at(0).szi, resizedBuf);
+    int nscales = scaleData.size();
+    imgPyramid.resize(nscales);
+
+    for (int i = 0; i < nscales; i++) {
+        const ScaleData& s = scaleData.at(i);
+        int new_w = s.szi.width - 1;
+        int new_h = s.szi.height - 1;
+        unsigned char* output = downSampling(imageArray, new_w, new_h);
+
+        imgPyramid[i].sz.width = new_w;
+        imgPyramid[i].sz.height = new_h;
+        imgPyramid[i].data = output;
+    }    
+}
+
 void COMPUTER_VISION::initImgProc()
 {
     // TODO: Haar Feature metadata
@@ -190,24 +208,15 @@ void COMPUTER_VISION::updateFrame()
     }
 
     // Image Display
-    QImage qFrame = QImage(imageArray, 640, 480, QImage::Format_Grayscale8).copy();
+    QImage qFrame;
+    {
+        QMutexLocker locker(&imageProcessor->mutex);
+        qFrame = QImage(imageArray, 640, 480, QImage::Format_Grayscale8).copy();
+    }
     displayLabel->setPixmap(QPixmap::fromImage(qFrame));
 
     {
-        Size sz0 = clacSz0(scaleData.at(0).szi, resizedBuf);
-        int nscales = scaleData.size();
-        imgPyramid.resize(nscales);
-
-        for (int i = 0; i < nscales; i++) {
-            const ScaleData& s = scaleData.at(i);
-            int new_w = s.szi.width - 1;
-            int new_h = s.szi.height - 1;
-            unsigned char* output = downSampling(imageArray, new_w, new_h);
-
-            imgPyramid[i].sz.width = new_w;
-            imgPyramid[i].sz.height = new_h;
-            imgPyramid[i].data = output;
-        }
+        buildPyramid();
 
         for (int i = 0; i < imgPyramid.size(); ++i) {
             free(imgPyramid[i].data);
