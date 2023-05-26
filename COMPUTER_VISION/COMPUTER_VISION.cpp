@@ -30,10 +30,7 @@ COMPUTER_VISION::COMPUTER_VISION(QWidget* parent)
 
 COMPUTER_VISION::~COMPUTER_VISION()
 {
-    free(imageArray);
-    for (int i = 0; i < imgPyramid.size(); ++i) {
-        free(imgPyramid[i].data);
-    }
+    free(imageArray);    
 }
 
 void COMPUTER_VISION::calcScales()
@@ -210,6 +207,10 @@ void COMPUTER_VISION::updateFrame()
             imgPyramid[i].sz.width = new_w;
             imgPyramid[i].sz.height = new_h;
             imgPyramid[i].data = output;
+        }
+
+        for (int i = 0; i < imgPyramid.size(); ++i) {
+            free(imgPyramid[i].data);
         }
     }
 

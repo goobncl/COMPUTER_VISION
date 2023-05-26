@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>1311</width>
-    <height>600</height>
+    <height>601</height>
    </rect>
   </property>
   <property name="sizePolicy">
@@ -85,7 +85,7 @@
     </property>
     <layout class="QGridLayout" name="gridLayout">
      <item row="4" column="3">
-      <widget class="QLabel" name="videoLabel_11">
+      <widget class="QLabel" name="layerLabel_10">
        <property name="styleSheet">
         <string notr="true">border: 3px solid gray;</string>
        </property>
@@ -101,7 +101,7 @@
       </widget>
      </item>
      <item row="3" column="5">
-      <widget class="QLabel" name="videoLabel_7">
+      <widget class="QLabel" name="layerLabel_06">
        <property name="styleSheet">
         <string notr="true">border: 3px solid gray;</string>
        </property>
@@ -117,7 +117,7 @@
       </widget>
      </item>
      <item row="3" column="4">
-      <widget class="QLabel" name="videoLabel_6">
+      <widget class="QLabel" name="layerLabel_05">
        <property name="styleSheet">
         <string notr="true">border: 3px solid gray;</string>
        </property>
@@ -133,7 +133,7 @@
       </widget>
      </item>
      <item row="3" column="3">
-      <widget class="QLabel" name="videoLabel_5">
+      <widget class="QLabel" name="layerLabel_04">
        <property name="styleSheet">
         <string notr="true">border: 3px solid gray;</string>
        </property>
@@ -149,7 +149,7 @@
       </widget>
      </item>
      <item row="4" column="0">
-      <widget class="QLabel" name="videoLabel_8">
+      <widget class="QLabel" name="layerLabel_07">
        <property name="styleSheet">
         <string notr="true">border: 3px solid gray;</string>
        </property>
@@ -165,7 +165,7 @@
       </widget>
      </item>
      <item row="3" column="1">
-      <widget class="QLabel" name="videoLabel_2">
+      <widget class="QLabel" name="layerLabel_02">
        <property name="styleSheet">
         <string notr="true">border: 3px solid gray;</string>
        </property>
@@ -181,7 +181,7 @@
       </widget>
      </item>
      <item row="3" column="0">
-      <widget class="QLabel" name="videoLabel_3">
+      <widget class="QLabel" name="layerLabel_01">
        <property name="styleSheet">
         <string notr="true">border: 3px solid gray;</string>
        </property>
@@ -197,7 +197,7 @@
       </widget>
      </item>
      <item row="4" column="4">
-      <widget class="QLabel" name="videoLabel_12">
+      <widget class="QLabel" name="layerLabel_11">
        <property name="styleSheet">
         <string notr="true">border: 3px solid gray;</string>
        </property>
@@ -213,7 +213,7 @@
       </widget>
      </item>
      <item row="4" column="2">
-      <widget class="QLabel" name="videoLabel_10">
+      <widget class="QLabel" name="layerLabel_09">
        <property name="styleSheet">
         <string notr="true">border: 3px solid gray;</string>
        </property>
@@ -229,7 +229,7 @@
       </widget>
      </item>
      <item row="3" column="2">
-      <widget class="QLabel" name="videoLabel_4">
+      <widget class="QLabel" name="layerLabel_03">
        <property name="styleSheet">
         <string notr="true">border: 3px solid gray;</string>
        </property>
@@ -245,7 +245,7 @@
       </widget>
      </item>
      <item row="4" column="1">
-      <widget class="QLabel" name="videoLabel_9">
+      <widget class="QLabel" name="layerLabel_08">
        <property name="styleSheet">
         <string notr="true">border: 3px solid gray;</string>
        </property>
@@ -261,7 +261,7 @@
       </widget>
      </item>
      <item row="4" column="5">
-      <widget class="QLabel" name="videoLabel_13">
+      <widget class="QLabel" name="layerLabel_12">
        <property name="styleSheet">
         <string notr="true">border: 3px solid gray;</string>
        </property>
@@ -277,7 +277,7 @@
       </widget>
      </item>
      <item row="5" column="0">
-      <widget class="QLabel" name="videoLabel_14">
+      <widget class="QLabel" name="layerLabel_13">
        <property name="styleSheet">
         <string notr="true">border: 3px solid gray;</string>
        </property>
@@ -293,7 +293,7 @@
       </widget>
      </item>
      <item row="6" column="0">
-      <widget class="QLabel" name="videoLabel_16">
+      <widget class="QLabel" name="layerLabel_19">
        <property name="styleSheet">
         <string notr="true">border: 3px solid gray;</string>
        </property>
@@ -309,7 +309,7 @@
       </widget>
      </item>
      <item row="5" column="1">
-      <widget class="QLabel" name="videoLabel_15">
+      <widget class="QLabel" name="layerLabel_14">
        <property name="styleSheet">
         <string notr="true">border: 3px solid gray;</string>
        </property>
@@ -325,7 +325,7 @@
       </widget>
      </item>
      <item row="7" column="0">
-      <widget class="QLabel" name="videoLabel_17">
+      <widget class="QLabel" name="layerLabel_25">
        <property name="styleSheet">
         <string notr="true">border: 3px solid gray;</string>
        </property>
@@ -341,7 +341,7 @@
       </widget>
      </item>
      <item row="5" column="2">
-      <widget class="QLabel" name="videoLabel_18">
+      <widget class="QLabel" name="layerLabel_15">
        <property name="styleSheet">
         <string notr="true">border: 3px solid gray;</string>
        </property>
@@ -357,7 +357,7 @@
       </widget>
      </item>
      <item row="5" column="3">
-      <widget class="QLabel" name="videoLabel_19">
+      <widget class="QLabel" name="layerLabel_16">
        <property name="styleSheet">
         <string notr="true">border: 3px solid gray;</string>
        </property>
@@ -373,7 +373,7 @@
       </widget>
      </item>
      <item row="5" column="4">
-      <widget class="QLabel" name="videoLabel_20">
+      <widget class="QLabel" name="layerLabel_17">
        <property name="styleSheet">
         <string notr="true">border: 3px solid gray;</string>
        </property>
@@ -389,7 +389,7 @@
       </widget>
      </item>
      <item row="5" column="5">
-      <widget class="QLabel" name="videoLabel_21">
+      <widget class="QLabel" name="layerLabel_18">
        <property name="styleSheet">
         <string notr="true">border: 3px solid gray;</string>
        </property>
@@ -405,7 +405,7 @@
       </widget>
      </item>
      <item row="6" column="1">
-      <widget class="QLabel" name="videoLabel_22">
+      <widget class="QLabel" name="layerLabel_20">
        <property name="styleSheet">
         <string notr="true">border: 3px solid gray;</string>
        </property>
@@ -421,7 +421,7 @@
       </widget>
      </item>
      <item row="6" column="2">
-      <widget class="QLabel" name="videoLabel_23">
+      <widget class="QLabel" name="layerLabel_21">
        <property name="styleSheet">
         <string notr="true">border: 3px solid gray;</string>
        </property>
@@ -437,7 +437,7 @@
       </widget>
      </item>
      <item row="6" column="3">
-      <widget class="QLabel" name="videoLabel_24">
+      <widget class="QLabel" name="layerLabel_22">
        <property name="styleSheet">
         <string notr="true">border: 3px solid gray;</string>
        </property>
@@ -453,7 +453,7 @@
       </widget>
      </item>
      <item row="6" column="4">
-      <widget class="QLabel" name="videoLabel_25">
+      <widget class="QLabel" name="layerLabel_23">
        <property name="styleSheet">
         <string notr="true">border: 3px solid gray;</string>
        </property>
@@ -469,7 +469,7 @@
       </widget>
      </item>
      <item row="6" column="5">
-      <widget class="QLabel" name="videoLabel_26">
+      <widget class="QLabel" name="layerLabel_24">
        <property name="styleSheet">
         <string notr="true">border: 3px solid gray;</string>
        </property>
@@ -485,7 +485,7 @@
       </widget>
      </item>
      <item row="7" column="1">
-      <widget class="QLabel" name="videoLabel_27">
+      <widget class="QLabel" name="layerLabel_26">
        <property name="styleSheet">
         <string notr="true">border: 3px solid gray;</string>
        </property>
@@ -501,7 +501,7 @@
       </widget>
      </item>
      <item row="7" column="2">
-      <widget class="QLabel" name="videoLabel_28">
+      <widget class="QLabel" name="layerLabel_27">
        <property name="styleSheet">
         <string notr="true">border: 3px solid gray;</string>
        </property>
@@ -517,7 +517,7 @@
       </widget>
      </item>
      <item row="7" column="3">
-      <widget class="QLabel" name="videoLabel_29">
+      <widget class="QLabel" name="layerLabel_28">
        <property name="styleSheet">
         <string notr="true">border: 3px solid gray;</string>
        </property>
@@ -533,7 +533,7 @@
       </widget>
      </item>
      <item row="7" column="4">
-      <widget class="QLabel" name="videoLabel_30">
+      <widget class="QLabel" name="layerLabel_29">
        <property name="styleSheet">
         <string notr="true">border: 3px solid gray;</string>
        </property>
