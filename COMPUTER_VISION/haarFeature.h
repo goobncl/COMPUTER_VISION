@@ -42,6 +42,12 @@ struct ScaleData {
     int ystep;
 };
 
+struct ImgLayer {
+    Size sz;
+    unsigned char* data;
+    ImgLayer() : sz(Size(0, 0)), data(NULL) {}
+};
+
 struct DTreeNode {
     int featureIdx;
     float threshold;

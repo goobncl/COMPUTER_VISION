@@ -16,18 +16,19 @@ public:
 
 private:
     unsigned char* imageArray;
-    
-    // TODO: Haar Feature metadata
     Ui::COMPUTER_VISIONClass ui;
     
+    // TODO: Haar Feature metadata
     Size imgSz;
     Size origWinSz;
     Size minObjSz;
     Size maxObjSz;
     Size sbufSz;
+    ImgLayer resizedBuf;
+    QVector<ImgLayer> imgPyramid;
     QVector<double> scales;
     QVector<ScaleData> scaleData;
-    cv::Mat rbuf, sbuf;
+    
     
     QTimer* timer;
     cv::VideoCapture cap;
@@ -42,11 +43,10 @@ private:
 
     void calcScales();
     bool updateScaleData();
+    Size clacSz0(Size oriSz, ImgLayer& resizedBuf);
     void initImgProc();
     double getFPS();
     void updateFrame();
-    size_t alignSize(size_t sz, int n);
-    double doubleAbs(double n);
 
 
 private slots:

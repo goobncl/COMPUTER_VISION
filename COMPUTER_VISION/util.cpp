@@ -2,6 +2,14 @@
 #include "util.h"
 
 
+size_t alignSize(size_t sz, int n) {
+	return (sz + n - 1) & -n;
+}
+
+double doubleAbs(double n) {
+	return n < 0 ? -n : n;
+}
+
 double doubleRound(double number) {
     return (number >= 0) ? (int)(number + 0.5) : (int)(number - 0.5);
 }
@@ -15,7 +23,7 @@ unsigned char* downSampling(unsigned char* input, int new_width, int new_height)
         return nullptr;
     }
 
-    unsigned char* output = new unsigned char[new_width * new_height];
+    unsigned char* output = (unsigned char*)malloc(sizeof(unsigned char) * new_width * new_height);
 
     double scale_x = (double)new_width / original_width;
     double scale_y = (double)new_height / original_height;

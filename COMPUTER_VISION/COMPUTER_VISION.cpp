@@ -30,7 +30,10 @@ COMPUTER_VISION::COMPUTER_VISION(QWidget* parent)
 
 COMPUTER_VISION::~COMPUTER_VISION()
 {
-    delete[] imageArray;
+    free(imageArray);
+    for (int i = 0; i < imgPyramid.size(); ++i) {
+        free(imgPyramid[i].data);
+    }
 }
 
 void COMPUTER_VISION::calcScales()
@@ -115,6 +118,14 @@ bool COMPUTER_VISION::updateScaleData()
     return recalcOptFeatures;
 }
 
+Size COMPUTER_VISION::clacSz0(Size oriSz, ImgLayer& rbuf)
+{
+    int alignedSizeWidth = alignSize(oriSz.width, 16);
+    alignedSizeWidth = rbuf.sz.width > alignedSizeWidth ? rbuf.sz.width : alignedSizeWidth;
+    int maxHeight = rbuf.sz.height > oriSz.height ? rbuf.sz.height : oriSz.height;
+    return Size(alignedSizeWidth, maxHeight);
+}
+
 void COMPUTER_VISION::initImgProc()
 {
     // TODO: Haar Feature metadata
@@ -131,7 +142,7 @@ void COMPUTER_VISION::initImgProc()
         //computeOptFeatures();
     }
 
-    imageArray = new unsigned char[imgSz.width * imgSz.height];
+    imageArray = (unsigned char*)malloc(sizeof(unsigned char) * imgSz.width * imgSz.height);
     imageProcessor = new ImgProc(imageArray, this);
 }
 
@@ -185,43 +196,21 @@ void COMPUTER_VISION::updateFrame()
     QImage qFrame = QImage(imageArray, 640, 480, QImage::Format_Grayscale8).copy();
     displayLabel->setPixmap(QPixmap::fromImage(qFrame));
 
-    // Plot Image Pyramid
     {
-
-        Size sz0 = scaleData.at(0).szi;
-        int alignedSizeWidth = alignSize(sz0.width, 16);
-        alignedSizeWidth = rbuf.cols > alignedSizeWidth ? rbuf.cols : alignedSizeWidth;
-        int maxHeight = rbuf.rows > sz0.height ? rbuf.rows : sz0.height;
-        sz0 = Size(alignedSizeWidth, maxHeight);
-#if 0
-        cv::Mat image(480, 640, CV_8U, imageArray);
-        sbuf.create(sbufSz.height * 2, sbufSz.width, CV_32S);
-        rbuf.create(sz0.height, sz0.width, CV_8U);
+        Size sz0 = clacSz0(scaleData.at(0).szi, resizedBuf);
         int nscales = scaleData.size();
+        imgPyramid.resize(nscales);
 
-        for (int i = 0; i < nscales; i++) {
-            const ScaleData& s = scaleData.at(i);
-            
-            cv::Mat dst(s.szi.height - 1, s.szi.width - 1, CV_8U, rbuf.ptr());
-            cv::resize(image, dst, dst.size(), 1. / s.scale, 1. / s.scale, cv::INTER_LINEAR_EXACT);
-
-            QString windowName = QString("Pyramid: %1").arg(i + 1);
-
-            cv::namedWindow(windowName.toStdString(), cv::WINDOW_KEEPRATIO);
-            cv::resizeWindow(windowName.toStdString(), 640, 480);
-            cv::imshow(windowName.toStdString(), dst);
-            cv::waitKey(0);
-        }
-#else
-        int nscales = scaleData.size();
         for (int i = 0; i < nscales; i++) {
             const ScaleData& s = scaleData.at(i);
             int new_w = s.szi.width - 1;
             int new_h = s.szi.height - 1;
             unsigned char* output = downSampling(imageArray, new_w, new_h);
-            delete [] output;
+
+            imgPyramid[i].sz.width = new_w;
+            imgPyramid[i].sz.height = new_h;
+            imgPyramid[i].data = output;
         }
-#endif
     }
 
     QString fpsString = QString::number(getFPS(), 'f', 8);
@@ -257,14 +246,4 @@ void COMPUTER_VISION::onBlurBtnClicked()
 		font.setWeight(QFont::Normal);
 	}
 	blurBtn->setFont(font);
-}
-
-size_t COMPUTER_VISION::alignSize(size_t sz, int n)
-{
-    return (sz + n - 1) & -n;
-}
-
-double COMPUTER_VISION::doubleAbs(double n)
-{
-    return (n < 0) ? (-n) : (n);
 }
