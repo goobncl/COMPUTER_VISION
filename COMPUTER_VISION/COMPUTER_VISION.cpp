@@ -133,12 +133,25 @@ void COMPUTER_VISION::buildPyramid()
         const ScaleData& s = scaleData.at(i);
         int new_w = s.szi.width - 1;
         int new_h = s.szi.height - 1;
-        unsigned char* output = downSampling(imageArray, new_w, new_h);
+        unsigned char* output;
+
+        {
+            QMutexLocker locker(&imageProcessor->mutex);
+            output = downSampling(imageArray, new_w, new_h);
+        }
 
         imgPyramid[i].sz.width = new_w;
         imgPyramid[i].sz.height = new_h;
         imgPyramid[i].data = output;
-    }    
+    }
+}
+
+void COMPUTER_VISION::clearPyramid()
+{
+    for (int i = 0; i < imgPyramid.size(); i++) {
+		free(imgPyramid[i].data);
+	}
+	imgPyramid.clear();
 }
 
 void COMPUTER_VISION::initImgProc()
@@ -217,10 +230,7 @@ void COMPUTER_VISION::updateFrame()
 
     {
         buildPyramid();
-
-        for (int i = 0; i < imgPyramid.size(); ++i) {
-            free(imgPyramid[i].data);
-        }
+        clearPyramid();
     }
 
     QString fpsString = QString::number(getFPS(), 'f', 8);
