@@ -123,35 +123,41 @@ Size COMPUTER_VISION::clacSz0(Size oriSz, ImgLayer& rbuf)
     return Size(alignedSizeWidth, maxHeight);
 }
 
-void COMPUTER_VISION::buildPyramid()
+void COMPUTER_VISION::buildImgPyramid()
 {
     Size sz0 = clacSz0(scaleData.at(0).szi, resizedBuf);
     int nscales = scaleData.size();
     imgPyramid.resize(nscales);
 
+    QFutureWatcher<void> watcher;
+    QList<QFuture<void>> futures;
+
     for (int i = 0; i < nscales; i++) {
-        const ScaleData& s = scaleData.at(i);
-        int new_w = s.szi.width - 1;
-        int new_h = s.szi.height - 1;
-        unsigned char* output;
+        futures.append(QtConcurrent::run([this, i] {
+            const ScaleData& s = scaleData.at(i);
+            int new_w = s.szi.width - 1;
+            int new_h = s.szi.height - 1;
 
-        {
-            QMutexLocker locker(&imageProcessor->mutex);
-            output = downSampling(imageArray, new_w, new_h);
-        }
+            unsigned char* output = downSampling(imageArray, new_w, new_h);
 
-        imgPyramid[i].sz.width = new_w;
-        imgPyramid[i].sz.height = new_h;
-        imgPyramid[i].data = output;
+            imgPyramid[i].sz.width = new_w;
+            imgPyramid[i].sz.height = new_h;
+            imgPyramid[i].data = output;
+         }));
+    }
+
+    for (auto& future : futures) {
+        watcher.setFuture(future);
+        watcher.waitForFinished();
     }
 }
 
-void COMPUTER_VISION::clearPyramid()
+void COMPUTER_VISION::clearImgPyramid()
 {
     for (int i = 0; i < imgPyramid.size(); i++) {
 		free(imgPyramid[i].data);
 	}
-	imgPyramid.clear();
+    imgPyramid.clear();
 }
 
 void COMPUTER_VISION::initImgProc()
@@ -228,10 +234,8 @@ void COMPUTER_VISION::updateFrame()
     }
     displayLabel->setPixmap(QPixmap::fromImage(qFrame));
 
-    {
-        buildPyramid();
-        clearPyramid();
-    }
+    buildImgPyramid();
+    clearImgPyramid();
 
     QString fpsString = QString::number(getFPS(), 'f', 8);
     statusBar()->showMessage("FPS: " + fpsString);
