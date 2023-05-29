@@ -242,13 +242,12 @@ void COMPUTER_VISION::displayImg()
     cv::Mat cvFrame;
     {
         QMutexLocker locker(&imageProcessor->mutex);
-        cvFrame = cv::Mat(FRAME_H, FRAME_W, CV_8UC1, imageArray).clone();
+        cvFrame = cv::Mat(FRAME_H, FRAME_W, CV_8UC1, imageArray);
     }
-    QImage qFrame = QImage(cvFrame.data, cvFrame.cols, cvFrame.rows, cvFrame.step, QImage::Format_Grayscale8);
-    displayLabel->setPixmap(QPixmap::fromImage(qFrame));
+    QImage qFrame(cvFrame.data, cvFrame.cols, cvFrame.rows, cvFrame.step, QImage::Format_Grayscale8);
+    displayLabel->setPixmap(QPixmap::fromImage(std::move(qFrame)));
 
-    QString fpsString = QString::number(getFPS(), 'f', 8);
-    statusBar()->showMessage("FPS: " + fpsString);
+    statusBar()->showMessage(QString("FPS: %1").arg(getFPS(), 0, 'f', 8));
 }
 
 void COMPUTER_VISION::displayPyramid() 
