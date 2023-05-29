@@ -224,17 +224,21 @@ void COMPUTER_VISION::procImg()
 {
     if (claheEnabled) {
         imageProcessor->setImageAndProcess(
-            imageArray, FRAME_W, FRAME_H, 
+            imageArray, 
+            FRAME_W, 
+            FRAME_H, 
             ImgProc::AlgType::Clahe
         );
     }   
 
     if (blurEnabled) {
         imageProcessor->setImageAndProcess(
-            imageArray, FRAME_W, FRAME_H, 
+            imageArray, 
+            FRAME_W, 
+            FRAME_H, 
             ImgProc::AlgType::Blur
         );
-    }   
+    }
 }
 
 void COMPUTER_VISION::displayImg()
