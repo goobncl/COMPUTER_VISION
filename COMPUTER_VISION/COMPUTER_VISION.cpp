@@ -251,15 +251,16 @@ void COMPUTER_VISION::displayImg()
     statusBar()->showMessage("FPS: " + fpsString);
 }
 
-void COMPUTER_VISION::displayPyramid()
+void COMPUTER_VISION::displayPyramid() 
 {
-    for (int i = 0; i < imgPyramid.size(); i++) {
+    int nLayers = imgPyramid.size();
+    for (size_t i = 0; i < nLayers; ++i) {
         cv::Mat cvImage(imgPyramid[i].sz.height, imgPyramid[i].sz.width, CV_8U, imgPyramid[i].data);
         QImage image = QImage(cvImage.data, cvImage.cols, cvImage.rows, cvImage.step, QImage::Format_Grayscale8);
         QPixmap pixmap = QPixmap::fromImage(image);
-        pixmap = pixmap.scaled(layerLabels[i]->width(), layerLabels[i]->height(), Qt::KeepAspectRatioByExpanding);
-        layerLabels[i]->setFixedSize(layerLabels[i]->width(), layerLabels[i]->height());
-        layerLabels[i]->setPixmap(pixmap);
+        QLabel* label = layerLabels[i];
+        pixmap = pixmap.scaled(label->width(), label->height(), Qt::KeepAspectRatioByExpanding);
+        label->setPixmap(pixmap);
     }
 }
 
