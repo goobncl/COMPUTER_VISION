@@ -5,6 +5,9 @@
 #include "util.h"
 #include "ImageProcessor.h"
 
+constexpr int FRAME_W = 640;
+constexpr int FRAME_H = 480;
+
 
 class COMPUTER_VISION : public QMainWindow
 {
@@ -24,11 +27,11 @@ private:
     Size minObjSz;
     Size maxObjSz;
     Size sbufSz;
-    ImgLayer resizedBuf;
-    QVector<ImgLayer> imgPyramid;
     QVector<double> scales;
     QVector<ScaleData> scaleData;
-    
+    QVector<QLabel*> layerLabels;
+    ImgLayer resizedBuf;
+    QVector<ImgLayer> imgPyramid;
     
     QTimer* timer;
     cv::VideoCapture cap;
@@ -44,10 +47,14 @@ private:
     void calcScales();
     bool updateScaleData();
     Size clacSz0(Size oriSz, ImgLayer& resizedBuf);
-    void buildImgPyramid();
-    void clearImgPyramid();
     void initImgProc();
     double getFPS();
+    void acqFrame();
+    void procImg();
+    void displayImg();  
+    void buildImgPyramid();
+    void displayPyramid();
+    void clearImgPyramid();
     void updateFrame();
 
 

@@ -14,6 +14,16 @@ COMPUTER_VISION::COMPUTER_VISION(QWidget* parent)
     displayLabel = findChild<QLabel*>("videoLabel");
     claheBtn = findChild<QPushButton*>("claheBtn");
     blurBtn = findChild<QPushButton*>("blurBtn");
+
+    {
+        for (int i = 0; i < 30; ++i) {
+            QString objectName = "layerLabel_" + QString::number(i).rightJustified(2, '0');
+            QLabel* label = findChild<QLabel*>(objectName);
+            if (label) {
+                layerLabels.push_back(label);
+            }
+        }
+    }
     
     claheEnabled = false;
     blurEnabled = false;
@@ -196,49 +206,71 @@ double COMPUTER_VISION::getFPS() {
     return fps;
 }
 
-void COMPUTER_VISION::updateFrame()
+void COMPUTER_VISION::acqFrame()
 {
     cv::Mat frame;
-    cap >> frame;
-
-    if (frame.empty())
-    {
-        timer->stop();
-        return;
-    }
-
-    // Image Acquisition
     cv::Mat grayFrame;
+    cap >> frame;
+    if (frame.empty()) timer->stop();
     cv::cvtColor(frame, grayFrame, cv::COLOR_BGR2GRAY);
 
     {
         QMutexLocker locker(&imageProcessor->mutex);
-        memcpy(imageArray, grayFrame.data, 640 * 480);
+        memcpy(imageArray, grayFrame.data, FRAME_W * FRAME_H);
     }
+}
 
-    // Image processing
-    if (claheEnabled) 
-    {
-        imageProcessor->setImageAndProcess(imageArray, 640, 480, ImgProc::AlgType::Clahe);
-    }
+void COMPUTER_VISION::procImg()
+{
+    if (claheEnabled) {
+        imageProcessor->setImageAndProcess(
+            imageArray, FRAME_W, FRAME_H, 
+            ImgProc::AlgType::Clahe
+        );
+    }   
 
     if (blurEnabled) {
-        imageProcessor->setImageAndProcess(imageArray, 640, 480, ImgProc::AlgType::Blur);
-    }
+        imageProcessor->setImageAndProcess(
+            imageArray, FRAME_W, FRAME_H, 
+            ImgProc::AlgType::Blur
+        );
+    }   
+}
 
-    // Image Display
-    QImage qFrame;
+void COMPUTER_VISION::displayImg()
+{
+    cv::Mat cvFrame;
     {
         QMutexLocker locker(&imageProcessor->mutex);
-        qFrame = QImage(imageArray, 640, 480, QImage::Format_Grayscale8).copy();
+        cvFrame = cv::Mat(FRAME_H, FRAME_W, CV_8UC1, imageArray).clone();
     }
+    QImage qFrame = QImage(cvFrame.data, cvFrame.cols, cvFrame.rows, cvFrame.step, QImage::Format_Grayscale8);
     displayLabel->setPixmap(QPixmap::fromImage(qFrame));
-
-    buildImgPyramid();
-    clearImgPyramid();
 
     QString fpsString = QString::number(getFPS(), 'f', 8);
     statusBar()->showMessage("FPS: " + fpsString);
+}
+
+void COMPUTER_VISION::displayPyramid()
+{
+    for (int i = 0; i < imgPyramid.size(); i++) {
+        cv::Mat cvImage(imgPyramid[i].sz.height, imgPyramid[i].sz.width, CV_8U, imgPyramid[i].data);
+        QImage image = QImage(cvImage.data, cvImage.cols, cvImage.rows, cvImage.step, QImage::Format_Grayscale8);
+        QPixmap pixmap = QPixmap::fromImage(image);
+        pixmap = pixmap.scaled(layerLabels[i]->width(), layerLabels[i]->height(), Qt::KeepAspectRatioByExpanding);
+        layerLabels[i]->setFixedSize(layerLabels[i]->width(), layerLabels[i]->height());
+        layerLabels[i]->setPixmap(pixmap);
+    }
+}
+
+void COMPUTER_VISION::updateFrame()
+{
+    acqFrame();
+    procImg();
+    displayImg();
+    buildImgPyramid();
+    displayPyramid();
+    clearImgPyramid();    
 }
 
 void COMPUTER_VISION::onClaheBtnClicked()
