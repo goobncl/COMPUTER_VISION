@@ -3,38 +3,46 @@
 
 
 COMPUTER_VISION::COMPUTER_VISION(QWidget* parent)
-    : QMainWindow(parent)
+    : QMainWindow(parent),
+    claheEnabled(false),
+    blurEnabled(false)
 {
     ui.setupUi(this);
     initImgProc();
+    initComps();
+    confCap();
+    setConn();
+}
 
-    cap.set(cv::CAP_PROP_FRAME_WIDTH, 640);
-    cap.set(cv::CAP_PROP_FRAME_HEIGHT, 480);
-
+void COMPUTER_VISION::initComps()
+{
     displayLabel = findChild<QLabel*>("videoLabel");
     claheBtn = findChild<QPushButton*>("claheBtn");
     blurBtn = findChild<QPushButton*>("blurBtn");
 
-    {
-        for (int i = 0; i < 30; ++i) {
-            QString objectName = "layerLabel_" + QString::number(i).rightJustified(2, '0');
-            QLabel* label = findChild<QLabel*>(objectName);
-            if (label) {
-                layerLabels.push_back(label);
-            }
+    int nLayers = scales.size();
+    for (int i = 0; i < nLayers; ++i) {
+        QString objectName = "layerLabel_" + QString::number(i).rightJustified(2, '0');
+        QLabel* label = findChild<QLabel*>(objectName);
+        if (label) {
+            layerLabels.push_back(label);
         }
     }
-    
-    claheEnabled = false;
-    blurEnabled = false;
+}
 
+void COMPUTER_VISION::confCap()
+{
+    cap.set(cv::CAP_PROP_FRAME_WIDTH, FRAME_W);
+    cap.set(cv::CAP_PROP_FRAME_HEIGHT, FRAME_H);
+    cap.open(0);
+}
+
+void COMPUTER_VISION::setConn()
+{
     timer = new QTimer(this);
-
     connect(timer, &QTimer::timeout, this, &COMPUTER_VISION::updateFrame);
     connect(claheBtn, &QPushButton::clicked, this, &COMPUTER_VISION::onClaheBtnClicked);
     connect(blurBtn, &QPushButton::clicked, this, &COMPUTER_VISION::onBlurBtnClicked);
-
-    cap.open(0);
     timer->start(0);
 }
 
@@ -153,7 +161,7 @@ void COMPUTER_VISION::buildImgPyramid()
             imgPyramid[i].sz.width = new_w;
             imgPyramid[i].sz.height = new_h;
             imgPyramid[i].data = output;
-         }));
+        }));
     }
 
     for (auto& future : futures) {
@@ -173,7 +181,7 @@ void COMPUTER_VISION::clearImgPyramid()
 void COMPUTER_VISION::initImgProc()
 {
     // TODO: Haar Feature metadata
-    imgSz = Size(640, 480);
+    imgSz = Size(FRAME_W, FRAME_H);
     origWinSz = Size(24, 24);
     minObjSz = Size(30, 30);
     maxObjSz = imgSz;

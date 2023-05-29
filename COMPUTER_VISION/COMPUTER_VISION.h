@@ -44,6 +44,9 @@ private:
     bool blurEnabled;
     ImgProc* imageProcessor;
 
+    void initComps();
+    void confCap();
+    void setConn();
     void calcScales();
     bool updateScaleData();
     Size clacSz0(Size oriSz, ImgLayer& resizedBuf);
