@@ -20,8 +20,21 @@ public:
 private:
     unsigned char* imageArray;
     Ui::COMPUTER_VISIONClass ui;
+        
+    struct Data {
+
+        int minNodesPerTree;
+        int maxNodesPerTree;
+        Size origWinSz;
+        QVector<Stage> stages;
+        QVector<DTree> classifiers;
+        QVector<DTreeNode> nodes;
+        QVector<float> leaves;
+        QVector<Stump> stumps;
+    };
+    Data data;
+    QSqlDatabase db;
     
-    // TODO: Haar Feature metadata
     Size imgSz;
     Size origWinSz;
     Size minObjSz;
@@ -44,13 +57,22 @@ private:
     bool blurEnabled;
     ImgProc* imageProcessor;
 
+    void initImgProc();
     void initComps();
     void confCap();
     void setConn();
+
+    QVector<Stage> readStages(QSqlQuery& query);
+    QVector<DTree> readClassifiers(QSqlQuery& query);
+    QVector<DTreeNode> readNodes(QSqlQuery& query);
+    QVector<float> readLeaves(QSqlQuery& query);
+    QVector<Stump> readStumps(QSqlQuery& query);
+    bool loadDataFromDB();
+    void setData();
+
     void calcScales();
     bool updateScaleData();
     Size clacSz0(Size oriSz, ImgLayer& resizedBuf);
-    void initImgProc();
     double getFPS();
     void acqFrame();
     void procImg();

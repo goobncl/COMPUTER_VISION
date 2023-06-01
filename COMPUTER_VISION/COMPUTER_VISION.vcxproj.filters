@@ -31,6 +31,9 @@
     <Filter Include="Algorithm Files\Haar Feature">
       <UniqueIdentifier>{c9901fbd-a190-48fc-8376-baec5ffefe92}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Database Files">
+      <UniqueIdentifier>{7ee4c867-485f-4e0b-b1e9-9f85262df26d}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <QtRcc Include="COMPUTER_VISION.qrc">
@@ -108,5 +111,10 @@
     <ClInclude Include="util.h">
       <Filter>Algorithm Files</Filter>
     </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="HaarCascadeFeatures.db">
+      <Filter>Database Files</Filter>
+    </None>
   </ItemGroup>
 </Project>

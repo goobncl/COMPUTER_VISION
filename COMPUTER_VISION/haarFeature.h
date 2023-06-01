@@ -74,20 +74,6 @@ struct Stump {
     float right;
 };
 
-struct Data {
-    int stageType;
-    int featureType;
-    int ncategories;
-    int minNodesPerTree, maxNodesPerTree;
-    Size origWinSize;
-    Stage* stages;
-    DTree* classifiers;
-    DTreeNode* nodes;
-    float* leaves;
-    int* subsets;
-    Stump* stumps;
-};
-
 struct Rect {
     int x;
     int y;

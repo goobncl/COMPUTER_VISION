@@ -12,6 +12,7 @@ COMPUTER_VISION::COMPUTER_VISION(QWidget* parent)
     initComps();
     confCap();
     setConn();
+    setData();
 }
 
 void COMPUTER_VISION::initComps()
@@ -68,6 +69,124 @@ void COMPUTER_VISION::setConn()
     connect(claheBtn, &QPushButton::clicked, this, &COMPUTER_VISION::onClaheBtnClicked);
     connect(blurBtn, &QPushButton::clicked, this, &COMPUTER_VISION::onBlurBtnClicked);
     timer->start(0);
+}
+
+QVector<Stage> COMPUTER_VISION::readStages(QSqlQuery& query)
+{
+    QVector<Stage> stages;
+
+    if (query.exec("SELECT FIRST, NTREES, THRESHOLD FROM FRONTALFACE_DEFAULT_STAGE")) {
+        while (query.next()) {
+            Stage stage;
+            stage.first = query.value(0).toInt();
+            stage.ntrees = query.value(1).toInt();
+            stage.threshold = query.value(2).toFloat();
+            stages.append(stage);
+        }
+    }
+
+    return stages;
+}
+
+QVector<DTree> COMPUTER_VISION::readClassifiers(QSqlQuery& query)
+{
+    QVector<DTree> classifiers;
+
+    if (query.exec("SELECT NODECOUNT FROM FRONTALFACE_DEFAULT_DTREE")) {
+        while (query.next()) {
+            DTree classifier;
+            classifier.nodeCount = query.value(0).toInt();
+            classifiers.append(classifier);
+        }
+    }
+
+    return classifiers;
+}
+
+QVector<DTreeNode> COMPUTER_VISION::readNodes(QSqlQuery& query)
+{
+    QVector<DTreeNode> nodes;
+
+    if (query.exec("SELECT FEATUREIDX, THRESHOLD, LEFT, RIGHT FROM FRONTALFACE_DEFAULT_DTREENODE")) {
+        while (query.next()) {
+            DTreeNode node;
+            node.featureIdx = query.value(0).toInt();
+            node.threshold = query.value(1).toFloat();
+            node.left = query.value(2).toInt();
+            node.right = query.value(3).toInt();
+            nodes.append(node);
+        }
+    }
+
+    return nodes;
+}
+
+QVector<float> COMPUTER_VISION::readLeaves(QSqlQuery& query)
+{
+    QVector<float> leaves;
+
+    if (query.exec("SELECT LEAVE FROM FRONTALFACE_DEFAULT_LEAVES")) {
+        while (query.next()) {
+            float leave = query.value(0).toFloat();
+            leaves.append(leave);
+        }
+    }
+
+    return leaves;
+}
+
+QVector<Stump> COMPUTER_VISION::readStumps(QSqlQuery& query)
+{
+    QVector<Stump> stumps;
+
+    if (query.exec("SELECT FEATUREIDX, THRESHOLD, LEFT, RIGHT FROM FRONTALFACE_DEFAULT_STUMP")) {
+        while (query.next()) {
+            Stump stump;
+            stump.featureIdx = query.value(0).toInt();
+            stump.threshold = query.value(1).toFloat();
+            stump.left = query.value(2).toFloat();
+            stump.right = query.value(3).toFloat();
+            stumps.append(stump);
+        }
+    }
+
+    return stumps;
+}
+
+bool COMPUTER_VISION::loadDataFromDB()
+{
+    QSqlDatabase db = QSqlDatabase::addDatabase("QSQLITE");
+    db.setDatabaseName("HaarCascadeFeatures.db");
+
+    if (!db.open()) {
+        qDebug() << "Error: connection with database failed";
+        return false;
+    }
+
+    qDebug() << "Database: connection ok";
+
+    QSqlQuery query;
+
+    data.stages = readStages(query);
+    data.classifiers = readClassifiers(query);
+    data.nodes = readNodes(query);
+    data.leaves = readLeaves(query);
+    data.stumps = readStumps(query);
+
+    db.close();
+
+    return true;
+}
+
+void COMPUTER_VISION::setData()
+{
+    data.minNodesPerTree = 1;
+    data.maxNodesPerTree = 1;
+    data.origWinSz = Size(24, 24);
+
+    if (!loadDataFromDB()) {
+        qDebug() << "Error: failed to load data from database";
+    }
 }
 
 COMPUTER_VISION::~COMPUTER_VISION()
