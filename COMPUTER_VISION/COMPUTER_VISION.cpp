@@ -24,8 +24,32 @@ void COMPUTER_VISION::initComps()
     for (int i = 0; i < nLayers; ++i) {
         QString objectName = "layerLabel_" + QString::number(i).rightJustified(2, '0');
         QLabel* label = findChild<QLabel*>(objectName);
+        
         if (label) {
             layerLabels.push_back(label);
+            QLabel* numLabel = new QLabel(label);            
+            QString labelText = "[" + QString::number(i + 1) + "] ";
+            labelText += QString::number(scaleData[i].szi.width);
+            labelText += " x ";
+            labelText += QString::number(scaleData[i].szi.height);
+            numLabel->setText(labelText);
+
+            numLabel->setAlignment(Qt::AlignTop | Qt::AlignLeft);
+            numLabel->setContentsMargins(5, 5, 5, 5);
+            numLabel->setStyleSheet("QLabel {"
+                " color : yellow;"
+                " border: none;"
+                " font-weight: bold;"
+                " font-size: 10px;"
+                "}");
+
+            QGraphicsDropShadowEffect* effect = new QGraphicsDropShadowEffect();
+            effect->setBlurRadius(2);
+            effect->setXOffset(1);
+            effect->setYOffset(1);
+            effect->setColor(QColor("black"));
+
+            numLabel->setGraphicsEffect(effect);
         }
     }
 }
@@ -156,11 +180,13 @@ void COMPUTER_VISION::buildImgPyramid()
             int new_w = s.szi.width - 1;
             int new_h = s.szi.height - 1;
 
-            unsigned char* output = downSampling(imageArray, new_w, new_h);
+            unsigned char* resized = downSampling(imageArray, new_w, new_h);
 
             imgPyramid[i].sz.width = new_w;
             imgPyramid[i].sz.height = new_h;
-            imgPyramid[i].data = output;
+            imgPyramid[i].data = resized;
+            imgPyramid[i].sum = integral(resized, new_w, new_h);
+            imgPyramid[i].sqsum = integralSquare(resized, new_w, new_h);
         }));
     }
 
@@ -174,6 +200,8 @@ void COMPUTER_VISION::clearImgPyramid()
 {
     for (int i = 0; i < imgPyramid.size(); i++) {
 		free(imgPyramid[i].data);
+        free(imgPyramid[i].sum);
+        free(imgPyramid[i].sqsum);
 	}
     imgPyramid.clear();
 }
@@ -266,7 +294,7 @@ void COMPUTER_VISION::displayPyramid()
 {
     int nLayers = imgPyramid.size();
     for (size_t i = 0; i < nLayers; ++i) {
-        cv::Mat cvImage(imgPyramid[i].sz.height, imgPyramid[i].sz.width, CV_8U, imgPyramid[i].data);
+        cv::Mat cvImage(imgPyramid[i].sz.height, imgPyramid[i].sz.width, CV_8UC1, imgPyramid[i].data);
         QImage image = QImage(cvImage.data, cvImage.cols, cvImage.rows, cvImage.step, QImage::Format_Grayscale8);
         QPixmap pixmap = QPixmap::fromImage(image);
         QLabel* label = layerLabels[i];

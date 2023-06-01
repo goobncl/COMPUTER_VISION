@@ -63,3 +63,38 @@ unsigned char* downSampling(unsigned char* input, int new_width, int new_height)
 
     return output;
 }
+
+int* integral(unsigned char* input, int width, int height) {
+    
+    int* output = (int*)calloc((width + 1) * (height + 1), sizeof(int));
+
+    for (int y = 1; y < height + 1; ++y) {
+        for (int x = 1; x < width + 1; ++x) {
+            int sum = input[(y - 1) * width + (x - 1)];
+            sum += output[(y - 1) * (width + 1) + x];
+            sum += output[y * (width + 1) + (x - 1)];
+            sum -= output[(y - 1) * (width + 1) + (x - 1)];
+            output[y * (width + 1) + x] = sum;
+        }
+    }
+
+    return output;
+}
+
+int* integralSquare(unsigned char* input, int width, int height) {
+
+    int* output = (int*)calloc((width + 1) * (height + 1), sizeof(int));
+
+    for (int y = 1; y < height + 1; ++y) {
+        for (int x = 1; x < width + 1; ++x) {
+            int value = input[(y - 1) * width + (x - 1)];
+            int square = value * value; 
+            square += output[(y - 1) * (width + 1) + x];
+            square += output[y * (width + 1) + (x - 1)];
+            square -= output[(y - 1) * (width + 1) + (x - 1)];
+            output[y * (width + 1) + x] = square;
+        }
+    }
+
+    return output;
+}

@@ -45,7 +45,9 @@ struct ScaleData {
 struct ImgLayer {
     Size sz;
     unsigned char* data;
-    ImgLayer() : sz(Size(0, 0)), data(NULL) {}
+    int* sum;
+    int* sqsum;
+    ImgLayer() : sz(Size(0, 0)), data(NULL), sum(NULL), sqsum(NULL) {}
 };
 
 struct DTreeNode {
