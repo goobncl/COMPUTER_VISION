@@ -23,9 +23,9 @@ void gaussianBlur(unsigned char* input, int width, int height) {
             double outputPixel = 0.0;
             for (int kx = -KERNEL_HALF; kx <= KERNEL_HALF; ++kx) {
                 int ix = x + kx;
-                if (ix >= 0 && ix < width) {
-                    outputPixel += input[y * width + ix] * kernel[kx + KERNEL_HALF];
-                }
+                if (ix < 0) ix = 0;
+                if (ix >= width) ix = width - 1;
+                outputPixel += input[y * width + ix] * kernel[kx + KERNEL_HALF];
             }
             temp[y * width + x] = (unsigned char)doubleRound(outputPixel / kernelSum);
         }
@@ -36,9 +36,9 @@ void gaussianBlur(unsigned char* input, int width, int height) {
             double outputPixel = 0.0;
             for (int ky = -KERNEL_HALF; ky <= KERNEL_HALF; ++ky) {
                 int iy = y + ky;
-                if (iy >= 0 && iy < height) {
-                    outputPixel += temp[iy * width + x] * kernel[ky + KERNEL_HALF];
-                }
+                if (iy < 0) iy = 0;
+                if (iy >= height) iy = height - 1;
+                outputPixel += temp[iy * width + x] * kernel[ky + KERNEL_HALF];
             }
             output[y * width + x] = (unsigned char)doubleRound(outputPixel / kernelSum);
         }
@@ -50,3 +50,4 @@ void gaussianBlur(unsigned char* input, int width, int height) {
     free(temp);
     free(output);
 }
+
