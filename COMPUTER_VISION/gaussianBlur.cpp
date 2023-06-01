@@ -4,6 +4,7 @@
 
 
 void gaussianBlur(unsigned char* input, int width, int height) {
+    
     int kernel[KERNEL_SIZE] = { 1, 4, 6, 4, 1 };
     int kernelSum = 16;
 

@@ -8,11 +8,20 @@ COMPUTER_VISION::COMPUTER_VISION(QWidget* parent)
     blurEnabled(false)
 {
     ui.setupUi(this);
+
+    setData();
     initImgProc();
     initComps();
     confCap();
     setConn();
-    setData();
+}
+
+COMPUTER_VISION::~COMPUTER_VISION()
+{
+    free(imageArray);
+    delete timer;
+    delete imageProcessor;
+    cap.release();
 }
 
 void COMPUTER_VISION::initComps()
@@ -189,19 +198,14 @@ void COMPUTER_VISION::setData()
     }
 }
 
-COMPUTER_VISION::~COMPUTER_VISION()
-{
-    free(imageArray);    
-}
-
 void COMPUTER_VISION::calcScales()
 {
     QVector<double> allScales;
 
     for (double factor = 1; ; factor *= 1.1f) {
         Size winSz = Size(
-            doubleRound(origWinSz.width * factor),
-            doubleRound(origWinSz.height * factor));
+            doubleRound(data.origWinSz.width * factor),
+            doubleRound(data.origWinSz.height * factor));
         if (winSz.width > imgSz.width || winSz.height > imgSz.height) {
             break;
         }
@@ -210,8 +214,8 @@ void COMPUTER_VISION::calcScales()
 
     for (size_t index = 0; index < allScales.size(); index++) {
         Size winSz = Size(
-            doubleRound(origWinSz.width * allScales[index]),
-            doubleRound(origWinSz.height * allScales[index]));
+            doubleRound(data.origWinSz.width * allScales[index]),
+            doubleRound(data.origWinSz.height * allScales[index]));
         if (winSz.width > maxObjSz.width || winSz.height > maxObjSz.height) {
             break;
         }
@@ -327,9 +331,7 @@ void COMPUTER_VISION::clearImgPyramid()
 
 void COMPUTER_VISION::initImgProc()
 {
-    // TODO: Haar Feature metadata
     imgSz = Size(FRAME_W, FRAME_H);
-    origWinSz = Size(24, 24);
     minObjSz = Size(30, 30);
     maxObjSz = imgSz;
     sbufSz = Size(0, 0);

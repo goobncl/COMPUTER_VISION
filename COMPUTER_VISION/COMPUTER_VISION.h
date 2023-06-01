@@ -36,7 +36,6 @@ private:
     QSqlDatabase db;
     
     Size imgSz;
-    Size origWinSz;
     Size minObjSz;
     Size maxObjSz;
     Size sbufSz;
