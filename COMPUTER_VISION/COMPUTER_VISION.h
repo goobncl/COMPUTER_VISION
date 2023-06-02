@@ -31,6 +31,7 @@ private:
         QVector<DTreeNode> nodes;
         QVector<float> leaves;
         QVector<Stump> stumps;
+        QVector<Feature> features;
     };
     Data data;
     QSqlDatabase db;
@@ -56,18 +57,19 @@ private:
     bool blurEnabled;
     ImgProc* imageProcessor;
 
-    void initImgProc();
-    void initComps();
-    void confCap();
-    void setConn();
-
     QVector<Stage> readStages(QSqlQuery& query);
     QVector<DTree> readClassifiers(QSqlQuery& query);
     QVector<DTreeNode> readNodes(QSqlQuery& query);
     QVector<float> readLeaves(QSqlQuery& query);
     QVector<Stump> readStumps(QSqlQuery& query);
+    QVector<Feature> readFeatures(QSqlQuery& query);
     bool loadDataFromDB();
     void setData();
+
+    void initImgProc();
+    void initComps();
+    void confCap();
+    void setConn();
 
     void calcScales();
     bool updateScaleData();

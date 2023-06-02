@@ -162,6 +162,47 @@ QVector<Stump> COMPUTER_VISION::readStumps(QSqlQuery& query)
     return stumps;
 }
 
+QVector<Feature> COMPUTER_VISION::readFeatures(QSqlQuery& query)
+{
+    QVector<Feature> features;
+
+    QString queryString =
+        "SELECT TILTED, "
+        "RECT1_X, RECT1_Y, RECT1_WIDTH, RECT1_HEIGHT, RECT1_WEIGHT, "
+        "RECT2_X, RECT2_Y, RECT2_WIDTH, RECT2_HEIGHT, RECT2_WEIGHT, "
+        "RECT3_X, RECT3_Y, RECT3_WIDTH, RECT3_HEIGHT, RECT3_WEIGHT "
+        "FROM FRONTALFACE_DEFAULT_HAAR";
+
+    if (query.exec(queryString)) {
+        while (query.next()) {
+            Feature feature;
+            feature.tilted = query.value(0).toBool();
+
+            feature.rect[0].r.x = query.value(1).toInt();
+            feature.rect[0].r.y = query.value(2).toInt();
+            feature.rect[0].r.width = query.value(3).toInt();
+            feature.rect[0].r.height = query.value(4).toInt();
+            feature.rect[0].weight = query.value(5).toFloat();
+
+            feature.rect[1].r.x = query.value(6).toInt();
+            feature.rect[1].r.y = query.value(7).toInt();
+            feature.rect[1].r.width = query.value(8).toInt();
+            feature.rect[1].r.height = query.value(9).toInt();
+            feature.rect[1].weight = query.value(10).toFloat();
+
+            feature.rect[2].r.x = query.value(11).toInt();
+            feature.rect[2].r.y = query.value(12).toInt();
+            feature.rect[2].r.width = query.value(13).toInt();
+            feature.rect[2].r.height = query.value(14).toInt();
+            feature.rect[2].weight = query.value(15).toFloat();
+            
+            features.append(feature);
+        }
+    }
+
+    return features;
+}
+
 bool COMPUTER_VISION::loadDataFromDB()
 {
     QSqlDatabase db = QSqlDatabase::addDatabase("QSQLITE");
@@ -181,6 +222,7 @@ bool COMPUTER_VISION::loadDataFromDB()
     data.nodes = readNodes(query);
     data.leaves = readLeaves(query);
     data.stumps = readStumps(query);
+    data.features = readFeatures(query);
 
     db.close();
 
@@ -419,7 +461,7 @@ void COMPUTER_VISION::displayPyramid()
         QImage image = QImage(cvImage.data, cvImage.cols, cvImage.rows, cvImage.step, QImage::Format_Grayscale8);
         QPixmap pixmap = QPixmap::fromImage(image);
         QLabel* label = layerLabels[i];
-        pixmap = pixmap.scaled(label->width(), label->height(), Qt::KeepAspectRatioByExpanding);
+        pixmap = pixmap.scaled(label->width(), label->height(), Qt::IgnoreAspectRatio);
         label->setPixmap(pixmap);
     }
 }
