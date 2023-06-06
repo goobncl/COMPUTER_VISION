@@ -71,9 +71,6 @@
     <ClCompile Include="gaussianBlur.cpp">
       <Filter>Algorithm Files\Gaussian Blur</Filter>
     </ClCompile>
-    <ClCompile Include="haarFeathre.cpp">
-      <Filter>Algorithm Files\Haar Feature</Filter>
-    </ClCompile>
     <ClCompile Include="util.cpp">
       <Filter>Algorithm Files</Filter>
     </ClCompile>

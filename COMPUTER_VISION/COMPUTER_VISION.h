@@ -32,10 +32,13 @@ private:
         QVector<float> leaves;
         QVector<Stump> stumps;
         QVector<Feature> features;
+        QVector<OptFeature> optFeatures;
     };
     Data data;
     QSqlDatabase db;
     
+    int nofs[4];
+    Rect normrect;
     Size imgSz;
     Size minObjSz;
     Size maxObjSz;
@@ -45,6 +48,7 @@ private:
     QVector<QLabel*> layerLabels;
     ImgLayer resizedBuf;
     QVector<ImgLayer> imgPyramid;
+    double varianceNormFactor;
     
     QTimer* timer;
     cv::VideoCapture cap;
@@ -73,11 +77,12 @@ private:
 
     void calcScales();
     bool updateScaleData();
+    void computeOptFeatures();
     Size clacSz0(Size oriSz, ImgLayer& resizedBuf);
     double getFPS();
     void acqFrame();
     void procImg();
-    void displayImg();  
+    void displayImg(); 
     void buildImgPyramid();
     void displayPyramid();
     void clearImgPyramid();

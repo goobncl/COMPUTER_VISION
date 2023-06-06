@@ -114,7 +114,6 @@
     <ClCompile Include="COMPUTER_VISION.cpp" />
     <ClCompile Include="clahe.cpp" />
     <ClCompile Include="gaussianBlur.cpp" />
-    <ClCompile Include="haarFeathre.cpp" />
     <ClCompile Include="ImageProcessor.cpp" />
     <ClCompile Include="prototype.cpp" />
     <ClCompile Include="main.cpp" />

@@ -234,6 +234,7 @@ void COMPUTER_VISION::setData()
     data.minNodesPerTree = 1;
     data.maxNodesPerTree = 1;
     data.origWinSz = Size(24, 24);
+    normrect = Rect(1, 1, data.origWinSz.width - 2, data.origWinSz.height - 2);
 
     if (!loadDataFromDB()) {
         qDebug() << "Error: failed to load data from database";
@@ -322,6 +323,19 @@ bool COMPUTER_VISION::updateScaleData()
     return recalcOptFeatures;
 }
 
+void COMPUTER_VISION::computeOptFeatures()
+{
+    int sstep = sbufSz.width;
+    SUM_OFS(nofs[0], nofs[1], nofs[2], nofs[3], 0, normrect, sstep);
+    size_t nfeatures = data.features.size();
+    QVector<Feature>& ff = data.features;
+    data.optFeatures.resize(nfeatures);
+    OptFeature* optfeaturesPtr = &(data.optFeatures)[0];
+    for (size_t fi = 0; fi < nfeatures; fi++) {
+        optfeaturesPtr[fi].setOffsets(ff[fi], sstep);
+    }
+}
+
 Size COMPUTER_VISION::clacSz0(Size oriSz, ImgLayer& rbuf)
 {
     int alignedSizeWidth = alignSize(oriSz.width, 16);
@@ -352,6 +366,11 @@ void COMPUTER_VISION::buildImgPyramid()
             imgPyramid[i].data = resized;
             imgPyramid[i].sum = integral(resized, new_w, new_h);
             imgPyramid[i].sqsum = integralSquare(resized, new_w, new_h);
+
+            // TODO: ...
+            {
+
+            }
         }));
     }
 
@@ -377,12 +396,13 @@ void COMPUTER_VISION::initImgProc()
     minObjSz = Size(30, 30);
     maxObjSz = imgSz;
     sbufSz = Size(0, 0);
+    varianceNormFactor = 0.f;
 
     calcScales();
     bool recalcOptFeatures = updateScaleData();
 
     if (recalcOptFeatures) {
-        //computeOptFeatures();
+        computeOptFeatures();
     }
 
     imageArray = (unsigned char*)malloc(sizeof(unsigned char) * imgSz.width * imgSz.height);
@@ -471,9 +491,9 @@ void COMPUTER_VISION::updateFrame()
     acqFrame();
     procImg();
     displayImg();
-    buildImgPyramid();
-    displayPyramid();
-    clearImgPyramid();    
+    //buildImgPyramid();
+    //displayPyramid();
+    //clearImgPyramid();    
 }
 
 void COMPUTER_VISION::onClaheBtnClicked()

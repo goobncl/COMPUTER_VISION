@@ -65,36 +65,33 @@ unsigned char* downSampling(unsigned char* input, int new_width, int new_height)
 }
 
 int* integral(unsigned char* input, int width, int height) {
-    
-    int* output = (int*)calloc((width + 1) * (height + 1), sizeof(int));
+    int* output = (int*)calloc(width * height, sizeof(int));
 
-    for (int y = 1; y < height + 1; ++y) {
-        for (int x = 1; x < width + 1; ++x) {
-            int sum = input[(y - 1) * width + (x - 1)];
-            sum += output[(y - 1) * (width + 1) + x];
-            sum += output[y * (width + 1) + (x - 1)];
-            sum -= output[(y - 1) * (width + 1) + (x - 1)];
-            output[y * (width + 1) + x] = sum;
+    for (int y = 0; y < height; ++y) {
+        for (int x = 0; x < width; ++x) {
+            int sum = input[y * width + x];
+            if (y > 0) sum += output[(y - 1) * width + x];
+            if (x > 0) sum += output[y * width + (x - 1)];
+            if (y > 0 && x > 0) sum -= output[(y - 1) * width + (x - 1)];
+            output[y * width + x] = sum;
         }
     }
-
     return output;
 }
 
 int* integralSquare(unsigned char* input, int width, int height) {
+    int* output = (int*)calloc(width * height, sizeof(int));
 
-    int* output = (int*)calloc((width + 1) * (height + 1), sizeof(int));
-
-    for (int y = 1; y < height + 1; ++y) {
-        for (int x = 1; x < width + 1; ++x) {
-            int value = input[(y - 1) * width + (x - 1)];
-            int square = value * value; 
-            square += output[(y - 1) * (width + 1) + x];
-            square += output[y * (width + 1) + (x - 1)];
-            square -= output[(y - 1) * (width + 1) + (x - 1)];
-            output[y * (width + 1) + x] = square;
+    for (int y = 0; y < height; ++y) {
+        for (int x = 0; x < width; ++x) {
+            int value = input[y * width + x];
+            int square = value * value;
+            if (y > 0) square += output[(y - 1) * width + x];
+            if (x > 0) square += output[y * width + (x - 1)];
+            if (y > 0 && x > 0) square -= output[(y - 1) * width + (x - 1)];
+            output[y * width + x] = square;
         }
     }
-
     return output;
 }
+
