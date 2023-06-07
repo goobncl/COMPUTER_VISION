@@ -18,7 +18,7 @@ public:
     ~COMPUTER_VISION();
 
 private:
-    unsigned char* imageArray;
+    unsigned char* image;
     unsigned char* rbuf;
     int* sbuf;
     Ui::COMPUTER_VISIONClass ui;

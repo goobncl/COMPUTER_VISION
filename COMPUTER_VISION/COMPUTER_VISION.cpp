@@ -18,7 +18,7 @@ COMPUTER_VISION::COMPUTER_VISION(QWidget* parent)
 
 COMPUTER_VISION::~COMPUTER_VISION()
 {
-    free(imageArray);
+    free(image);
     free(rbuf);
     free(sbuf);
     delete timer;
@@ -361,7 +361,7 @@ void COMPUTER_VISION::buildImgPyramid()
             int new_w = s.szi.width - 1;
             int new_h = s.szi.height - 1;
 
-            unsigned char* resized = downSampling(imageArray, new_w, new_h);
+            unsigned char* resized = downSampling(image, new_w, new_h);
 
             imgPyramid[i].sz.width = new_w;
             imgPyramid[i].sz.height = new_h;
@@ -407,8 +407,8 @@ void COMPUTER_VISION::initImgProc()
         computeOptFeatures();
     }
 
-    imageArray = (unsigned char*)malloc(sizeof(unsigned char) * imgSz.width * imgSz.height);
-    imageProcessor = new ImgProc(imageArray, this);
+    image = (unsigned char*)malloc(sizeof(unsigned char) * imgSz.width * imgSz.height);
+    imageProcessor = new ImgProc(image, this);
 }
 
 
@@ -437,7 +437,7 @@ void COMPUTER_VISION::acqFrame()
 
     {
         QMutexLocker locker(&imageProcessor->mutex);
-        memcpy(imageArray, grayFrame.data, FRAME_W * FRAME_H);
+        memcpy(image, grayFrame.data, FRAME_W * FRAME_H);
     }
 }
 
@@ -445,7 +445,7 @@ void COMPUTER_VISION::procImg()
 {
     if (claheEnabled) {
         imageProcessor->setImageAndProcess(
-            imageArray, 
+            image, 
             FRAME_W, 
             FRAME_H, 
             ImgProc::AlgType::Clahe
@@ -454,7 +454,7 @@ void COMPUTER_VISION::procImg()
 
     if (blurEnabled) {
         imageProcessor->setImageAndProcess(
-            imageArray, 
+            image, 
             FRAME_W, 
             FRAME_H, 
             ImgProc::AlgType::Blur
@@ -467,7 +467,7 @@ void COMPUTER_VISION::displayImg()
     cv::Mat cvFrame;
     {
         QMutexLocker locker(&imageProcessor->mutex);
-        cvFrame = cv::Mat(FRAME_H, FRAME_W, CV_8UC1, imageArray);
+        cvFrame = cv::Mat(FRAME_H, FRAME_W, CV_8UC1, image);
     }
     QImage qFrame(cvFrame.data, cvFrame.cols, cvFrame.rows, cvFrame.step, QImage::Format_Grayscale8);
     displayLabel->setPixmap(QPixmap::fromImage(std::move(qFrame)));
