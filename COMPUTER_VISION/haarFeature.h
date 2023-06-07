@@ -29,6 +29,9 @@ struct Size {
     int height;
     Size() : width(0), height(0) {}
     Size(int w, int h) : width(w), height(h) {}
+    int area() const {
+        return width * height;
+    }
 };
 
 struct ScaleData {
@@ -45,14 +48,6 @@ struct ScaleData {
     Size szi;
     int layer_offset;
     int ystep;
-};
-
-struct ImgLayer {
-    Size sz;
-    unsigned char* data;
-    int* sum;
-    int* sqsum;
-    ImgLayer() : sz(Size(0, 0)), data(NULL), sum(NULL), sqsum(NULL) {}
 };
 
 struct DTreeNode {

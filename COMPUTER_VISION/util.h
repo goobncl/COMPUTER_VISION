@@ -6,8 +6,8 @@
 size_t alignSize(size_t sz, int n);
 double doubleAbs(double n);
 double doubleRound(double number);
-unsigned char* downSampling(unsigned char* input, int new_width, int new_height);
-int* integral(unsigned char* input, int width, int height);
-int* integralSquare(unsigned char* input, int width, int height);
+void downSampling(unsigned char* src, unsigned char* dst, int new_width, int new_height);
+void integral(unsigned char* src, int* dst, int width, int height, int layer_offset);
+void integralSquare(unsigned char* src, int* dst, int width, int height, int layer_offset);
 
 #endif // UTIL_H

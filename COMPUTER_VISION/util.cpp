@@ -14,16 +14,10 @@ double doubleRound(double number) {
     return (number >= 0) ? (int)(number + 0.5) : (int)(number - 0.5);
 }
 
-unsigned char* downSampling(unsigned char* input, int new_width, int new_height) {
+void downSampling(unsigned char* src, unsigned char* dst, int new_width, int new_height) {
 
     const int original_width = 640;
     const int original_height = 480;
-
-    if (input == nullptr || new_width <= 0 || new_height <= 0) {
-        return nullptr;
-    }
-
-    unsigned char* output = (unsigned char*)malloc(sizeof(unsigned char) * new_width * new_height);
 
     double scale_x = (double)new_width / original_width;
     double scale_y = (double)new_height / original_height;
@@ -35,7 +29,7 @@ unsigned char* downSampling(unsigned char* input, int new_width, int new_height)
             double original_y = y / scale_y;
 
             if (original_x >= original_width - 1 || original_y >= original_height - 1) {
-                output[y * new_width + x] = 0;
+                dst[y * new_width + x] = 0;
                 continue;
             }
 
@@ -45,53 +39,44 @@ unsigned char* downSampling(unsigned char* input, int new_width, int new_height)
             double fx = original_x - original_x_int;
             double fy = original_y - original_y_int;
 
-            unsigned char p00 = input[original_y_int * original_width + original_x_int];
-            unsigned char p01 = input[original_y_int * original_width + original_x_int + 1];
-            unsigned char p10 = input[(original_y_int + 1) * original_width + original_x_int];
-            unsigned char p11 = input[(original_y_int + 1) * original_width + original_x_int + 1];
+            unsigned char p00 = src[original_y_int * original_width + original_x_int];
+            unsigned char p01 = src[original_y_int * original_width + original_x_int + 1];
+            unsigned char p10 = src[(original_y_int + 1) * original_width + original_x_int];
+            unsigned char p11 = src[(original_y_int + 1) * original_width + original_x_int + 1];
 
             double w00 = (1 - fx) * (1 - fy);
             double w01 = fx * (1 - fy);
             double w10 = (1 - fx) * fy;
             double w11 = fx * fy;
 
-            output[y * new_width + x] = (unsigned char)(
+            dst[y * new_width + x] = (unsigned char)(
                 w00 * p00 + w01 * p01 + w10 * p10 + w11 * p11
             );
         }
     }
-
-    return output;
 }
 
-int* integral(unsigned char* input, int width, int height) {
-    int* output = (int*)calloc(width * height, sizeof(int));
-
+void integral(unsigned char* src, int* dst, int width, int height, int layer_offset) {
     for (int y = 0; y < height; ++y) {
         for (int x = 0; x < width; ++x) {
-            int sum = input[y * width + x];
-            if (y > 0) sum += output[(y - 1) * width + x];
-            if (x > 0) sum += output[y * width + (x - 1)];
-            if (y > 0 && x > 0) sum -= output[(y - 1) * width + (x - 1)];
-            output[y * width + x] = sum;
+            int sum = src[y * width + x];
+            if (y > 0) sum += dst[(y - 1) * width + x + layer_offset];
+            if (x > 0) sum += dst[y * width + (x - 1) + layer_offset];
+            if (y > 0 && x > 0) sum -= dst[(y - 1) * width + (x - 1) + layer_offset];
+            dst[y * width + x + layer_offset] = sum;
         }
     }
-    return output;
 }
 
-int* integralSquare(unsigned char* input, int width, int height) {
-    int* output = (int*)calloc(width * height, sizeof(int));
-
+void integralSquare(unsigned char* src, int* dst, int width, int height, int layer_offset) {
     for (int y = 0; y < height; ++y) {
         for (int x = 0; x < width; ++x) {
-            int value = input[y * width + x];
+            int value = src[y * width + x];
             int square = value * value;
-            if (y > 0) square += output[(y - 1) * width + x];
-            if (x > 0) square += output[y * width + (x - 1)];
-            if (y > 0 && x > 0) square -= output[(y - 1) * width + (x - 1)];
-            output[y * width + x] = square;
+            if (y > 0) square += dst[(y - 1) * width + x + layer_offset];
+            if (x > 0) square += dst[y * width + (x - 1) + layer_offset];
+            if (y > 0 && x > 0) square -= dst[(y - 1) * width + (x - 1) + layer_offset];
+            dst[y * width + x + layer_offset] = square;
         }
     }
-    return output;
 }
-

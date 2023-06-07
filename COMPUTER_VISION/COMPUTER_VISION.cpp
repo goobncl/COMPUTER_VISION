@@ -338,60 +338,6 @@ void COMPUTER_VISION::computeOptFeatures()
     }
 }
 
-Size COMPUTER_VISION::clacSz0(Size oriSz, ImgLayer& rbuf)
-{
-    int alignedSizeWidth = alignSize(oriSz.width, 16);
-    alignedSizeWidth = rbuf.sz.width > alignedSizeWidth ? rbuf.sz.width : alignedSizeWidth;
-    int maxHeight = rbuf.sz.height > oriSz.height ? rbuf.sz.height : oriSz.height;
-    return Size(alignedSizeWidth, maxHeight);
-}
-
-void COMPUTER_VISION::buildImgPyramid()
-{
-    Size sz0 = clacSz0(scaleData.at(0).szi, resizedBuf);
-    int nscales = scaleData.size();
-    imgPyramid.resize(nscales);
-
-    QFutureWatcher<void> watcher;
-    QList<QFuture<void>> futures;
-
-    for (int i = 0; i < nscales; i++) {
-        futures.append(QtConcurrent::run([this, i] {
-            const ScaleData& s = scaleData.at(i);
-            int new_w = s.szi.width - 1;
-            int new_h = s.szi.height - 1;
-
-            unsigned char* resized = downSampling(image, new_w, new_h);
-
-            imgPyramid[i].sz.width = new_w;
-            imgPyramid[i].sz.height = new_h;
-            imgPyramid[i].data = resized;
-            imgPyramid[i].sum = integral(resized, new_w, new_h);
-            imgPyramid[i].sqsum = integralSquare(resized, new_w, new_h);
-
-            // TODO: ...
-            {
-
-            }
-        }));
-    }
-
-    for (auto& future : futures) {
-        watcher.setFuture(future);
-        watcher.waitForFinished();
-    }
-}
-
-void COMPUTER_VISION::clearImgPyramid()
-{
-    for (int i = 0; i < imgPyramid.size(); i++) {
-		free(imgPyramid[i].data);
-        free(imgPyramid[i].sum);
-        free(imgPyramid[i].sqsum);
-	}
-    imgPyramid.clear();
-}
-
 void COMPUTER_VISION::initImgProc()
 {
     imgSz = Size(FRAME_W, FRAME_H);
@@ -401,13 +347,15 @@ void COMPUTER_VISION::initImgProc()
     varianceNormFactor = 0.f;
 
     calcScales();
-    bool recalcOptFeatures = updateScaleData();
+    updateScaleData();
+    computeOptFeatures();
 
-    if (recalcOptFeatures) {
-        computeOptFeatures();
-    }
+    sz0 = scaleData.at(0).szi;
+    sz0 = Size((int)alignSize(sz0.width, 16), sz0.height);
 
     image = (unsigned char*)malloc(sizeof(unsigned char) * imgSz.width * imgSz.height);
+    rbuf = (unsigned char*)malloc(sizeof(unsigned char) * sz0.width * sz0.height);
+    sbuf = (int*)malloc(sizeof(int) * sbufSz.width * (sbufSz.height * 2));
     imageProcessor = new ImgProc(image, this);
 }
 
@@ -441,6 +389,58 @@ void COMPUTER_VISION::acqFrame()
     }
 }
 
+void COMPUTER_VISION::verifySum(int scaleIdx)
+{
+    const ScaleData& s = scaleData.at(scaleIdx);
+
+    cv::Mat A(s.szi.height, s.szi.width, CV_32S, sbuf + s.layer_offset);
+    cv::Mat B(s.szi.height, s.szi.width, CV_8U, rbuf);
+    cv::Mat C, D;
+
+    cv::integral(B, C, CV_32S);
+
+    D = C(cv::Rect(1, 1, B.cols, B.rows));
+
+    double diff = cv::norm(A, D, cv::NORM_INF);
+    if (diff == 0) {
+        std::cout << "O" << std::endl;
+    }
+    else {
+        std::cout << "X" << std::endl;
+    }
+}
+
+void COMPUTER_VISION::verifySqsum(int scaleIdx)
+{
+    const ScaleData& s = scaleData.at(scaleIdx);
+
+    cv::Mat A(s.szi.height, s.szi.width, CV_32S, sbuf + s.layer_offset + sqofs);
+    cv::Mat B(s.szi.height, s.szi.width, CV_8U, rbuf);
+    cv::Mat sum, sqsum;
+
+    cv::integral(B, sum, sqsum, cv::noArray(), CV_32S, CV_32S);
+
+    cv::Mat D = sqsum(cv::Rect(1, 1, B.cols, B.rows));
+
+    double diff = cv::norm(A, D, cv::NORM_INF);
+    if (diff == 0) {
+        std::cout << "O" << std::endl;
+    }
+    else {
+        std::cout << "X" << std::endl;
+    }
+}
+
+void COMPUTER_VISION::computeChannels(int scaleIdx, unsigned char* img)
+{
+    const ScaleData& s = scaleData.at(scaleIdx);
+    sqofs = sbufSz.area();
+    integral(img, sbuf, s.szi.width, s.szi.height, s.layer_offset);
+    integralSquare(img, sbuf, s.szi.width, s.szi.height, s.layer_offset + sqofs);
+    //verifySum(scaleIdx);
+    //verifySqsum(scaleIdx);
+}
+
 void COMPUTER_VISION::procImg()
 {
     if (claheEnabled) {
@@ -460,6 +460,24 @@ void COMPUTER_VISION::procImg()
             ImgProc::AlgType::Blur
         );
     }
+
+    // TODO: ... 
+    {
+        size_t nscales = scaleData.size();
+        memset(sbuf, 0, sizeof(int) * sbufSz.width * (sbufSz.height * 2));
+
+        for (size_t i = 0; i < nscales; i++) {
+            const ScaleData& s = scaleData.at(i);
+            memset(rbuf, 0, sizeof(unsigned char) * sz0.width * sz0.height);
+            downSampling(image, rbuf, s.szi.width, s.szi.height);
+
+            //cv::Mat TMP(s.szi.height, s.szi.width, CV_8U, rbuf);
+            //cv::imshow("", TMP);
+            //cv::waitKey(0);
+
+            computeChannels(i, rbuf);
+        }
+    }
 }
 
 void COMPUTER_VISION::displayImg()
@@ -475,27 +493,11 @@ void COMPUTER_VISION::displayImg()
     statusBar()->showMessage(QString("FPS: %1").arg(getFPS(), 0, 'f', 8));
 }
 
-void COMPUTER_VISION::displayPyramid() 
-{
-    int nLayers = imgPyramid.size();
-    for (size_t i = 0; i < nLayers; ++i) {
-        cv::Mat cvImage(imgPyramid[i].sz.height, imgPyramid[i].sz.width, CV_8UC1, imgPyramid[i].data);
-        QImage image = QImage(cvImage.data, cvImage.cols, cvImage.rows, cvImage.step, QImage::Format_Grayscale8);
-        QPixmap pixmap = QPixmap::fromImage(image);
-        QLabel* label = layerLabels[i];
-        pixmap = pixmap.scaled(label->width(), label->height(), Qt::IgnoreAspectRatio);
-        label->setPixmap(pixmap);
-    }
-}
-
 void COMPUTER_VISION::updateFrame()
 {
     acqFrame();
     procImg();
-    displayImg();
-    //buildImgPyramid();
-    //displayPyramid();
-    //clearImgPyramid();    
+    displayImg(); 
 }
 
 void COMPUTER_VISION::onClaheBtnClicked()

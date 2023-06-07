@@ -39,8 +39,10 @@ private:
     Data data;
     QSqlDatabase db;
     
+    int sqofs;
     int nofs[4];
     Rect normrect;
+    Size sz0;
     Size imgSz;
     Size minObjSz;
     Size maxObjSz;
@@ -48,8 +50,6 @@ private:
     QVector<double> scales;
     QVector<ScaleData> scaleData;
     QVector<QLabel*> layerLabels;
-    ImgLayer resizedBuf;
-    QVector<ImgLayer> imgPyramid;
     double varianceNormFactor;
     
     QTimer* timer;
@@ -80,16 +80,14 @@ private:
     void calcScales();
     bool updateScaleData();
     void computeOptFeatures();
-    Size clacSz0(Size oriSz, ImgLayer& resizedBuf);
+    void computeChannels(int scaleIdx, unsigned char* img);
     double getFPS();
     void acqFrame();
     void procImg();
     void displayImg(); 
-    void buildImgPyramid();
-    void displayPyramid();
-    void clearImgPyramid();
     void updateFrame();
-
+    void verifySum(int scaleIdx);
+    void verifySqsum(int scaleIdx);
 
 private slots:
     void onClaheBtnClicked();
