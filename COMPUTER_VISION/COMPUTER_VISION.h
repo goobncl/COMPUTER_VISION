@@ -19,6 +19,8 @@ public:
 
 private:
     unsigned char* imageArray;
+    unsigned char* rbuf;
+    int* sbuf;
     Ui::COMPUTER_VISIONClass ui;
         
     struct Data {

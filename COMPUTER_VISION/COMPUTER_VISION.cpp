@@ -19,6 +19,8 @@ COMPUTER_VISION::COMPUTER_VISION(QWidget* parent)
 COMPUTER_VISION::~COMPUTER_VISION()
 {
     free(imageArray);
+    free(rbuf);
+    free(sbuf);
     delete timer;
     delete imageProcessor;
     cap.release();
@@ -501,14 +503,14 @@ void COMPUTER_VISION::onClaheBtnClicked()
     claheEnabled = !claheEnabled;
 
     QFont font = claheBtn->font();
-    if (claheEnabled)
-    {
+    
+    if (claheEnabled) {
         font.setWeight(QFont::Bold);
     }
-    else
-    {
+    else {
         font.setWeight(QFont::Normal);
     }
+    
     claheBtn->setFont(font);
 }
 
@@ -516,13 +518,13 @@ void COMPUTER_VISION::onBlurBtnClicked()
 {
     blurEnabled = !blurEnabled;
 	QFont font = blurBtn->font();
-    if (blurEnabled)
-    {
+    
+    if (blurEnabled) {
 		font.setWeight(QFont::Bold);
 	}
-    else
-    {
+    else {
 		font.setWeight(QFont::Normal);
 	}
-	blurBtn->setFont(font);
+	
+    blurBtn->setFont(font);
 }
