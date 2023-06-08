@@ -389,14 +389,14 @@ void COMPUTER_VISION::acqFrame()
     }
 }
 
-void COMPUTER_VISION::verifyMatEqual(const cv::Mat& mat1, const cv::Mat& mat2, const std::string& mat_name)
+void COMPUTER_VISION::verifyMatEqual(const cv::Mat& mat1, const cv::Mat& mat2, const QString& mat_name)
 {
     double diff = cv::norm(mat1, mat2, cv::NORM_INF);
     if (diff == 0) {
-        std::cout << mat_name << ": O" << std::endl;
+        qDebug() << mat_name << ": O";
     }
     else {
-        std::cout << mat_name << ": X" << std::endl;
+        qDebug() << mat_name << ": X";
     }
 }
 
@@ -426,7 +426,7 @@ void COMPUTER_VISION::computeChannels(int scaleIdx, unsigned char* img)
     integralSquare(img, sbuf, s.szi.width, s.szi.height, (s.layer_offset + sqofs));
 # if 0:    
     verifyIntegral(scaleIdx);
-# endif    
+# endif
 }
 
 void COMPUTER_VISION::procImg()
