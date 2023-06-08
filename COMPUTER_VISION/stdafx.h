@@ -1,5 +1,6 @@
 #pragma once
 
+#include <fstream>
 #include <QObject>
 #include <QThread>
 #include <QMutex>

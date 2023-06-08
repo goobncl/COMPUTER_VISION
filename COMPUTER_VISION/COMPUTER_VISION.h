@@ -88,6 +88,7 @@ private:
     void updateFrame();
     void verifyMatEqual(const cv::Mat& mat1, const cv::Mat& mat2, const QString& mat_name);
     void verifyIntegral(int scaleIdx);
+    void saveMatToCsv(const cv::Mat& mat, const QString& filename);
 
 private slots:
     void onClaheBtnClicked();
