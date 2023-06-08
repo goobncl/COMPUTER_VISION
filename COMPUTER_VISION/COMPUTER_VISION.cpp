@@ -328,7 +328,7 @@ bool COMPUTER_VISION::updateScaleData()
 void COMPUTER_VISION::computeOptFeatures()
 {
     int sstep = sbufSz.width;
-    SUM_OFS(nofs[0], nofs[1], nofs[2], nofs[3], 0, normrect, sstep);
+    CV_SUM_OFS(nofs[0], nofs[1], nofs[2], nofs[3], 0, normrect, sstep);
     size_t nfeatures = data.features.size();
     QVector<Feature>& ff = data.features;
     data.optFeatures.resize(nfeatures);

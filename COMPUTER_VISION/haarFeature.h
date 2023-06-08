@@ -6,9 +6,9 @@
 #define TRUE 1
 #define FALSE 0
 #define RECT_NUM 3
-#define CALC_SUM_OFFSET_(p0, p1, p2, p3, ptr) ((ptr)[p0] - (ptr)[p1] - (ptr)[p2] + (ptr)[p3])
-#define CALC_SUM_OFFSET(rect, ptr) CALC_SUM_OFFSET_((rect)[0], (rect)[1], (rect)[2], (rect)[3], ptr)
-#define SUM_OFS( p0, p1, p2, p3, sum, rect, step )                 \
+#define CALC_SUM_OFS_(p0, p1, p2, p3, ptr) ((ptr)[p0] - (ptr)[p1] - (ptr)[p2] + (ptr)[p3])
+#define CALC_SUM_OFS(rect, ptr) CALC_SUM_OFS_((rect)[0], (rect)[1], (rect)[2], (rect)[3], ptr)
+#define CV_SUM_OFS( p0, p1, p2, p3, sum, rect, step )                 \
 (p0) = sum + (rect).x + (step) * (rect).y,                            \
 (p1) = sum + (rect).x + (rect).width + (step) * (rect).y,             \
 (p2) = sum + (rect).x + (step) * ((rect).y + (rect).height),          \
@@ -112,15 +112,15 @@ struct OptFeature {
         weight[0] = _f.rect[0].weight;
         weight[1] = _f.rect[1].weight;
         weight[2] = _f.rect[2].weight;
-        SUM_OFS(offset[0][0], offset[0][1], offset[0][2], offset[0][3], 0, _f.rect[0].r, step);
-        SUM_OFS(offset[1][0], offset[1][1], offset[1][2], offset[1][3], 0, _f.rect[1].r, step);
-        SUM_OFS(offset[2][0], offset[2][1], offset[2][2], offset[2][3], 0, _f.rect[2].r, step);
+        CV_SUM_OFS(offset[0][0], offset[0][1], offset[0][2], offset[0][3], 0, _f.rect[0].r, step);
+        CV_SUM_OFS(offset[1][0], offset[1][1], offset[1][2], offset[1][3], 0, _f.rect[1].r, step);
+        CV_SUM_OFS(offset[2][0], offset[2][1], offset[2][2], offset[2][3], 0, _f.rect[2].r, step);
     }
 
     double calc(const int* ptr) const {
-        double ret = weight[0] * CALC_SUM_OFFSET(offset[0], ptr) + weight[1] * CALC_SUM_OFFSET(offset[1], ptr);
+        double ret = weight[0] * CALC_SUM_OFS(offset[0], ptr) + weight[1] * CALC_SUM_OFS(offset[1], ptr);
         if (weight[2] != 0.0f) {
-            ret += weight[2] * CALC_SUM_OFFSET(offset[2], ptr);
+            ret += weight[2] * CALC_SUM_OFS(offset[2], ptr);
         }
         return ret;
     }
