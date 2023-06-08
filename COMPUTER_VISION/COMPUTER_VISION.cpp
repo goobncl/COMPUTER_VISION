@@ -424,6 +424,9 @@ void COMPUTER_VISION::computeChannels(int scaleIdx, unsigned char* img)
     sqofs = sbufSz.area();
     integral(img, sbuf, s.szi.width, s.szi.height, s.layer_offset);
     integralSquare(img, sbuf, s.szi.width, s.szi.height, (s.layer_offset + sqofs));
+# if 0:    
+    verifyIntegral(scaleIdx);
+# endif    
 }
 
 void COMPUTER_VISION::procImg()
