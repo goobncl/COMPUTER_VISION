@@ -86,8 +86,8 @@ private:
     void procImg();
     void displayImg(); 
     void updateFrame();
-    void verifySum(int scaleIdx);
-    void verifySqsum(int scaleIdx);
+    void verifyMatEqual(const cv::Mat& mat1, const cv::Mat& mat2, const std::string& mat_name);
+    void verifyIntegral(int scaleIdx);
 
 private slots:
     void onClaheBtnClicked();

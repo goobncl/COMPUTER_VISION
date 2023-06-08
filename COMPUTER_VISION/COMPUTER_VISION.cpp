@@ -389,46 +389,33 @@ void COMPUTER_VISION::acqFrame()
     }
 }
 
-void COMPUTER_VISION::verifySum(int scaleIdx)
+void COMPUTER_VISION::verifyMatEqual(const cv::Mat& mat1, const cv::Mat& mat2, const std::string& mat_name)
 {
-    const ScaleData& s = scaleData.at(scaleIdx);
-
-    cv::Mat A(s.szi.height, s.szi.width, CV_32S, sbuf + s.layer_offset);
-    cv::Mat B(s.szi.height, s.szi.width, CV_8U, rbuf);
-    cv::Mat C, D;
-
-    cv::integral(B, C, CV_32S);
-
-    D = C(cv::Rect(1, 1, B.cols, B.rows));
-
-    double diff = cv::norm(A, D, cv::NORM_INF);
+    double diff = cv::norm(mat1, mat2, cv::NORM_INF);
     if (diff == 0) {
-        std::cout << "O" << std::endl;
+        std::cout << mat_name << ": O" << std::endl;
     }
     else {
-        std::cout << "X" << std::endl;
+        std::cout << mat_name << ": X" << std::endl;
     }
 }
 
-void COMPUTER_VISION::verifySqsum(int scaleIdx)
+void COMPUTER_VISION::verifyIntegral(int scaleIdx)
 {
     const ScaleData& s = scaleData.at(scaleIdx);
 
-    cv::Mat A(s.szi.height, s.szi.width, CV_32S, sbuf + s.layer_offset + sqofs);
-    cv::Mat B(s.szi.height, s.szi.width, CV_8U, rbuf);
+    cv::Mat sbuf_sum(s.szi.height, s.szi.width, CV_32S, sbuf + s.layer_offset);
+    cv::Mat sbuf_sqsum(s.szi.height, s.szi.width, CV_32S, sbuf + s.layer_offset + sqofs);
+    cv::Mat rbuf_img(s.szi.height, s.szi.width, CV_8U, rbuf);
     cv::Mat sum, sqsum;
 
-    cv::integral(B, sum, sqsum, cv::noArray(), CV_32S, CV_32S);
+    cv::integral(rbuf_img, sum, sqsum, cv::noArray(), CV_32S, CV_32S);
 
-    cv::Mat D = sqsum(cv::Rect(1, 1, B.cols, B.rows));
+    sum = sum(cv::Rect(1, 1, s.szi.width, s.szi.height));
+    sqsum = sqsum(cv::Rect(1, 1, s.szi.width, s.szi.height));
 
-    double diff = cv::norm(A, D, cv::NORM_INF);
-    if (diff == 0) {
-        std::cout << "O" << std::endl;
-    }
-    else {
-        std::cout << "X" << std::endl;
-    }
+    verifyMatEqual(sbuf_sum, sum, "sum");
+    verifyMatEqual(sbuf_sqsum, sqsum, "sqsum");
 }
 
 void COMPUTER_VISION::computeChannels(int scaleIdx, unsigned char* img)
@@ -436,9 +423,7 @@ void COMPUTER_VISION::computeChannels(int scaleIdx, unsigned char* img)
     const ScaleData& s = scaleData.at(scaleIdx);
     sqofs = sbufSz.area();
     integral(img, sbuf, s.szi.width, s.szi.height, s.layer_offset);
-    integralSquare(img, sbuf, s.szi.width, s.szi.height, s.layer_offset + sqofs);
-    //verifySum(scaleIdx);
-    //verifySqsum(scaleIdx);
+    integralSquare(img, sbuf, s.szi.width, s.szi.height, (s.layer_offset + sqofs));
 }
 
 void COMPUTER_VISION::procImg()
@@ -470,11 +455,6 @@ void COMPUTER_VISION::procImg()
             const ScaleData& s = scaleData.at(i);
             memset(rbuf, 0, sizeof(unsigned char) * sz0.width * sz0.height);
             downSampling(image, rbuf, s.szi.width, s.szi.height);
-
-            //cv::Mat TMP(s.szi.height, s.szi.width, CV_8U, rbuf);
-            //cv::imshow("", TMP);
-            //cv::waitKey(0);
-
             computeChannels(i, rbuf);
         }
     }
