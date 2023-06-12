@@ -726,16 +726,45 @@ void COMPUTER_VISION::calcImgPyramid()
     }
 }
 
+QImage COMPUTER_VISION::normMat(cv::Mat& cvImage)
+{
+    double minVal, maxVal;
+    cv::minMaxLoc(cvImage, &minVal, &maxVal);
+    cv::Mat normalized;
+    cvImage.convertTo(normalized, CV_32F, 1.0 / (maxVal - minVal), -minVal / (maxVal - minVal));
+    normalized.convertTo(normalized, CV_8UC1, 255.0);
+
+    return QImage(normalized.data, normalized.cols, normalized.rows, normalized.step, QImage::Format_Grayscale8).copy();
+}
+
+void COMPUTER_VISION::displayLayer(ImgLayer& layer, int layerIndex)
+{
+    QImage image;
+    switch (layer.state) {
+    case LayerState::DATA:
+    {
+        cv::Mat cvImage(layer.sz.height, layer.sz.width, CV_8UC1, layer.data);
+        image = QImage(cvImage.data, cvImage.cols, cvImage.rows, cvImage.step, QImage::Format_Grayscale8);
+    }
+    break;
+    case LayerState::SUM:
+    case LayerState::SQSUM:
+    {
+        cv::Mat cvImage(layer.sz.height, layer.sz.width, CV_32S, layer.state == LayerState::SUM ? layer.sum : layer.sqsum);
+        image = normMat(cvImage);
+    }
+    break;
+    }
+
+    QLabel* label = layerLabels[layerIndex];
+    label->setPixmap(QPixmap::fromImage(image.scaled(label->width(), label->height(), Qt::IgnoreAspectRatio)));
+}
+
 void COMPUTER_VISION::displayPyramid()
 {
     int nLayers = imgPyramid.size();
     for (size_t i = 0; i < nLayers; ++i) {
-        cv::Mat cvImage(imgPyramid[i].sz.height, imgPyramid[i].sz.width, CV_8UC1, imgPyramid[i].data);
-        QImage image = QImage(cvImage.data, cvImage.cols, cvImage.rows, cvImage.step, QImage::Format_Grayscale8);
-        QPixmap pixmap = QPixmap::fromImage(image);
-        QLabel* label = layerLabels[i];
-        pixmap = pixmap.scaled(label->width(), label->height(), Qt::IgnoreAspectRatio);
-        label->setPixmap(pixmap);
+        displayLayer(imgPyramid[i], i);
     }
 }
 
@@ -795,15 +824,12 @@ void COMPUTER_VISION::onLayerClicked(int layerIndex) {
     switch (layer.state) {
     case LayerState::DATA:
         layer.state = LayerState::SUM;
-        //displayLayer(layer, layer.sum);
         break;
     case LayerState::SUM:
         layer.state = LayerState::SQSUM;
-        //displayLayer(layer, layer.sqsum);
         break;
     case LayerState::SQSUM:
         layer.state = LayerState::DATA;
-        //displayLayer(layer, layer.data);
         break;
     }
 }

@@ -107,6 +107,8 @@ private:
 
     Size clacSz0(Size oriSz);
     void calcImgPyramid();
+    QImage normMat(cv::Mat& cvImage);
+    void displayLayer(ImgLayer& layer, int layerIndex);
     void displayPyramid();
     void clearImgPyramid();
 
