@@ -22,11 +22,11 @@ struct ImgLayer {
     ImgLayer() : sz(Size(0, 0)), data(NULL), sum(NULL), sqsum(NULL), state(LayerState::DATA) {}
 };
 
-class ClickLabel : public QLabel {
+class QClickLabel : public QLabel {
     Q_OBJECT
 public:
-    explicit ClickLabel(QWidget* p = 0) : QLabel(p) {}
-    ~ClickLabel() {}
+    explicit QClickLabel(QWidget* p = 0) : QLabel(p) {}
+    ~QClickLabel() {}
 
 signals:
     void clicked();
