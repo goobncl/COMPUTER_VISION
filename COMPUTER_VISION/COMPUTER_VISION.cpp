@@ -156,7 +156,7 @@ void COMPUTER_VISION::setConn()
     
     //int nLayers = scales.size();
     //for (size_t i = 0; i < nLayers; ++i) {
-    //    connect(layerLabels[i], &ClickableLabel::clicked, [this, i]() { this->onLayerClicked(i); });
+    //    connect(layerLabels[i], &QClickLabel::clicked, [this, i]() { this->onLayerClicked(i); });
     //}
 
     timer->start(0);
