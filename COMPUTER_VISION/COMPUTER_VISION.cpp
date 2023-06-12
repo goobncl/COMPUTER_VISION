@@ -27,6 +27,20 @@ COMPUTER_VISION::~COMPUTER_VISION()
     cap.release();
 }
 
+bool COMPUTER_VISION::eventFilter(QObject* obj, QEvent* event)
+{
+    if (event->type() == QEvent::MouseButtonPress) {
+        for (int i = 0; i < layerLabels.size(); ++i) {
+            if (obj == layerLabels[i]) {
+                onLayerClicked(i);
+                return true;
+            }
+        }
+    }
+
+    return QObject::eventFilter(obj, event);
+}
+
 void COMPUTER_VISION::initComponents()
 {
     displayLabel = findChild<QLabel*>("videoLabel");
@@ -53,7 +67,8 @@ void COMPUTER_VISION::initLayerLabels()
         QLabel* label = findChild<QLabel*>(objectName);
 
         if (label) {
-            layerLabels.push_back((QLabel*)label);
+            layerLabels.push_back(label);
+            label->installEventFilter(this);
             QLabel* numLabel = createNumLabel(label, i);
             QGraphicsDropShadowEffect* effect = createDropShadowEffect();
             numLabel->setGraphicsEffect(effect);
@@ -773,4 +788,22 @@ void COMPUTER_VISION::onBlurBtnClicked()
 	}
 	
     blurBtn->setFont(font);
+}
+
+void COMPUTER_VISION::onLayerClicked(int layerIndex) {
+    ImgLayer& layer = imgPyramid[layerIndex];
+    switch (layer.state) {
+    case LayerState::DATA:
+        layer.state = LayerState::SUM;
+        //displayLayer(layer, layer.sum);
+        break;
+    case LayerState::SUM:
+        layer.state = LayerState::SQSUM;
+        //displayLayer(layer, layer.sqsum);
+        break;
+    case LayerState::SQSUM:
+        layer.state = LayerState::DATA;
+        //displayLayer(layer, layer.data);
+        break;
+    }
 }

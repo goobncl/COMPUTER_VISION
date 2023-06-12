@@ -26,6 +26,9 @@ class COMPUTER_VISION : public QMainWindow
 {
     Q_OBJECT
 
+protected:
+    bool eventFilter(QObject* obj, QEvent* event) override;
+
 public:
     COMPUTER_VISION(QWidget* parent = Q_NULLPTR);
     ~COMPUTER_VISION();
@@ -85,11 +88,10 @@ private:
     QVector<float> readLeaves(QSqlQuery& query);
     QVector<Stump> readStumps(QSqlQuery& query);
     QVector<Feature> readFeatures(QSqlQuery& query);
+    
     bool loadDataFromDB();
     void setData();
-
     void initImgProc();
-
     void initComponents();
     QLabel* createNumLabel(QLabel* label, int i);
     QGraphicsDropShadowEffect* createDropShadowEffect();
@@ -126,4 +128,5 @@ private:
 private slots:
     void onClaheBtnClicked();
     void onBlurBtnClicked();
+    void onLayerClicked(int layerIndex);
 };
