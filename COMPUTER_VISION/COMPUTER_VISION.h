@@ -22,17 +22,17 @@ struct ImgLayer {
     ImgLayer() : sz(Size(0, 0)), data(NULL), sum(NULL), sqsum(NULL), state(LayerState::DATA) {}
 };
 
-class ClickableLabel : public QLabel {
+class ClickLabel : public QLabel {
     Q_OBJECT
 public:
-    explicit ClickableLabel(QWidget* parent = 0) : QLabel(parent) {}
-    ~ClickableLabel() {}
+    explicit ClickLabel(QWidget* p = 0) : QLabel(p) {}
+    ~ClickLabel() {}
 
 signals:
     void clicked();
 
 protected:
-    void mousePressEvent(QMouseEvent* event) {
+    void mousePressEvent(QMouseEvent* e) {
         emit clicked();
     }
 };
