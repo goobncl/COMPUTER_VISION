@@ -32,7 +32,7 @@
   </ImportGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Debug|x64'" Label="QtSettings">
     <QtInstall>6.5.0</QtInstall>
-    <QtModules>core;gui;widgets;multimedia;sql;statemachine;designer;uitools;uiplugin</QtModules>
+    <QtModules>core;gui;testlib;widgets;multimedia;sql;statemachine;charts;designer;uitools;uiplugin</QtModules>
     <QtBuildConfig>debug</QtBuildConfig>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Release|x64'" Label="QtSettings">

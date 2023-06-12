@@ -55,6 +55,8 @@ private:
     QTimer* timer;
     cv::VideoCapture cap;
 
+    QLineSeries* series;
+    QChartView* fpsTimeSeries;
     QPushButton* claheBtn;
     QPushButton* blurBtn;
     QLabel* displayLabel;
@@ -73,6 +75,16 @@ private:
     void setData();
 
     void initImgProc();
+
+    void initComponents();
+    QLabel* createNumLabel(QLabel* label, int i);
+    QGraphicsDropShadowEffect* createDropShadowEffect();
+    void initLayerLabels();
+    void customizeAxis(QChart* chart);
+    void setAxisStyle(QValueAxis* axis);
+    void initFpsTimeSeries();
+    void initStatusBar();
+
     void initComps();
     void confCap();
     void setConn();
@@ -89,6 +101,8 @@ private:
     void verifyMatEqual(const cv::Mat& mat1, const cv::Mat& mat2, const QString& mat_name);
     void verifyIntegral(int scaleIdx);
     void saveMatToCsv(const cv::Mat& mat, const QString& filename);
+    int predictOrderedStump(const int* ptr, int layer_offset);
+    bool setWindow(int* ptr, int scaleIdx);
 
 private slots:
     void onClaheBtnClicked();

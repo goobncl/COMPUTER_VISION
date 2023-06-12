@@ -26,44 +26,117 @@ COMPUTER_VISION::~COMPUTER_VISION()
     cap.release();
 }
 
-void COMPUTER_VISION::initComps()
+void COMPUTER_VISION::initComponents()
 {
     displayLabel = findChild<QLabel*>("videoLabel");
     claheBtn = findChild<QPushButton*>("claheBtn");
     blurBtn = findChild<QPushButton*>("blurBtn");
+}
 
+QLabel* COMPUTER_VISION::createNumLabel(QLabel* label, int i)
+{
+    QLabel* numLabel = new QLabel(label);
+    QString labelText = "[" + QString::number(i + 1) + "] ";
+    labelText += QString::number(scaleData[i].szi.width);
+    labelText += " x ";
+    labelText += QString::number(scaleData[i].szi.height);
+    numLabel->setText(labelText);
+
+    numLabel->setAlignment(Qt::AlignTop | Qt::AlignLeft);
+    numLabel->setContentsMargins(5, 5, 5, 5);
+    numLabel->setStyleSheet("QLabel {"
+        " color : yellow;"
+        " border: none;"
+        " font-weight: bold;"
+        " font-size: 10px;"
+        "}");
+
+    return numLabel;
+}
+
+QGraphicsDropShadowEffect* COMPUTER_VISION::createDropShadowEffect()
+{
+    QGraphicsDropShadowEffect* effect = new QGraphicsDropShadowEffect();
+    effect->setBlurRadius(2);
+    effect->setXOffset(1);
+    effect->setYOffset(1);
+    effect->setColor(QColor("black"));
+
+    return effect;
+}
+
+void COMPUTER_VISION::initLayerLabels()
+{
     int nLayers = scales.size();
     for (int i = 0; i < nLayers; ++i) {
         QString objectName = "layerLabel_" + QString::number(i).rightJustified(2, '0');
         QLabel* label = findChild<QLabel*>(objectName);
-        
+
         if (label) {
             layerLabels.push_back(label);
-            QLabel* numLabel = new QLabel(label);            
-            QString labelText = "[" + QString::number(i + 1) + "] ";
-            labelText += QString::number(scaleData[i].szi.width);
-            labelText += " x ";
-            labelText += QString::number(scaleData[i].szi.height);
-            numLabel->setText(labelText);
-
-            numLabel->setAlignment(Qt::AlignTop | Qt::AlignLeft);
-            numLabel->setContentsMargins(5, 5, 5, 5);
-            numLabel->setStyleSheet("QLabel {"
-                " color : yellow;"
-                " border: none;"
-                " font-weight: bold;"
-                " font-size: 10px;"
-                "}");
-
-            QGraphicsDropShadowEffect* effect = new QGraphicsDropShadowEffect();
-            effect->setBlurRadius(2);
-            effect->setXOffset(1);
-            effect->setYOffset(1);
-            effect->setColor(QColor("black"));
-
+            QLabel* numLabel = createNumLabel(label, i);
+            QGraphicsDropShadowEffect* effect = createDropShadowEffect();
             numLabel->setGraphicsEffect(effect);
         }
     }
+}
+
+void COMPUTER_VISION::initFpsTimeSeries()
+{
+    fpsTimeSeries = findChild<QChartView*>("fpsTimeSerise");
+    QChart* chart = new QChart();
+    series = new QLineSeries();
+
+    QPen pen(Qt::red);
+    pen.setWidth(2);
+    series->setPen(pen);
+
+    chart->addSeries(series);
+    chart->createDefaultAxes();
+    chart->setPlotArea(QRect(30, 20, 590, 150));
+    chart->setBackgroundBrush(Qt::black);
+    fpsTimeSeries->setBackgroundBrush(Qt::black);
+    customizeAxis(chart);
+    chart->legend()->setVisible(false);
+    fpsTimeSeries->setChart(chart);
+}
+
+void COMPUTER_VISION::setAxisStyle(QValueAxis* axis)
+{
+    QPen gridPen(Qt::white);
+    gridPen.setStyle(Qt::DotLine);
+    axis->setGridLinePen(gridPen);
+
+    QPen axisPen(Qt::white);
+    axis->setLinePen(axisPen);
+    axis->setLabelsColor(Qt::white);
+    axis->setGridLineColor(Qt::white);
+}
+
+void COMPUTER_VISION::customizeAxis(QChart* chart)
+{
+    QValueAxis* axisX = qobject_cast<QValueAxis*>(chart->axes(Qt::Horizontal).at(0));
+    QValueAxis* axisY = qobject_cast<QValueAxis*>(chart->axes(Qt::Vertical).at(0));
+    axisY->setLabelsAngle(-90);
+    axisY->setRange(0, 40.0);
+    axisX->setTickCount(8);
+    axisX->setLabelsVisible(false);
+    setAxisStyle(axisX);
+    setAxisStyle(axisY);
+}
+
+void COMPUTER_VISION::initStatusBar()
+{
+    this->statusBar()->setStyleSheet("QStatusBar{border-top: 1px solid #747574;}");
+    this->statusBar()->setSizeGripEnabled(false);
+}
+
+void COMPUTER_VISION::initComps()
+{
+    initComponents();
+    initLayerLabels();
+    initFpsTimeSeries();
+    initStatusBar();
 }
 
 void COMPUTER_VISION::confCap()
@@ -412,6 +485,10 @@ void COMPUTER_VISION::verifyIntegral(int scaleIdx)
     sqsum = sqsum(cv::Rect(1, 1, s.szi.width, s.szi.height));
 
 # if 0:
+    if (scaleIdx == 0) {
+        saveMatToCsv(sbuf_sum, "my_sum.csv");
+        saveMatToCsv(sbuf_sqsum, "my_sqsum.csv");
+    }
     saveMatToCsv(sbuf_sum, "my_sum.csv");
     saveMatToCsv(sbuf_sqsum, "my_sqsum.csv");
     saveMatToCsv(sum, "sum.csv");
@@ -461,8 +538,7 @@ void COMPUTER_VISION::procImg()
             ImgProc::AlgType::Blur
         );
     }
-
-    // TODO: ... 
+#if 0:
     {
         size_t nscales = scaleData.size();
         memset(sbuf, 0, sizeof(int) * sbufSz.width * (sbufSz.height * 2));
@@ -474,10 +550,97 @@ void COMPUTER_VISION::procImg()
             computeChannels(i, rbuf);
         }
     }
+
+    {
+        cv::Mat sbufMat(sbufSz.height * 2, sbufSz.width, CV_32S, sbuf);
+        saveMatToCsv(sbufMat, "sbuf_raw.csv");
+    }
+    
+    // TODO: ... 
+    {
+        size_t nscales = scaleData.size();
+        Size origWinSz = data.origWinSz;
+        
+        for (size_t scaleIdx = 0; scaleIdx < nscales; scaleIdx++) {
+            const ScaleData& s = scaleData.at(scaleIdx);
+            int layer_offset = s.layer_offset;
+            double scaleFactor = s.scale;
+            int yStep = s.ystep;
+            Size szw = s.getWorkingSize(origWinSz);
+
+            for (int y = 0; y < szw.height; y += yStep) {
+                for (int x = 0; x < szw.width; x += yStep) {
+                    int* ptr = &sbuf[s.layer_offset + y * s.szi.width + x];
+                    if (setWindow(ptr, scaleIdx)) {
+                        int result = predictOrderedStump(ptr, layer_offset);
+                        if (result > 0) {
+                            printf("");
+                        }
+                        else if (result == 0) {
+                            x += yStep;
+                        }
+                    }
+                }
+            }
+        }
+    }
+#endif
 }
 
-void COMPUTER_VISION::displayImg()
+bool COMPUTER_VISION::setWindow(int* ptr, int scaleIdx)
 {
+    const ScaleData& s = scaleData.at(scaleIdx);
+
+    const int* pwin = ptr + s.layer_offset;
+    const int* pq = (const int*)(pwin + sqofs);
+    int valsum = CALC_SUM_OFS(nofs, pwin);
+    unsigned valsqsum = (unsigned)(CALC_SUM_OFS(nofs, pq));
+
+    double area = normrect.area();
+    double nf = area * valsqsum - (double)valsum * valsum;
+    if (nf > 0.)
+    {
+        nf = std::sqrt(nf);
+        varianceNormFactor = (float)(1. / nf);
+        return area * varianceNormFactor < 1e-1;
+    }
+    else
+    {
+        varianceNormFactor = 1.f;
+        return false;
+    }
+}
+
+int COMPUTER_VISION::predictOrderedStump(const int* ptr, int layer_offset)
+{
+    Stump* cascadeStumps = &data.stumps[0];
+    Stage* cascadeStages = &data.stages[0];
+    OptFeature* cascadeFeatures = &data.optFeatures[0];
+    int nstages = data.stages.size();
+    double tmp = 0;
+
+    for (int stageIdx = 0; stageIdx < nstages; stageIdx++) {
+        Stage& stage = cascadeStages[stageIdx];
+        int ntrees = stage.ntrees;
+        
+        tmp = 0;
+        for (int i = 0; i < ntrees; i++) {
+            Stump& stump = cascadeStumps[i];
+            OptFeature& feature = cascadeFeatures[stump.featureIdx];
+            double value = feature.calc(ptr + layer_offset) * varianceNormFactor;
+            tmp += value < stump.threshold ? stump.left : stump.right;
+        }
+
+        if (tmp < stage.threshold) {
+            return -stageIdx;
+        }
+        cascadeStumps += ntrees;
+    }
+
+	return 1;
+}
+
+void COMPUTER_VISION::displayImg() {
     cv::Mat cvFrame;
     {
         QMutexLocker locker(&imageProcessor->mutex);
@@ -486,7 +649,21 @@ void COMPUTER_VISION::displayImg()
     QImage qFrame(cvFrame.data, cvFrame.cols, cvFrame.rows, cvFrame.step, QImage::Format_Grayscale8);
     displayLabel->setPixmap(QPixmap::fromImage(std::move(qFrame)));
 
-    statusBar()->showMessage(QString("FPS: %1").arg(getFPS(), 0, 'f', 8));
+    {
+        double fps = getFPS();
+        QTime now = QTime::currentTime();
+        int timeNow = now.msecsSinceStartOfDay();
+        series->append(timeNow, fps);
+
+        while (series->count() > 0 && timeNow - series->at(0).x() > 2000) {
+            series->remove(0);
+        }
+
+        QValueAxis* axisX = qobject_cast<QValueAxis*>(fpsTimeSeries->chart()->axisX());
+        axisX->setRange(timeNow - 1000, timeNow);
+
+        statusBar()->showMessage(QString("FPS: %1").arg(fps, 0, 'f', 8));
+    }
 }
 
 void COMPUTER_VISION::updateFrame()

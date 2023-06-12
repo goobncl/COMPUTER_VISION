@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>1311</width>
-    <height>603</height>
+    <height>736</height>
    </rect>
   </property>
   <property name="sizePolicy">
@@ -18,6 +18,11 @@
   </property>
   <property name="windowTitle">
    <string>COMPUTER_VISION</string>
+  </property>
+  <property name="styleSheet">
+   <string notr="true">QChartView {
+    border-radius: 0px;
+}</string>
   </property>
   <widget class="QWidget" name="centralWidget">
    <property name="sizePolicy">
@@ -51,7 +56,7 @@
    <widget class="QPushButton" name="claheBtn">
     <property name="geometry">
      <rect>
-      <x>10</x>
+      <x>660</x>
       <y>500</y>
       <width>121</width>
       <height>41</height>
@@ -64,7 +69,7 @@
    <widget class="QPushButton" name="blurBtn">
     <property name="geometry">
      <rect>
-      <x>140</x>
+      <x>790</x>
       <y>500</y>
       <width>121</width>
       <height>41</height>
@@ -596,9 +601,33 @@ color : red;</string>
      </item>
     </layout>
    </widget>
+   <widget class="QChartView" name="fpsTimeSerise">
+    <property name="geometry">
+     <rect>
+      <x>10</x>
+      <y>500</y>
+      <width>640</width>
+      <height>200</height>
+     </rect>
+    </property>
+    <property name="styleSheet">
+     <string notr="true">QChartView {
+	border: 3px solid gray;
+    border-radius: 0px;
+}
+</string>
+    </property>
+   </widget>
   </widget>
  </widget>
  <layoutdefault spacing="6" margin="11"/>
+ <customwidgets>
+  <customwidget>
+   <class>QChartView</class>
+   <extends>QGraphicsView</extends>
+   <header>QtCharts/QChartView</header>
+  </customwidget>
+ </customwidgets>
  <resources/>
  <connections/>
 </ui>

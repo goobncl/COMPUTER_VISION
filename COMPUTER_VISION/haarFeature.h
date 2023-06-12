@@ -81,6 +81,9 @@ struct Rect {
     int height;
     Rect() : x(0), y(0), width(0), height(0) {}
     Rect(int x, int y, int w, int h) : x(x), y(y), width(w), height(h) {}
+    int area() const {
+        return width * height;
+    }
 };
 
 struct Feature {
@@ -124,19 +127,6 @@ struct OptFeature {
         }
         return ret;
     }
-};
-
-struct HaarEvaluator {
-    Feature* features;
-    OptFeature* optfeatures;
-    OptFeature* optfeatures_lbuf;
-    Bool hasTiltedFeatures;
-    int tilted_offset, sqr_offset;
-    int norm_offset[4];
-    Rect normrect;
-    const int* pwin;
-    OptFeature* optfeaturesPtr;
-    float varianceNormFactor;
 };
 
 #endif // HAAR_FEATURE_H
