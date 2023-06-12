@@ -18,13 +18,13 @@ COMPUTER_VISION::COMPUTER_VISION(QWidget* parent)
 
 COMPUTER_VISION::~COMPUTER_VISION()
 {
+    cap.release();
+    delete timer;
+    delete imageProcessor;
     clearImgPyramid();
     free(image);
     free(rbuf);
     free(sbuf);
-    delete timer;
-    delete imageProcessor;
-    cap.release();
 }
 
 bool COMPUTER_VISION::eventFilter(QObject* obj, QEvent* event)
