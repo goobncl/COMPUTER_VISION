@@ -686,8 +686,6 @@ void COMPUTER_VISION::displayImg() {
 Size COMPUTER_VISION::clacSz0(Size oriSz)
 {
     int alignedSizeWidth = alignSize(oriSz.width, 16);
-    //alignedSizeWidth = rbuf.sz.width > alignedSizeWidth ? rbuf.sz.width : alignedSizeWidth;
-    //int maxHeight = rbuf.sz.height > oriSz.height ? rbuf.sz.height : oriSz.height;
     return Size(alignedSizeWidth, oriSz.height);
 }
 
