@@ -100,7 +100,7 @@ private:
     void initStatusBar();
 
     void initComps();
-    void confCap();
+    void setCam();
     void setConn();
 
     Size clacSz0(Size oriSz);

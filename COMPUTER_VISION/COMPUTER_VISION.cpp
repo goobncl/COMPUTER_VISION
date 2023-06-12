@@ -12,7 +12,7 @@ COMPUTER_VISION::COMPUTER_VISION(QWidget* parent)
     setData();
     initImgProc();
     initComps();
-    confCap();
+    setCam();
     setConn();
 }
 
@@ -140,7 +140,7 @@ void COMPUTER_VISION::initComps()
     initStatusBar();
 }
 
-void COMPUTER_VISION::confCap()
+void COMPUTER_VISION::setCam()
 {
     cap.set(cv::CAP_PROP_FRAME_WIDTH, FRAME_W);
     cap.set(cv::CAP_PROP_FRAME_HEIGHT, FRAME_H);
