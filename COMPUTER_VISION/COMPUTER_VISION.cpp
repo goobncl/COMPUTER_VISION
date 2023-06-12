@@ -53,17 +53,17 @@ void COMPUTER_VISION::initLayerLabels()
         QLabel* label = findChild<QLabel*>(objectName);
 
         if (label) {
-            layerLabels.push_back((QClickLabel*)label);
-            QClickLabel* numLabel = createNumLabel(label, i);
+            layerLabels.push_back((QLabel*)label);
+            QLabel* numLabel = createNumLabel(label, i);
             QGraphicsDropShadowEffect* effect = createDropShadowEffect();
             numLabel->setGraphicsEffect(effect);
         }
     }
 }
 
-QClickLabel* COMPUTER_VISION::createNumLabel(QLabel* label, int i)
+QLabel* COMPUTER_VISION::createNumLabel(QLabel* label, int i)
 {
-    QClickLabel* numLabel = new QClickLabel(label);
+    QLabel* numLabel = new QLabel(label);
     QString labelText = "[" + QString::number(i + 1) + "] ";
     labelText += QString::number(scaleData[i].szi.width);
     labelText += " x ";
@@ -153,11 +153,6 @@ void COMPUTER_VISION::setConn()
     connect(timer, &QTimer::timeout, this, &COMPUTER_VISION::updateFrame);
     connect(claheBtn, &QPushButton::clicked, this, &COMPUTER_VISION::onClaheBtnClicked);
     connect(blurBtn, &QPushButton::clicked, this, &COMPUTER_VISION::onBlurBtnClicked);
-    
-    int nLayers = scales.size();
-    for (size_t i = 0; i < nLayers; ++i) {
-        connect(layerLabels[i], &QClickLabel::clicked, [this, i]() { this->onLayerClicked(i); });
-    }
 
     timer->start(0);
 }
@@ -778,22 +773,4 @@ void COMPUTER_VISION::onBlurBtnClicked()
 	}
 	
     blurBtn->setFont(font);
-}
-
-void COMPUTER_VISION::onLayerClicked(int layerIndex) {
-    ImgLayer& layer = imgPyramid[layerIndex];
-    switch (layer.state) {
-    case LayerState::DATA:
-        layer.state = LayerState::SUM;
-        //displayLayer(layer, layer.sum);
-        break;
-    case LayerState::SUM:
-        layer.state = LayerState::SQSUM;
-        //displayLayer(layer, layer.sqsum);
-        break;
-    case LayerState::SQSUM:
-        layer.state = LayerState::DATA;
-        //displayLayer(layer, layer.data);
-        break;
-    }
 }

@@ -22,21 +22,6 @@ struct ImgLayer {
     ImgLayer() : sz(Size(0, 0)), data(NULL), sum(NULL), sqsum(NULL), state(LayerState::DATA) {}
 };
 
-class QClickLabel : public QLabel {
-    Q_OBJECT
-public:
-    explicit QClickLabel(QWidget* parent = 0) : QLabel(parent) {}
-    ~QClickLabel() {}
-
-signals:
-    void clicked();
-
-protected:
-    void mousePressEvent(QMouseEvent* e) {
-        emit clicked();
-    }
-};
-
 class COMPUTER_VISION : public QMainWindow
 {
     Q_OBJECT
@@ -77,7 +62,7 @@ private:
     Size sbufSz;
     QVector<double> scales;
     QVector<ScaleData> scaleData;
-    QVector<QClickLabel*> layerLabels;
+    QVector<QLabel*> layerLabels;
     QVector<ImgLayer> imgPyramid;
     double varianceNormFactor;
     
@@ -106,7 +91,7 @@ private:
     void initImgProc();
 
     void initComponents();
-    QClickLabel* createNumLabel(QLabel* label, int i);
+    QLabel* createNumLabel(QLabel* label, int i);
     QGraphicsDropShadowEffect* createDropShadowEffect();
     void initLayerLabels();
     void customizeAxis(QChart* chart);
@@ -141,5 +126,4 @@ private:
 private slots:
     void onClaheBtnClicked();
     void onBlurBtnClicked();
-    void onLayerClicked(int layerIndex);
 };
