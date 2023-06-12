@@ -25,7 +25,7 @@ struct ImgLayer {
 class QClickLabel : public QLabel {
     Q_OBJECT
 public:
-    explicit QClickLabel(QWidget* p = 0) : QLabel(p) {}
+    explicit QClickLabel(QWidget* parent = 0) : QLabel(parent) {}
     ~QClickLabel() {}
 
 signals:
