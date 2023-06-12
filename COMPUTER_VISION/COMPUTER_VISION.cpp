@@ -18,6 +18,7 @@ COMPUTER_VISION::COMPUTER_VISION(QWidget* parent)
 
 COMPUTER_VISION::~COMPUTER_VISION()
 {
+    clearImgPyramid();
     free(image);
     free(rbuf);
     free(sbuf);
@@ -152,6 +153,12 @@ void COMPUTER_VISION::setConn()
     connect(timer, &QTimer::timeout, this, &COMPUTER_VISION::updateFrame);
     connect(claheBtn, &QPushButton::clicked, this, &COMPUTER_VISION::onClaheBtnClicked);
     connect(blurBtn, &QPushButton::clicked, this, &COMPUTER_VISION::onBlurBtnClicked);
+    
+    //int nLayers = scales.size();
+    //for (size_t i = 0; i < nLayers; ++i) {
+    //    connect(layerLabels[i], &ClickableLabel::clicked, [this, i]() { this->onLayerClicked(i); });
+    //}
+
     timer->start(0);
 }
 
@@ -425,6 +432,16 @@ void COMPUTER_VISION::initImgProc()
 
     sz0 = scaleData.at(0).szi;
     sz0 = Size((int)alignSize(sz0.width, 16), sz0.height);
+    {
+        int nscales = scaleData.size();
+        imgPyramid.resize(nscales);
+
+        for (int i = 0; i < nscales; ++i) {
+            imgPyramid[i].data = (unsigned char*)malloc(sizeof(unsigned char) * sz0.width * sz0.height);
+            imgPyramid[i].sum = (int*)malloc(sizeof(int) * sz0.width * sz0.height);
+            imgPyramid[i].sqsum = (int*)malloc(sizeof(int) * sz0.width * sz0.height);
+        }
+    }
 
     image = (unsigned char*)malloc(sizeof(unsigned char) * imgSz.width * imgSz.height);
     rbuf = (unsigned char*)malloc(sizeof(unsigned char) * sz0.width * sz0.height);
@@ -519,6 +536,30 @@ void COMPUTER_VISION::computeChannels(int scaleIdx, unsigned char* img)
 # endif
 }
 
+bool COMPUTER_VISION::setWindow(int* ptr, int scaleIdx)
+{
+    const ScaleData& s = scaleData.at(scaleIdx);
+
+    const int* pwin = ptr + s.layer_offset;
+    const int* pq = (const int*)(pwin + sqofs);
+    int valsum = CALC_SUM_OFS(nofs, pwin);
+    unsigned valsqsum = (unsigned)(CALC_SUM_OFS(nofs, pq));
+
+    double area = normrect.area();
+    double nf = area * valsqsum - (double)valsum * valsum;
+    if (nf > 0.)
+    {
+        nf = std::sqrt(nf);
+        varianceNormFactor = (float)(1. / nf);
+        return area * varianceNormFactor < 1e-1;
+    }
+    else
+    {
+        varianceNormFactor = 1.f;
+        return false;
+    }
+}
+
 void COMPUTER_VISION::procImg()
 {
     if (claheEnabled) {
@@ -587,30 +628,6 @@ void COMPUTER_VISION::procImg()
 #endif
 }
 
-bool COMPUTER_VISION::setWindow(int* ptr, int scaleIdx)
-{
-    const ScaleData& s = scaleData.at(scaleIdx);
-
-    const int* pwin = ptr + s.layer_offset;
-    const int* pq = (const int*)(pwin + sqofs);
-    int valsum = CALC_SUM_OFS(nofs, pwin);
-    unsigned valsqsum = (unsigned)(CALC_SUM_OFS(nofs, pq));
-
-    double area = normrect.area();
-    double nf = area * valsqsum - (double)valsum * valsum;
-    if (nf > 0.)
-    {
-        nf = std::sqrt(nf);
-        varianceNormFactor = (float)(1. / nf);
-        return area * varianceNormFactor < 1e-1;
-    }
-    else
-    {
-        varianceNormFactor = 1.f;
-        return false;
-    }
-}
-
 int COMPUTER_VISION::predictOrderedStump(const int* ptr, int layer_offset)
 {
     Stump* cascadeStumps = &data.stumps[0];
@@ -666,11 +683,90 @@ void COMPUTER_VISION::displayImg() {
     }
 }
 
+Size COMPUTER_VISION::clacSz0(Size oriSz)
+{
+    int alignedSizeWidth = alignSize(oriSz.width, 16);
+    //alignedSizeWidth = rbuf.sz.width > alignedSizeWidth ? rbuf.sz.width : alignedSizeWidth;
+    //int maxHeight = rbuf.sz.height > oriSz.height ? rbuf.sz.height : oriSz.height;
+    return Size(alignedSizeWidth, oriSz.height);
+}
+
+void COMPUTER_VISION::calcImgPyramid()
+{   
+    int nscales = scaleData.size();
+    QFutureWatcher<void> watcher;
+    QList<QFuture<void>> futures;
+
+    for (int i = 0; i < nscales; i++) {
+        futures.append(QtConcurrent::run([this, i] {
+            
+            const ScaleData& s = scaleData.at(i);
+            int new_w = s.szi.width;
+            int new_h = s.szi.height;
+            imgPyramid[i].sz.width = new_w;
+            imgPyramid[i].sz.height = new_h;     
+
+            downSampling(image, imgPyramid[i].data, new_w, new_h);
+            integral(imgPyramid[i].data, imgPyramid[i].sum, new_w, new_h, 0);
+            integralSquare(imgPyramid[i].data, imgPyramid[i].sqsum, new_w, new_h, 0);
+            }));
+    }
+
+    for (auto& future : futures) {
+        watcher.setFuture(future);
+        watcher.waitForFinished();
+    }
+}
+
+void COMPUTER_VISION::onLayerClicked(int layerIndex) {
+    ImgLayer& layer = imgPyramid[layerIndex];
+    switch (layer.state) {
+    case LayerState::DATA:
+        layer.state = LayerState::SUM;
+        //displayLayer(layer, layer.sum);
+        break;
+    case LayerState::SUM:
+        layer.state = LayerState::SQSUM;
+        //displayLayer(layer, layer.sqsum);
+        break;
+    case LayerState::SQSUM:
+        layer.state = LayerState::DATA;
+        //displayLayer(layer, layer.data);
+        break;
+    }
+}
+
+void COMPUTER_VISION::displayPyramid()
+{
+    int nLayers = imgPyramid.size();
+    for (size_t i = 0; i < nLayers; ++i) {
+        cv::Mat cvImage(imgPyramid[i].sz.height, imgPyramid[i].sz.width, CV_8UC1, imgPyramid[i].data);
+        QImage image = QImage(cvImage.data, cvImage.cols, cvImage.rows, cvImage.step, QImage::Format_Grayscale8);
+        QPixmap pixmap = QPixmap::fromImage(image);
+        QLabel* label = layerLabels[i];
+        pixmap = pixmap.scaled(label->width(), label->height(), Qt::IgnoreAspectRatio);
+        label->setPixmap(pixmap);
+    }
+}
+
+void COMPUTER_VISION::clearImgPyramid()
+{
+    for (int i = 0; i < imgPyramid.size(); i++) {
+        free(imgPyramid[i].data);
+        free(imgPyramid[i].sum);
+        free(imgPyramid[i].sqsum);
+    }
+    imgPyramid.clear();
+}
+
 void COMPUTER_VISION::updateFrame()
 {
     acqFrame();
     procImg();
     displayImg(); 
+
+    calcImgPyramid();
+    displayPyramid();
 }
 
 void COMPUTER_VISION::onClaheBtnClicked()

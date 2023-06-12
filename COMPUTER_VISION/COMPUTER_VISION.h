@@ -9,6 +9,34 @@ constexpr int FRAME_W = 640;
 constexpr int FRAME_H = 480;
 
 
+enum class LayerState {
+    DATA, SUM, SQSUM
+};
+
+struct ImgLayer {
+    Size sz;
+    unsigned char* data;
+    int* sum;
+    int* sqsum;
+    LayerState state;
+    ImgLayer() : sz(Size(0, 0)), data(NULL), sum(NULL), sqsum(NULL), state(LayerState::DATA) {}
+};
+
+class ClickableLabel : public QLabel {
+    Q_OBJECT
+public:
+    explicit ClickableLabel(QWidget* parent = 0) : QLabel(parent) {}
+    ~ClickableLabel() {}
+
+signals:
+    void clicked();
+
+protected:
+    void mousePressEvent(QMouseEvent* event) {
+        emit clicked();
+    }
+};
+
 class COMPUTER_VISION : public QMainWindow
 {
     Q_OBJECT
@@ -50,6 +78,7 @@ private:
     QVector<double> scales;
     QVector<ScaleData> scaleData;
     QVector<QLabel*> layerLabels;
+    QVector<ImgLayer> imgPyramid;
     double varianceNormFactor;
     
     QTimer* timer;
@@ -89,6 +118,11 @@ private:
     void confCap();
     void setConn();
 
+    Size clacSz0(Size oriSz);
+    void calcImgPyramid();
+    void displayPyramid();
+    void clearImgPyramid();
+
     void calcScales();
     bool updateScaleData();
     void computeOptFeatures();
@@ -107,4 +141,5 @@ private:
 private slots:
     void onClaheBtnClicked();
     void onBlurBtnClicked();
+    void onLayerClicked(int layerIndex);
 };
