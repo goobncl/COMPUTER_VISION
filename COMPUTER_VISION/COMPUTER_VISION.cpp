@@ -34,27 +34,6 @@ void COMPUTER_VISION::initComponents()
     blurBtn = findChild<QPushButton*>("blurBtn");
 }
 
-QLabel* COMPUTER_VISION::createNumLabel(QLabel* label, int i)
-{
-    QLabel* numLabel = new QLabel(label);
-    QString labelText = "[" + QString::number(i + 1) + "] ";
-    labelText += QString::number(scaleData[i].szi.width);
-    labelText += " x ";
-    labelText += QString::number(scaleData[i].szi.height);
-    numLabel->setText(labelText);
-
-    numLabel->setAlignment(Qt::AlignTop | Qt::AlignLeft);
-    numLabel->setContentsMargins(5, 5, 5, 5);
-    numLabel->setStyleSheet("QLabel {"
-        " color : yellow;"
-        " border: none;"
-        " font-weight: bold;"
-        " font-size: 10px;"
-        "}");
-
-    return numLabel;
-}
-
 QGraphicsDropShadowEffect* COMPUTER_VISION::createDropShadowEffect()
 {
     QGraphicsDropShadowEffect* effect = new QGraphicsDropShadowEffect();
@@ -74,12 +53,33 @@ void COMPUTER_VISION::initLayerLabels()
         QLabel* label = findChild<QLabel*>(objectName);
 
         if (label) {
-            layerLabels.push_back(label);
-            QLabel* numLabel = createNumLabel(label, i);
+            layerLabels.push_back((QClickLabel*)label);
+            QClickLabel* numLabel = createNumLabel(label, i);
             QGraphicsDropShadowEffect* effect = createDropShadowEffect();
             numLabel->setGraphicsEffect(effect);
         }
     }
+}
+
+QClickLabel* COMPUTER_VISION::createNumLabel(QLabel* label, int i)
+{
+    QClickLabel* numLabel = new QClickLabel(label);
+    QString labelText = "[" + QString::number(i + 1) + "] ";
+    labelText += QString::number(scaleData[i].szi.width);
+    labelText += " x ";
+    labelText += QString::number(scaleData[i].szi.height);
+    numLabel->setText(labelText);
+
+    numLabel->setAlignment(Qt::AlignTop | Qt::AlignLeft);
+    numLabel->setContentsMargins(5, 5, 5, 5);
+    numLabel->setStyleSheet("QLabel {"
+        " color : yellow;"
+        " border: none;"
+        " font-weight: bold;"
+        " font-size: 10px;"
+        "}");
+
+    return numLabel;
 }
 
 void COMPUTER_VISION::initFpsTimeSeries()
@@ -154,10 +154,10 @@ void COMPUTER_VISION::setConn()
     connect(claheBtn, &QPushButton::clicked, this, &COMPUTER_VISION::onClaheBtnClicked);
     connect(blurBtn, &QPushButton::clicked, this, &COMPUTER_VISION::onBlurBtnClicked);
     
-    //int nLayers = scales.size();
-    //for (size_t i = 0; i < nLayers; ++i) {
-    //    connect(layerLabels[i], &QClickLabel::clicked, [this, i]() { this->onLayerClicked(i); });
-    //}
+    int nLayers = scales.size();
+    for (size_t i = 0; i < nLayers; ++i) {
+        connect(layerLabels[i], &QClickLabel::clicked, [this, i]() { this->onLayerClicked(i); });
+    }
 
     timer->start(0);
 }
@@ -716,24 +716,6 @@ void COMPUTER_VISION::calcImgPyramid()
     }
 }
 
-void COMPUTER_VISION::onLayerClicked(int layerIndex) {
-    ImgLayer& layer = imgPyramid[layerIndex];
-    switch (layer.state) {
-    case LayerState::DATA:
-        layer.state = LayerState::SUM;
-        //displayLayer(layer, layer.sum);
-        break;
-    case LayerState::SUM:
-        layer.state = LayerState::SQSUM;
-        //displayLayer(layer, layer.sqsum);
-        break;
-    case LayerState::SQSUM:
-        layer.state = LayerState::DATA;
-        //displayLayer(layer, layer.data);
-        break;
-    }
-}
-
 void COMPUTER_VISION::displayPyramid()
 {
     int nLayers = imgPyramid.size();
@@ -796,4 +778,22 @@ void COMPUTER_VISION::onBlurBtnClicked()
 	}
 	
     blurBtn->setFont(font);
+}
+
+void COMPUTER_VISION::onLayerClicked(int layerIndex) {
+    ImgLayer& layer = imgPyramid[layerIndex];
+    switch (layer.state) {
+    case LayerState::DATA:
+        layer.state = LayerState::SUM;
+        //displayLayer(layer, layer.sum);
+        break;
+    case LayerState::SUM:
+        layer.state = LayerState::SQSUM;
+        //displayLayer(layer, layer.sqsum);
+        break;
+    case LayerState::SQSUM:
+        layer.state = LayerState::DATA;
+        //displayLayer(layer, layer.data);
+        break;
+    }
 }

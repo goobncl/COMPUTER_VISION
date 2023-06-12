@@ -77,7 +77,7 @@ private:
     Size sbufSz;
     QVector<double> scales;
     QVector<ScaleData> scaleData;
-    QVector<QLabel*> layerLabels;
+    QVector<QClickLabel*> layerLabels;
     QVector<ImgLayer> imgPyramid;
     double varianceNormFactor;
     
@@ -106,7 +106,7 @@ private:
     void initImgProc();
 
     void initComponents();
-    QLabel* createNumLabel(QLabel* label, int i);
+    QClickLabel* createNumLabel(QLabel* label, int i);
     QGraphicsDropShadowEffect* createDropShadowEffect();
     void initLayerLabels();
     void customizeAxis(QChart* chart);
