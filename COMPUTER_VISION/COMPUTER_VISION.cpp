@@ -732,7 +732,7 @@ void COMPUTER_VISION::calcHaarFeature()
     QFutureWatcher<void> watcher;
     QList<QFuture<void>> futures;
 
-    for (size_t i = 0; i < nscales; i++) {
+    for (size_t i = 4; i < nscales; i++) {
         futures.append(QtConcurrent::run([this, i] {
             
             const ScaleData& s = scaleData.at(i);
@@ -742,7 +742,8 @@ void COMPUTER_VISION::calcHaarFeature()
 
             for (int y = 0; y <= height; y += step) {
                 for (int x = 0; x <= width; x += step) {
-                    
+                    int* pSum = &imgPyramid[i].sum[y * s.szi.width + x];
+                    int* pSqsum = &imgPyramid[i].sqsum[y * s.szi.width + x];
 				}
 			}
 
