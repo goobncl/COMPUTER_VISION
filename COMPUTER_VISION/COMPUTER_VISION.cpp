@@ -785,7 +785,7 @@ void COMPUTER_VISION::updateFrame()
     displayImg(); 
 
     calcImgPyramid();
-    displayPyramid();
+    //displayPyramid();
 }
 
 void COMPUTER_VISION::onClaheBtnClicked()
