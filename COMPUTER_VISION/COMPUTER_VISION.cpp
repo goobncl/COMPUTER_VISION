@@ -736,11 +736,12 @@ void COMPUTER_VISION::calcHaarFeature()
         futures.append(QtConcurrent::run([this, i] {
             
             const ScaleData& s = scaleData.at(i);
-            int width = s.szi.width;
-            int height = s.szi.height;
+            int width = s.szi.width - data.origWinSz.width;
+            int height = s.szi.height - data.origWinSz.height;
+            int step = s.ystep;
 
-            for (int y = 0; y < height; y++) {
-                for (int x = 0; x < width; x++) {
+            for (int y = 0; y <= height; y += step) {
+                for (int x = 0; x <= width; x += step) {
                     
 				}
 			}
@@ -814,7 +815,7 @@ void COMPUTER_VISION::updateFrame()
 
     calcImgPyramid();
     calcHaarFeature();
-    displayPyramid();
+    //displayPyramid();
 }
 
 void COMPUTER_VISION::onClaheBtnClicked()
