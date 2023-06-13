@@ -30,7 +30,7 @@ COMPUTER_VISION::~COMPUTER_VISION()
 bool COMPUTER_VISION::eventFilter(QObject* obj, QEvent* event)
 {
     if (event->type() == QEvent::MouseButtonPress) {
-        for (int i = 0; i < layerLabels.size(); ++i) {
+        for (size_t i = 0; i < layerLabels.size(); ++i) {
             if (obj == layerLabels[i]) {
                 onLayerClicked(i);
                 return true;
@@ -62,7 +62,7 @@ QGraphicsDropShadowEffect* COMPUTER_VISION::createDropShadowEffect()
 void COMPUTER_VISION::initLayerLabels()
 {
     int nLayers = scales.size();
-    for (int i = 0; i < nLayers; ++i) {
+    for (size_t i = 0; i < nLayers; ++i) {
         QString objectName = "layerLabel_" + QString::number(i).rightJustified(2, '0');
         QLabel* label = findChild<QLabel*>(objectName);
 
@@ -446,7 +446,7 @@ void COMPUTER_VISION::initImgProc()
         int nscales = scaleData.size();
         imgPyramid.resize(nscales);
 
-        for (int i = 0; i < nscales; ++i) {
+        for (size_t i = 0; i < nscales; ++i) {
             imgPyramid[i].data = (unsigned char*)malloc(sizeof(unsigned char) * sz0.width * sz0.height);
             imgPyramid[i].sum = (int*)malloc(sizeof(int) * sz0.width * sz0.height);
             imgPyramid[i].sqsum = (int*)malloc(sizeof(int) * sz0.width * sz0.height);
@@ -651,7 +651,7 @@ int COMPUTER_VISION::predictOrderedStump(const int* ptr, int layer_offset)
         int ntrees = stage.ntrees;
         
         tmp = 0;
-        for (int i = 0; i < ntrees; i++) {
+        for (size_t i = 0; i < ntrees; i++) {
             Stump& stump = cascadeStumps[i];
             OptFeature& feature = cascadeFeatures[stump.featureIdx];
             double value = feature.calc(ptr + layer_offset) * varianceNormFactor;
@@ -705,7 +705,7 @@ void COMPUTER_VISION::calcImgPyramid()
     QFutureWatcher<void> watcher;
     QList<QFuture<void>> futures;
 
-    for (int i = 0; i < nscales; i++) {
+    for (size_t i = 0; i < nscales; i++) {
         futures.append(QtConcurrent::run([this, i] {
             
             const ScaleData& s = scaleData.at(i);
@@ -717,7 +717,35 @@ void COMPUTER_VISION::calcImgPyramid()
             downSampling(image, imgPyramid[i].data, new_w, new_h);
             integral(imgPyramid[i].data, imgPyramid[i].sum, new_w, new_h, 0);
             integralSquare(imgPyramid[i].data, imgPyramid[i].sqsum, new_w, new_h, 0);
-            }));
+        }));
+    }
+
+    for (auto& future : futures) {
+        watcher.setFuture(future);
+        watcher.waitForFinished();
+    }
+}
+
+void COMPUTER_VISION::calcHaarFeature()
+{
+    int nscales = scaleData.size();
+    QFutureWatcher<void> watcher;
+    QList<QFuture<void>> futures;
+
+    for (size_t i = 0; i < nscales; i++) {
+        futures.append(QtConcurrent::run([this, i] {
+            
+            const ScaleData& s = scaleData.at(i);
+            int width = s.szi.width;
+            int height = s.szi.height;
+
+            for (int y = 0; y < height; y++) {
+                for (int x = 0; x < width; x++) {
+                    
+				}
+			}
+
+        }));
     }
 
     for (auto& future : futures) {
@@ -770,7 +798,7 @@ void COMPUTER_VISION::displayPyramid()
 
 void COMPUTER_VISION::clearImgPyramid()
 {
-    for (int i = 0; i < imgPyramid.size(); i++) {
+    for (size_t i = 0; i < imgPyramid.size(); i++) {
         free(imgPyramid[i].data);
         free(imgPyramid[i].sum);
         free(imgPyramid[i].sqsum);
@@ -785,7 +813,8 @@ void COMPUTER_VISION::updateFrame()
     displayImg(); 
 
     calcImgPyramid();
-    //displayPyramid();
+    calcHaarFeature();
+    displayPyramid();
 }
 
 void COMPUTER_VISION::onClaheBtnClicked()
