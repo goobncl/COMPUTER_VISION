@@ -434,7 +434,7 @@ void COMPUTER_VISION::initImgProc()
     minObjSz = Size(30, 30);
     maxObjSz = imgSz;
     sbufSz = Size(0, 0);
-    varianceNormFactor = 0.f;
+    varNormFact = 0.f;
 
     calcScales();
     updateScaleData();
@@ -560,12 +560,12 @@ bool COMPUTER_VISION::setWindow(int* ptr, int scaleIdx)
     if (nf > 0.)
     {
         nf = std::sqrt(nf);
-        varianceNormFactor = (float)(1. / nf);
-        return area * varianceNormFactor < 1e-1;
+        varNormFact = (float)(1. / nf);
+        return area * varNormFact < 1e-1;
     }
     else
     {
-        varianceNormFactor = 1.f;
+        varNormFact = 1.f;
         return false;
     }
 }
@@ -654,7 +654,7 @@ int COMPUTER_VISION::predictOrderedStump(const int* ptr, int layer_offset)
         for (size_t i = 0; i < ntrees; i++) {
             Stump& stump = cascadeStumps[i];
             OptFeature& feature = cascadeFeatures[stump.featureIdx];
-            double value = feature.calc(ptr + layer_offset) * varianceNormFactor;
+            double value = feature.calc(ptr + layer_offset) * varNormFact;
             tmp += value < stump.threshold ? stump.left : stump.right;
         }
 
@@ -732,23 +732,31 @@ void COMPUTER_VISION::calcHaarFeature()
     QList<QFuture<void>> futures;
     
     for (size_t i = 4; i < nscales; i++) {
+        
         futures.append(QtConcurrent::run([this, i] {
+            
             const ScaleData& s = scaleData.at(i);
+            int* pSum = imgPyramid[i].sum;
+            int* pSqsum = imgPyramid[i].sqsum;
+            int width = imgPyramid[i].sz.width;
             int rangeX = s.szi.width - data.origWinSz.width;
             int rangeY = s.szi.height - data.origWinSz.height;
             int step = s.ystep;
     
             for (int y = 0; y <= rangeY; y += step) {
                 for (int x = 0; x <= rangeX; x += step) {
-    
-                    int width = imgPyramid[i].sz.width;
-                    int* pSum = imgPyramid[i].sum;
-                    int* pSqsum = imgPyramid[i].sqsum;
                     
                     int valSum = calcAreaSum(pSum, x, y, width);
                     int valSqsum = calcAreaSum(pSqsum, x, y, width);
                     double nf = 576.f * valSqsum - (double)valSum * valSum;
-    
+                    
+                    if (nf > 0.f) {
+                        nf = std::sqrt(nf);
+                        imgPyramid[i].varNFact = (double)(1.f/nf);
+					}
+                    else {
+                        imgPyramid[i].varNFact = 1.f;
+					}
                     
                 }
             }

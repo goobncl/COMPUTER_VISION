@@ -19,7 +19,8 @@ struct ImgLayer {
     int* sum;
     int* sqsum;
     LayerState state;
-    ImgLayer() : sz(Size(0, 0)), data(NULL), sum(NULL), sqsum(NULL), state(LayerState::DATA) {}
+    double varNFact;
+    ImgLayer() : sz(Size(0, 0)), data(NULL), sum(NULL), sqsum(NULL), state(LayerState::DATA), varNFact(0.f) {}
 };
 
 class COMPUTER_VISION : public QMainWindow
@@ -67,7 +68,7 @@ private:
     QVector<ScaleData> scaleData;
     QVector<QLabel*> layerLabels;
     QVector<ImgLayer> imgPyramid;
-    double varianceNormFactor;
+    double varNormFact;
     
     QTimer* timer;
     cv::VideoCapture cap;
