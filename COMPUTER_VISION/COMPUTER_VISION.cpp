@@ -747,8 +747,9 @@ void COMPUTER_VISION::calcHaarFeature()
                     
                     int valSum = calcAreaSum(pSum, x, y, width);
                     int valSqsum = calcAreaSum(pSqsum, x, y, width);
-                    double area = 576.f;
-                    double nf = area * valSqsum - (double)valSum * valSum;
+                    double nf = 576.f * valSqsum - (double)valSum * valSum;
+
+
                 }
             }
         }));
