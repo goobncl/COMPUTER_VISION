@@ -707,7 +707,6 @@ void COMPUTER_VISION::calcImgPyramid()
 
     for (size_t i = 0; i < nscales; i++) {
         futures.append(QtConcurrent::run([this, i] {
-            
             const ScaleData& s = scaleData.at(i);
             int new_w = s.szi.width;
             int new_h = s.szi.height;
@@ -728,28 +727,33 @@ void COMPUTER_VISION::calcImgPyramid()
 
 void COMPUTER_VISION::calcHaarFeature()
 {
-    int nscales = scaleData.size();
+    int nscales = scaleData.size(); 
     QFutureWatcher<void> watcher;
     QList<QFuture<void>> futures;
-
-    for (size_t i = 4; i < nscales; i++) {
+    
+    for (size_t i = 0; i < nscales; i++) {
         futures.append(QtConcurrent::run([this, i] {
-            
             const ScaleData& s = scaleData.at(i);
-            int width = s.szi.width - data.origWinSz.width;
-            int height = s.szi.height - data.origWinSz.height;
+            int rangeX = s.szi.width - data.origWinSz.width;
+            int rangeY = s.szi.height - data.origWinSz.height;
             int step = s.ystep;
-
-            for (int y = 0; y <= height; y += step) {
-                for (int x = 0; x <= width; x += step) {
-                    int* pSum = &imgPyramid[i].sum[y * s.szi.width + x];
-                    int* pSqsum = &imgPyramid[i].sqsum[y * s.szi.width + x];
-				}
-			}
-
+    
+            for (int y = 0; y <= rangeY; y += step) {
+                for (int x = 0; x <= rangeX; x += step) {
+    
+                    int width = imgPyramid[i].sz.width;
+                    int* pSum = imgPyramid[i].sum;
+                    int* pSqsum = imgPyramid[i].sqsum;
+                    
+                    int valSum = calcAreaSum(pSum, x, y, width);
+                    int valSqsum = calcAreaSum(pSqsum, x, y, width);
+                    double area = 576.f;
+                    double nf = area * valSqsum - (double)valSum * valSum;
+                }
+            }
         }));
-    }
-
+    }  
+    
     for (auto& future : futures) {
         watcher.setFuture(future);
         watcher.waitForFinished();

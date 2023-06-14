@@ -80,3 +80,21 @@ void integralSquare(unsigned char* src, int* dst, int width, int height, int lay
         }
     }
 }
+
+int getPixelVal(int* src, int x, int y, int width) {
+    if (x < 0 || y < 0) return 0;
+    return src[y * width + x];
+}
+
+int calcAreaSum(int* src, int topLeftX, int topLeftY, int width) {
+
+    int bottomRightX = topLeftX + 23;
+    int bottomRightY = topLeftY + 23;
+
+    int p0 = getPixelVal(src, bottomRightX, bottomRightY, width);
+    int p1 = getPixelVal(src, bottomRightX, topLeftY - 1, width);
+    int p2 = getPixelVal(src, topLeftX - 1, bottomRightY, width);
+    int p3 = getPixelVal(src, topLeftX - 1, topLeftY - 1, width);
+
+    return (p0 - p1 - p2 + p3);
+}
