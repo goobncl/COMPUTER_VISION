@@ -731,7 +731,7 @@ void COMPUTER_VISION::calcHaarFeature()
     QFutureWatcher<void> watcher;
     QList<QFuture<void>> futures;
     
-    for (size_t i = 0; i < nscales; i++) {
+    for (size_t i = 4; i < nscales; i++) {
         futures.append(QtConcurrent::run([this, i] {
             const ScaleData& s = scaleData.at(i);
             int rangeX = s.szi.width - data.origWinSz.width;
@@ -748,8 +748,8 @@ void COMPUTER_VISION::calcHaarFeature()
                     int valSum = calcAreaSum(pSum, x, y, width);
                     int valSqsum = calcAreaSum(pSqsum, x, y, width);
                     double nf = 576.f * valSqsum - (double)valSum * valSum;
-
-
+    
+                    
                 }
             }
         }));
