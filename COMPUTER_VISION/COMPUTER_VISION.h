@@ -110,6 +110,7 @@ private:
     void calcImgPyramid();
     QImage normMat(cv::Mat& cvImage);
     void displayLayer(ImgLayer& layer, int layerIndex);    
+    double calcNormFactor(int* pSum, int* pSqsum, int x, int y, int width);
     void calcHaarFeature();
     void clearImgPyramid();
     void displayPyramid();

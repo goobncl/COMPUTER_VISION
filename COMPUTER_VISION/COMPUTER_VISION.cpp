@@ -725,6 +725,21 @@ void COMPUTER_VISION::calcImgPyramid()
     }
 }
 
+double COMPUTER_VISION::calcNormFactor(int* pSum, int* pSqsum, int x, int y, int width)
+{
+    int valSum = calcAreaSum(pSum, x, y, width);
+    int valSqsum = calcAreaSum(pSqsum, x, y, width);
+    double nf = 576.f * valSqsum - (double)valSum * valSum;
+
+    if (nf > 0.f) {
+        nf = std::sqrt(nf);
+        return (double)(1.f / nf);
+    }
+    else {
+        return 1.f;
+    }
+}
+
 void COMPUTER_VISION::calcHaarFeature()
 {
     int nscales = scaleData.size(); 
@@ -745,19 +760,7 @@ void COMPUTER_VISION::calcHaarFeature()
     
             for (int y = 0; y <= rangeY; y += step) {
                 for (int x = 0; x <= rangeX; x += step) {
-                    
-                    int valSum = calcAreaSum(pSum, x, y, width);
-                    int valSqsum = calcAreaSum(pSqsum, x, y, width);
-                    double nf = 576.f * valSqsum - (double)valSum * valSum;
-                    
-                    if (nf > 0.f) {
-                        nf = std::sqrt(nf);
-                        imgPyramid[i].varNFact = (double)(1.f/nf);
-					}
-                    else {
-                        imgPyramid[i].varNFact = 1.f;
-					}
-                    
+                    imgPyramid[i].varNFact = calcNormFactor(pSum, pSqsum, x, y, width);
                 }
             }
         }));
