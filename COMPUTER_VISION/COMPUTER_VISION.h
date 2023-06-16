@@ -68,7 +68,6 @@ private:
     QVector<ScaleData> scaleData;
     QVector<QLabel*> layerLabels;
     QVector<ImgLayer> imgPyramid;
-    double varNormFact;
     
     QTimer* timer;
     cv::VideoCapture cap;
@@ -127,7 +126,7 @@ private:
     void verifyMatEqual(const cv::Mat& mat1, const cv::Mat& mat2, const QString& mat_name);
     void verifyIntegral(int scaleIdx);
     void saveMatToCsv(const cv::Mat& mat, const QString& filename);
-    int predictOrderedStump(const int* ptr, int layer_offset);
+    int predictOrderedStump(int* ptr, int width, int height, double varNFact);
     bool setWindow(int* ptr, int scaleIdx);
 
 private slots:

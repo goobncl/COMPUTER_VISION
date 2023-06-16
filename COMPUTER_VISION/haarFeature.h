@@ -98,6 +98,30 @@ struct Feature {
         rect[0].r = rect[1].r = rect[2].r = Rect();
         rect[0].weight = rect[1].weight = rect[2].weight = 0;
     }
+
+    double calc(const int* ptr, int width, int height) const {
+        
+        double ret = 0.f;
+
+        int baseY = rect[0].r.y * width;
+        int baseX = rect[0].r.x;
+        int baseWidth = rect[0].r.width;
+        int baseHeight = rect[0].r.height * width;
+
+        int p3_idx = (baseY - width) + (baseX - 1);
+        int p1_idx = p3_idx + baseWidth;
+        int p2_idx = (baseY + baseHeight - width) + (baseX - 1);
+        int p0_idx = p2_idx + baseWidth;
+
+        int p0 = (p0_idx >= 0 && p0_idx < width * height) ? ptr[p0_idx] : 0;
+        int p1 = (p1_idx >= 0 && p1_idx < width * height) ? ptr[p1_idx] : 0;
+        int p2 = (p2_idx >= 0 && p2_idx < width * height) ? ptr[p2_idx] : 0;
+        int p3 = (p3_idx >= 0 && p3_idx < width * height) ? ptr[p3_idx] : 0;
+
+        int result = p0 - p1 - p2 + p3;
+
+        return 0.f;
+    }
 };
 
 struct OptFeature {

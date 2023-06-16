@@ -434,7 +434,6 @@ void COMPUTER_VISION::initImgProc()
     minObjSz = Size(30, 30);
     maxObjSz = imgSz;
     sbufSz = Size(0, 0);
-    varNormFact = 0.f;
 
     calcScales();
     updateScaleData();
@@ -560,12 +559,12 @@ bool COMPUTER_VISION::setWindow(int* ptr, int scaleIdx)
     if (nf > 0.)
     {
         nf = std::sqrt(nf);
-        varNormFact = (float)(1. / nf);
+        int varNormFact = (float)(1. / nf);
         return area * varNormFact < 1e-1;
     }
     else
     {
-        varNormFact = 1.f;
+        int varNormFact = 1.f;
         return false;
     }
 }
@@ -638,11 +637,11 @@ void COMPUTER_VISION::procImg()
 #endif
 }
 
-int COMPUTER_VISION::predictOrderedStump(const int* ptr, int layer_offset)
+int COMPUTER_VISION::predictOrderedStump(int* ptr, int width, int height, double varNFact)
 {
     Stump* cascadeStumps = &data.stumps[0];
     Stage* cascadeStages = &data.stages[0];
-    OptFeature* cascadeFeatures = &data.optFeatures[0];
+    Feature* cascadeFeatures = &data.features[0];
     int nstages = data.stages.size();
     double tmp = 0;
 
@@ -653,8 +652,8 @@ int COMPUTER_VISION::predictOrderedStump(const int* ptr, int layer_offset)
         tmp = 0;
         for (size_t i = 0; i < ntrees; i++) {
             Stump& stump = cascadeStumps[i];
-            OptFeature& feature = cascadeFeatures[stump.featureIdx];
-            double value = feature.calc(ptr + layer_offset) * varNormFact;
+            Feature& feature = cascadeFeatures[stump.featureIdx];
+            double value = feature.calc(ptr, width, height)* varNFact;
             tmp += value < stump.threshold ? stump.left : stump.right;
         }
 
@@ -745,6 +744,13 @@ void COMPUTER_VISION::calcHaarFeature()
     int nscales = scaleData.size(); 
     QFutureWatcher<void> watcher;
     QList<QFuture<void>> futures;
+
+    //{
+    //    const ScaleData& s = scaleData.at(4);
+    //    int* pSum = imgPyramid[4].sum;
+    //    cv::Mat sum(s.szi.height, s.szi.width, CV_32S, pSum);
+    //    saveMatToCsv(sum, "sum.csv");
+    //}
     
     for (size_t i = 4; i < nscales; i++) {
         
@@ -754,13 +760,23 @@ void COMPUTER_VISION::calcHaarFeature()
             int* pSum = imgPyramid[i].sum;
             int* pSqsum = imgPyramid[i].sqsum;
             int width = imgPyramid[i].sz.width;
+            int height = imgPyramid[i].sz.height;
             int rangeX = s.szi.width - data.origWinSz.width;
             int rangeY = s.szi.height - data.origWinSz.height;
             int step = s.ystep;
     
             for (int y = 0; y <= rangeY; y += step) {
                 for (int x = 0; x <= rangeX; x += step) {
+                    
                     imgPyramid[i].varNFact = calcNormFactor(pSum, pSqsum, x, y, width);
+                    int result = predictOrderedStump(&pSum[y * width + x], width, height, imgPyramid[i].varNFact);
+                    
+                    //if (result > 0) {
+                    //    printf("");
+                    //}
+                    //else if (result == 0) {
+                    //    x += step;
+                    //}
                 }
             }
         }));
