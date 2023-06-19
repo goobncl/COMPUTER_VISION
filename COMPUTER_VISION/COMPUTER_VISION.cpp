@@ -744,13 +744,6 @@ void COMPUTER_VISION::calcHaarFeature()
     int nscales = scaleData.size(); 
     QFutureWatcher<void> watcher;
     QList<QFuture<void>> futures;
-
-    //{
-    //    const ScaleData& s = scaleData.at(4);
-    //    int* pSum = imgPyramid[4].sum;
-    //    cv::Mat sum(s.szi.height, s.szi.width, CV_32S, pSum);
-    //    saveMatToCsv(sum, "sum.csv");
-    //}
     
     for (size_t i = 4; i < nscales; i++) {
         
@@ -771,12 +764,12 @@ void COMPUTER_VISION::calcHaarFeature()
                     imgPyramid[i].varNFact = calcNormFactor(pSum, pSqsum, x, y, width);
                     int result = predictOrderedStump(&pSum[y * width + x], width, height, imgPyramid[i].varNFact);
                     
-                    //if (result > 0) {
-                    //    printf("");
-                    //}
-                    //else if (result == 0) {
-                    //    x += step;
-                    //}
+                    if (result > 0) {
+                        printf("");
+                    }
+                    else if (result == 0) {
+                        x += step;
+                    }
                 }
             }
         }));

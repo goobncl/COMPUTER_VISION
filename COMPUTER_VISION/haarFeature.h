@@ -99,14 +99,12 @@ struct Feature {
         rect[0].weight = rect[1].weight = rect[2].weight = 0;
     }
 
-    double calc(const int* ptr, int width, int height) const {
+    double area(const Rect *r, const int * ptr, int width, int height) const {
         
-        double ret = 0.f;
-
-        int baseY = rect[0].r.y * width;
-        int baseX = rect[0].r.x;
-        int baseWidth = rect[0].r.width;
-        int baseHeight = rect[0].r.height * width;
+        int baseY = r->y * width;
+        int baseX = r->x;
+        int baseWidth = r->width;
+        int baseHeight = r->height * width;
 
         int p3_idx = (baseY - width) + (baseX - 1);
         int p1_idx = p3_idx + baseWidth;
@@ -118,9 +116,19 @@ struct Feature {
         int p2 = (p2_idx >= 0 && p2_idx < width * height) ? ptr[p2_idx] : 0;
         int p3 = (p3_idx >= 0 && p3_idx < width * height) ? ptr[p3_idx] : 0;
 
-        int result = p0 - p1 - p2 + p3;
+        return p0 - p1 - p2 + p3;
+    }
 
-        return 0.f;
+    double calc(const int* ptr, int width, int height) const {
+        
+        double ret = rect[0].weight * area(&rect[0].r, ptr, width, height) + 
+                     rect[1].weight * area(&rect[1].r, ptr, width, height);
+
+        if (rect[2].weight != 0.0f) {
+            ret += rect[2].weight * area(&rect[2].r, ptr, width, height);
+        }
+
+        return ret;
     }
 };
 
