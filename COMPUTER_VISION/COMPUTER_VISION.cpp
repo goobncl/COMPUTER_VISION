@@ -437,7 +437,6 @@ void COMPUTER_VISION::initImgProc()
 
     calcScales();
     updateScaleData();
-    computeOptFeatures();
 
     sz0 = scaleData.at(0).szi;
     sz0 = Size((int)alignSize(sz0.width, 16), sz0.height);
