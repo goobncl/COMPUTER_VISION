@@ -114,6 +114,7 @@ private:
     void displayLayer(ImgLayer& layer, int layerIndex);    
     double calcNormFactor(int* pSum, int* pSqsum, int x, int y, int width);
     void calcHaarFeature();
+    int partition(const QVector<Rect>& rectList, QVector<int>& labels);
     bool compRect(const Rect& r1, const Rect& r2);
     void clearImgPyramid();
     void displayPyramid();

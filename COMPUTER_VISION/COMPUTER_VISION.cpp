@@ -738,18 +738,95 @@ void COMPUTER_VISION::calcHaarFeature()
         watcher.setFuture(future);
         watcher.waitForFinished();
     }
-
-    faces.clear();
 }
 
-bool COMPUTER_VISION::compRect(const Rect& r1, const Rect& r2)
-{
-    double delta = 0.2 * (intMin(r1.width, r2.width) + 
+bool COMPUTER_VISION::compRect(const Rect& r1, const Rect& r2) {
+
+    double delta = 0.2 * (intMin(r1.width, r2.width) +
                           intMin(r1.height, r2.height)) * 0.5;
     return intAbs(r1.x - r2.x) <= delta &&
            intAbs(r1.y - r2.y) <= delta &&
            intAbs(r1.x + r1.width - r2.x - r2.width) <= delta &&
            intAbs(r1.y + r1.height - r2.y - r2.height) <= delta;
+}
+
+int COMPUTER_VISION::partition(const QVector<Rect>& rectList, QVector<int>& labels)
+{
+    int N = (int)rectList.size();
+    const Rect* pRect = &rectList[0];
+    const int PARENT = 0;
+    const int RANK = 1;
+
+    QVector<int> nodes(N * 2);
+    int (*pNode)[2] = (int(*)[2])&nodes[0];
+
+    for (size_t i = 0; i < N; i++) {
+        pNode[i][PARENT] = -1;
+        pNode[i][RANK] = 0;
+    }
+
+    for (size_t i = 0; i < N; i++) {        
+        int root = i;
+        while (pNode[root][PARENT] >= 0) {
+            root = pNode[root][PARENT];
+        }
+
+        for (size_t j = 0; j < N; j++) {
+            
+            if (i == j || !compRect(rectList[i], rectList[j])) {
+                continue;
+            }
+            
+            int root2 = j;
+
+            while (pNode[root2][PARENT] >= 0) {
+                root2 = pNode[root2][PARENT];
+            }
+
+            if (root2 != root) {
+                int rank = pNode[root][RANK];
+                int rank2 = pNode[root2][RANK];
+                if (rank > rank2) {
+                    pNode[root2][PARENT] = root;
+                }
+                else {
+                    pNode[root][PARENT] = root2;
+                    pNode[root2][RANK] += rank == rank2;
+                    root = root2;
+                }
+
+                int k = j;
+                int parent;
+
+                while ((parent = pNode[k][PARENT]) >= 0) {
+                    pNode[k][PARENT] = root;
+                    k = parent;
+                }
+
+                k = i;
+                while ((parent = pNode[k][PARENT]) >= 0) {
+                    pNode[k][PARENT] = root;
+                    k = parent;
+                }
+            }
+        }
+    }
+
+    labels.resize(N);
+    int nclasses = 0;
+
+    for (size_t i = 0; i < N; i++) {
+        int root = i;
+        while (pNode[root][PARENT] >= 0) {
+			root = pNode[root][PARENT];
+		}
+        if (pNode[root][RANK] >= 0) {
+            pNode[root][RANK] = ~nclasses++;
+        }
+        labels[i] = ~pNode[root][RANK];
+    }
+
+    return nclasses;
 }
 
 QImage COMPUTER_VISION::normMat(cv::Mat& cvImage)
