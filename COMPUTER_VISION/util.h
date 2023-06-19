@@ -4,6 +4,9 @@
 #define UTIL_H
 
 size_t alignSize(size_t sz, int n);
+int intMin(int n1, int n2);
+int intMax(int n1, int n2);
+int intAbs(int n);
 double doubleAbs(double n);
 double doubleRound(double number);
 void downSampling(unsigned char* src, unsigned char* dst, int new_width, int new_height);

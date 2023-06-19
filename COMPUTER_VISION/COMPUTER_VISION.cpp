@@ -662,7 +662,7 @@ void COMPUTER_VISION::calcImgPyramid()
             int new_w = s.szi.width;
             int new_h = s.szi.height;
             imgPyramid[i].sz.width = new_w;
-            imgPyramid[i].sz.height = new_h;     
+            imgPyramid[i].sz.height = new_h;
 
             downSampling(image, imgPyramid[i].data, new_w, new_h);
             integral(imgPyramid[i].data, imgPyramid[i].sum, new_w, new_h, 0);
@@ -702,6 +702,7 @@ void COMPUTER_VISION::calcHaarFeature()
         futures.append(QtConcurrent::run([this, i] {
             
             const ScaleData& s = scaleData.at(i);
+            double scaleFactor = s.scale;
             int* pSum = imgPyramid[i].sum;
             int* pSqsum = imgPyramid[i].sqsum;
             int width = imgPyramid[i].sz.width;
@@ -717,7 +718,13 @@ void COMPUTER_VISION::calcHaarFeature()
                     int result = predictOrderedStump(&pSum[y * width + x], width, height, imgPyramid[i].varNFact);
                     
                     if (result > 0) {
-                        printf("");
+                        QMutexLocker locker(&facesMutex);
+                        faces.append(Rect(
+                            doubleRound(x * scaleFactor),
+                            doubleRound(y * scaleFactor),
+                            doubleRound(24 * scaleFactor),
+                            doubleRound(24 * scaleFactor))
+                        );
                     }
                     else if (result == 0) {
                         x += step;
@@ -731,6 +738,18 @@ void COMPUTER_VISION::calcHaarFeature()
         watcher.setFuture(future);
         watcher.waitForFinished();
     }
+
+    faces.clear();
+}
+
+bool COMPUTER_VISION::compRect(const Rect& r1, const Rect& r2)
+{
+    double delta = 0.2 * (intMin(r1.width, r2.width) + 
+                          intMin(r1.height, r2.height)) * 0.5;
+    return intAbs(r1.x - r2.x) <= delta &&
+           intAbs(r1.y - r2.y) <= delta &&
+           intAbs(r1.x + r1.width - r2.x - r2.width) <= delta &&
+           intAbs(r1.y + r1.height - r2.y - r2.height) <= delta;
 }
 
 QImage COMPUTER_VISION::normMat(cv::Mat& cvImage)
@@ -793,6 +812,7 @@ void COMPUTER_VISION::updateFrame()
 
     calcImgPyramid();
     calcHaarFeature();
+
     //displayPyramid();
 }
 

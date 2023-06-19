@@ -69,6 +69,9 @@ private:
     QVector<QLabel*> layerLabels;
     QVector<ImgLayer> imgPyramid;
     
+    QVector<Rect> faces;
+    QMutex facesMutex;
+    
     QTimer* timer;
     cv::VideoCapture cap;
 
@@ -111,6 +114,7 @@ private:
     void displayLayer(ImgLayer& layer, int layerIndex);    
     double calcNormFactor(int* pSum, int* pSqsum, int x, int y, int width);
     void calcHaarFeature();
+    bool compRect(const Rect& r1, const Rect& r2);
     void clearImgPyramid();
     void displayPyramid();
 

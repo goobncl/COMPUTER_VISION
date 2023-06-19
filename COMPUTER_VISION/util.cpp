@@ -6,6 +6,18 @@ size_t alignSize(size_t sz, int n) {
 	return (sz + n - 1) & -n;
 }
 
+int intMin(int n1, int n2) {
+	return n1 < n2 ? n1 : n2;
+}
+
+int intMax(int n1, int n2) {
+    return n1 > n2 ? n1 : n2;
+}
+
+int intAbs(int n) {
+    return n < 0 ? -n : n;
+}
+
 double doubleAbs(double n) {
 	return n < 0 ? -n : n;
 }
