@@ -588,53 +588,6 @@ void COMPUTER_VISION::procImg()
             ImgProc::AlgType::Blur
         );
     }
-#if 0:
-    {
-        size_t nscales = scaleData.size();
-        memset(sbuf, 0, sizeof(int) * sbufSz.width * (sbufSz.height * 2));
-
-        for (size_t i = 0; i < nscales; i++) {
-            const ScaleData& s = scaleData.at(i);
-            memset(rbuf, 0, sizeof(unsigned char) * sz0.width * sz0.height);
-            downSampling(image, rbuf, s.szi.width, s.szi.height);
-            computeChannels(i, rbuf);
-        }
-    }
-
-    {
-        cv::Mat sbufMat(sbufSz.height * 2, sbufSz.width, CV_32S, sbuf);
-        saveMatToCsv(sbufMat, "sbuf_raw.csv");
-    }
-    
-    // TODO: ... 
-    {
-        size_t nscales = scaleData.size();
-        Size origWinSz = data.origWinSz;
-        
-        for (size_t scaleIdx = 0; scaleIdx < nscales; scaleIdx++) {
-            const ScaleData& s = scaleData.at(scaleIdx);
-            int layer_offset = s.layer_offset;
-            double scaleFactor = s.scale;
-            int yStep = s.ystep;
-            Size szw = s.getWorkingSize(origWinSz);
-
-            for (int y = 0; y < szw.height; y += yStep) {
-                for (int x = 0; x < szw.width; x += yStep) {
-                    int* ptr = &sbuf[s.layer_offset + y * s.szi.width + x];
-                    if (setWindow(ptr, scaleIdx)) {
-                        int result = predictOrderedStump(ptr, layer_offset);
-                        if (result > 0) {
-                            printf("");
-                        }
-                        else if (result == 0) {
-                            x += yStep;
-                        }
-                    }
-                }
-            }
-        }
-    }
-#endif
 }
 
 int COMPUTER_VISION::predictOrderedStump(int* ptr, int width, int height, double varNFact)
