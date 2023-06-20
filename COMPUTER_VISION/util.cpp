@@ -18,6 +18,16 @@ int intAbs(int n) {
     return n < 0 ? -n : n;
 }
 
+int doubleToInt(double n) {
+	
+    const double MIN_INT = -2147483648.f;
+    const double MAX_INT =  2147483647.f;
+
+    if (n <= MIN_INT) return (int)MIN_INT;
+    else if (n >= MAX_INT) return (int)MAX_INT;
+	else return (int)n;
+}
+
 double doubleAbs(double n) {
 	return n < 0 ? -n : n;
 }

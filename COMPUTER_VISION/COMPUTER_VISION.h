@@ -116,8 +116,10 @@ private:
     void calcHaarFeature();
     int partition(const QVector<Rect>& rectList, QVector<int>& labels);
     bool compRect(const Rect& r1, const Rect& r2);
+    void groupRectangles(QVector<Rect>& rectList, int threshold, double eps);
     void clearImgPyramid();
     void displayPyramid();
+    void drawFaces();
 
     void calcScales();
     bool updateScaleData();

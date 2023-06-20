@@ -829,6 +829,76 @@ int COMPUTER_VISION::partition(const QVector<Rect>& rectList, QVector<int>& labe
     return nclasses;
 }
 
+void COMPUTER_VISION::groupRectangles(QVector<Rect>& rectList, int threshold, double eps)
+{
+    if (rectList.empty()) {
+        return;
+    }
+
+    QVector<int> labels;
+    int nclasses = partition(rectList, labels);
+    QVector<Rect> rrects(nclasses);
+    QVector<int> rweights(nclasses, 0);
+    int nlabels = (int)labels.size();
+    int i, j;
+
+    for (i = 0; i < nlabels; i++) {
+        int cls = labels[i];
+        rrects[cls].x += rectList[i].x;
+        rrects[cls].y += rectList[i].y;
+        rrects[cls].width += rectList[i].width;
+        rrects[cls].height += rectList[i].height;
+        rweights[cls]++;
+    }
+
+    for (i = 0; i < nclasses; i++) {
+        Rect r = rrects[i];
+        double s = 1.f / rweights[i];
+        rrects[i] = Rect(doubleToInt((double)r.x * s),
+            		     doubleToInt((double)r.y * s),
+            		     doubleToInt((double)r.width * s),
+            		     doubleToInt((double)r.height * s));
+    }
+
+    rectList.clear();
+
+    for (i = 0; i < nclasses; i++) {
+        
+        Rect r1 = rrects[i];
+        int n1 = rweights[i];
+
+        if (n1 <= threshold) {
+            continue;
+        }
+
+        for (j = 0; j < nclasses; j++) {
+            
+            int n2 = rweights[j];
+
+            if (j == i || n2 <= threshold) {
+				continue;
+			}
+
+            Rect r2 = rrects[j];
+            int dx = doubleToInt((double)r2.width * eps);
+            int dy = doubleToInt((double)r2.height * eps);
+
+            if (i != j &&
+                r1.x >= r2.x - dx &&
+                r1.y >= r2.y - dy &&
+                r1.x + r1.width <= r2.x + r2.width + dx &&
+                r1.y + r1.height <= r2.y + r2.height + dy &&
+                (n2 > intMax(3, n1)) || (n1 < 3)) {
+                break;
+            }
+        }
+
+        if (j == nclasses) {
+            rectList.push_back(r1);
+        }
+    }
+}
+
 QImage COMPUTER_VISION::normMat(cv::Mat& cvImage)
 {
     double minVal, maxVal;
@@ -889,8 +959,31 @@ void COMPUTER_VISION::updateFrame()
 
     calcImgPyramid();
     calcHaarFeature();
+    groupRectangles(faces, 10, 0.2);
 
-    //displayPyramid();
+    drawFaces();
+}
+
+void COMPUTER_VISION::drawFaces()
+{
+    if (faces.empty()) {
+        return;
+    }
+
+    QPixmap pixmap = displayLabel->pixmap(); 
+    QPainter painter(&pixmap);
+
+    QPen pen;
+    pen.setWidth(5);
+    pen.setColor(Qt::green);
+    painter.setPen(pen);
+
+    for (int i = 0; i < faces.size(); ++i) {
+        Rect face = faces[i];
+        painter.drawRect(face.x, face.y, face.width, face.height);
+    }
+
+    displayLabel->setPixmap(pixmap);
 }
 
 void COMPUTER_VISION::onClaheBtnClicked()
