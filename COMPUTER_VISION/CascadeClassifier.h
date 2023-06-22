@@ -11,6 +11,7 @@ public:
 	CascadeClassifier();
 	~CascadeClassifier();
 	void calcImgPyramid(unsigned char* image);
+	void calcHaarFeature();
 
 private:
 	QSqlDatabase db;
@@ -46,4 +47,6 @@ private:
 	void initScaleData();
 	void initImgProc();
 	void clearImgPyramid();
+	double calcNormFactor(int* pSum, int* pSqsum, int x, int y, int width);
+	int predictOrderedStump(int* ptr, int width, int height, double varNFact);
 };

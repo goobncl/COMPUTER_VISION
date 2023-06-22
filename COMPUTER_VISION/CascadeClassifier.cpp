@@ -224,7 +224,7 @@ void CascadeClassifier::initImgProc()
 	calcScales();
 	initScaleData();
 
-	sz0 = scaleData.at(0).szi;
+	sz0 = scaleData[0].szi;
 	sz0 = Size((int)alignSize(sz0.width, 16), sz0.height);
 
 	int nscales = scaleData.size();
@@ -248,6 +248,49 @@ void CascadeClassifier::clearImgPyramid()
 	imgPyramid.clear();
 }
 
+double CascadeClassifier::calcNormFactor(int* pSum, int* pSqsum, int x, int y, int width)
+{
+	int valSum = calcAreaSum(pSum, x, y, width);
+	int valSqsum = calcAreaSum(pSqsum, x, y, width);
+	double nf = 576.f * valSqsum - (double)valSum * valSum;
+
+	if (nf > 0.f) {
+		nf = std::sqrt(nf);
+		return (double)(1.f / nf);
+	}
+	else {
+		return 1.f;
+	}
+}
+
+int CascadeClassifier::predictOrderedStump(int* ptr, int width, int height, double varNFact)
+{
+	Stump* cascadeStumps = &data.stumps[0];
+	Stage* cascadeStages = &data.stages[0];
+	Feature* cascadeFeatures = &data.features[0];
+	int nstages = data.stages.size();
+	double tmp = 0;
+
+	for (size_t stageIdx = 0; stageIdx < nstages; stageIdx++) {
+		Stage& stage = cascadeStages[stageIdx];
+		int ntrees = stage.ntrees;
+		tmp = 0;
+		for (size_t stumpIdx = 0; stumpIdx < ntrees; stumpIdx++) {
+			Stump& stump = cascadeStumps[stumpIdx];
+			Feature& feature = cascadeFeatures[stump.featureIdx];
+			double value = feature.calc(ptr, width, height) * varNFact;
+			tmp += (value < stump.threshold) ? (stump.left) : (stump.right);
+		}
+
+		if (tmp < stage.threshold) {
+			return -stageIdx;
+		}
+		cascadeStumps += ntrees;
+	}
+
+	return 1;
+}
+
 void CascadeClassifier::calcImgPyramid(unsigned char* image)
 {
 	std::for_each(
@@ -268,4 +311,58 @@ void CascadeClassifier::calcImgPyramid(unsigned char* image)
 			integralSquare(imgPyramid[i].data, imgPyramid[i].sqsum, new_w, new_h, 0);
 		}
 	);	
+}
+
+void CascadeClassifier::calcHaarFeature()
+{
+	// [1]: Without parallel
+	//{
+	//	int nscales = scaleData.size();
+	//
+	//	for (size_t i = 10; i < nscales; i++) {
+	//		const ScaleData& s = scaleData.at(i);
+	//		double scaleFactor = s.scale;
+	//		int* pSum = imgPyramid[i].sum;
+	//		int* pSqsum = imgPyramid[i].sqsum;
+	//		int width = imgPyramid[i].sz.width;
+	//		int height = imgPyramid[i].sz.height;
+	//		int rangeX = s.szi.width - data.origWinSz.width;
+	//		int rangeY = s.szi.height - data.origWinSz.height;
+	//		int step = s.ystep;
+	//
+	//		for (int y = 0; y <= rangeY; y += step) {
+	//			for (int x = 0; x <= rangeX; x += step) {
+	//				imgPyramid[i].varNFact = calcNormFactor(pSum, pSqsum, x, y, width);
+	//			}
+	//		}
+	//	}
+	//}
+
+	// [2]: With parallel
+	{
+		std::for_each(
+			std::execution::par,
+			std::begin(scaleData) + 10,
+			std::end(scaleData),
+			[&](const ScaleData& s) {
+
+				size_t i = &s - &scaleData[0];
+
+				double scaleFactor = s.scale;
+				int* pSum = imgPyramid[i].sum;
+				int* pSqsum = imgPyramid[i].sqsum;
+				int width = imgPyramid[i].sz.width;
+				int height = imgPyramid[i].sz.height;
+				int rangeX = s.szi.width - data.origWinSz.width;
+				int rangeY = s.szi.height - data.origWinSz.height;
+				int step = s.ystep;
+
+				for (int y = 0; y <= rangeY; y += step) {
+					for (int x = 0; x <= rangeX; x += step) {
+						imgPyramid[i].varNFact = calcNormFactor(pSum, pSqsum, x, y, width);
+					}
+				}
+			}
+		);
+	}
 }
