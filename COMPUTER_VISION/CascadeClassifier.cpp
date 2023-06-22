@@ -332,6 +332,8 @@ void CascadeClassifier::calcImgPyramid(unsigned char* image)
 
 void CascadeClassifier::calcHaarFeature()
 {	
+	std::mutex mutex;
+
 	std::for_each(
 		std::execution::par,
 		std::begin(scaleData) + 10,
@@ -366,7 +368,13 @@ void CascadeClassifier::calcHaarFeature()
 					);
 
 					if (result > 0) {
-
+						std::lock_guard<std::mutex> lock(mutex);
+						candidates.push_back(Rect(
+							doubleRound(x * scaleFactor),
+							doubleRound(y * scaleFactor),
+							doubleRound(24 * scaleFactor),
+							doubleRound(24 * scaleFactor)
+						));
 					}
 					else if (result == 0) {
 						x += step;

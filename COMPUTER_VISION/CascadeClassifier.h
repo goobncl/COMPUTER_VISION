@@ -32,7 +32,7 @@ private:
 	std::vector<double> scales;
 	std::vector<ScaleData> scaleData;
 	std::vector<ImgPlane> imgPyramid;
-	std::vector<Rect> faces;
+	std::vector<Rect> candidates;
 
 	std::vector<Stage> readStages(QSqlQuery& query);
 	std::vector<DTree> readClassifiers(QSqlQuery& query);
