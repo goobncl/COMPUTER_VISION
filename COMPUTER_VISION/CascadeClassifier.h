@@ -8,10 +8,12 @@
 class CascadeClassifier
 {
 public:
+	std::vector<Rect> candidates;
 	CascadeClassifier();
 	~CascadeClassifier();
 	void calcImgPyramid(unsigned char* image);
 	void calcHaarFeature();
+	void groupRectangles(std::vector<Rect>& rectList, int threshold, double eps);
 
 private:
 	QSqlDatabase db;
@@ -31,8 +33,7 @@ private:
 	Size maxObjSz;
 	std::vector<double> scales;
 	std::vector<ScaleData> scaleData;
-	std::vector<ImgPlane> imgPyramid;
-	std::vector<Rect> candidates;
+	std::vector<ImgPlane> imgPyramid;	
 
 	std::vector<Stage> readStages(QSqlQuery& query);
 	std::vector<DTree> readClassifiers(QSqlQuery& query);
@@ -49,4 +50,6 @@ private:
 	void clearImgPyramid();
 	double calcNormFactor(int* pSum, int* pSqsum, int x, int y, int width);
 	int predictOrderedStump(int* ptr, int width, int height, double varNFact);
+	bool compRect(const Rect& r1, const Rect& r2);
+	int partition(const std::vector<Rect>& rectList, std::vector<int>& labels);
 };

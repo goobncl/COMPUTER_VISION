@@ -32,6 +32,7 @@ void ImgProc::setImageAndProcess(unsigned char* inputImage, int width, int heigh
             clahe(inputImage, width, height);
             faceDetector.calcImgPyramid(inputImage);
             faceDetector.calcHaarFeature();
+            faceDetector.groupRectangles(faceDetector.candidates, 10, 0.2);
             break;
         case AlgType::Blur:
             gaussianBlur(inputImage, width, height);
