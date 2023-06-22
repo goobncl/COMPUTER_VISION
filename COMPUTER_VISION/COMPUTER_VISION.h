@@ -53,7 +53,6 @@ private:
         QVector<OptFeature> optFeatures;
     };
     Data data;
-    QSqlDatabase db;
     
     int sqofs;
     int nofs[4];
@@ -84,14 +83,6 @@ private:
     bool blurEnabled;
     ImgProc* imageProcessor;
 
-    QVector<Stage> readStages(QSqlQuery& query);
-    QVector<DTree> readClassifiers(QSqlQuery& query);
-    QVector<DTreeNode> readNodes(QSqlQuery& query);
-    QVector<float> readLeaves(QSqlQuery& query);
-    QVector<Stump> readStumps(QSqlQuery& query);
-    QVector<Feature> readFeatures(QSqlQuery& query);    
-    bool loadDataFromDB();
-
     void setData();
     void initImgProc();
     void initComponents();
@@ -108,20 +99,11 @@ private:
     void setConn();
 
     Size clacSz0(Size oriSz);
-    void calcImgPyramid();
     QImage normMat(cv::Mat& cvImage);
     void displayLayer(ImgLayer& layer, int layerIndex);    
-    double calcNormFactor(int* pSum, int* pSqsum, int x, int y, int width);
-    void calcHaarFeature();
-    int partition(const QVector<Rect>& rectList, QVector<int>& labels);
-    bool compRect(const Rect& r1, const Rect& r2);
-    void groupRectangles(QVector<Rect>& rectList, int threshold, double eps);
-    void clearImgPyramid();
     void displayPyramid();
     void drawFaces();
 
-    void calcScales();
-    bool updateScaleData();
     void computeOptFeatures();
     void computeChannels(int scaleIdx, unsigned char* img);
     double getFPS();
@@ -132,7 +114,6 @@ private:
     void verifyMatEqual(const cv::Mat& mat1, const cv::Mat& mat2, const QString& mat_name);
     void verifyIntegral(int scaleIdx);
     void saveMatToCsv(const cv::Mat& mat, const QString& filename);
-    int predictOrderedStump(int* ptr, int width, int height, double varNFact);
     bool setWindow(int* ptr, int scaleIdx);
 
 private slots:
