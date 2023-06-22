@@ -306,9 +306,26 @@ void CascadeClassifier::calcImgPyramid(unsigned char* image)
 			imgPyramid[i].sz.width = new_w;
 			imgPyramid[i].sz.height = new_h;
 
-			downSampling(image, imgPyramid[i].data, new_w, new_h);
-			integral(imgPyramid[i].data, imgPyramid[i].sum, new_w, new_h, 0);
-			integralSquare(imgPyramid[i].data, imgPyramid[i].sqsum, new_w, new_h, 0);
+			downSampling(
+				image, 
+				imgPyramid[i].data, 
+				new_w, 
+				new_h
+			);
+			integral(
+				imgPyramid[i].data, 
+				imgPyramid[i].sum, 
+				new_w, 
+				new_h, 
+				0
+			);
+			integralSquare(
+				imgPyramid[i].data, 
+				imgPyramid[i].sqsum, 
+				new_w, 
+				new_h, 
+				0
+			);
 		}
 	);	
 }
@@ -334,7 +351,26 @@ void CascadeClassifier::calcHaarFeature()
 
 			for (int y = 0; y <= rangeY; y += step) {
 				for (int x = 0; x <= rangeX; x += step) {
-					imgPyramid[i].varNFact = calcNormFactor(pSum, pSqsum, x, y, width);
+					imgPyramid[i].varNFact = calcNormFactor(
+						pSum, 
+						pSqsum, 
+						x, 
+						y, 
+						width
+					);
+					int result = predictOrderedStump(
+						&pSum[y * width + x],
+						width, 
+						height, 
+						imgPyramid[i].varNFact
+					);
+
+					if (result > 0) {
+
+					}
+					else if (result == 0) {
+						x += step;
+					}
 				}
 			}
 		}
