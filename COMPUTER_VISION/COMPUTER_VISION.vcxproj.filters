@@ -28,11 +28,11 @@
     <Filter Include="Algorithm Files\Gaussian Blur">
       <UniqueIdentifier>{94972405-b528-427c-b571-59b4a92f05f4}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Algorithm Files\Haar Feature">
-      <UniqueIdentifier>{c9901fbd-a190-48fc-8376-baec5ffefe92}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Database Files">
       <UniqueIdentifier>{7ee4c867-485f-4e0b-b1e9-9f85262df26d}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Algorithm Files\Object Detection">
+      <UniqueIdentifier>{c9901fbd-a190-48fc-8376-baec5ffefe92}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -74,6 +74,9 @@
     <ClCompile Include="util.cpp">
       <Filter>Algorithm Files</Filter>
     </ClCompile>
+    <ClCompile Include="CascadeClassifier.cpp">
+      <Filter>Algorithm Files\Object Detection</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <QtMoc Include="COMPUTER_VISION.h">
@@ -103,10 +106,13 @@
       <Filter>Algorithm Files\Gaussian Blur</Filter>
     </ClInclude>
     <ClInclude Include="haarFeature.h">
-      <Filter>Algorithm Files\Haar Feature</Filter>
+      <Filter>Algorithm Files\Object Detection</Filter>
     </ClInclude>
     <ClInclude Include="util.h">
       <Filter>Algorithm Files</Filter>
+    </ClInclude>
+    <ClInclude Include="CascadeClassifier.h">
+      <Filter>Algorithm Files\Object Detection</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

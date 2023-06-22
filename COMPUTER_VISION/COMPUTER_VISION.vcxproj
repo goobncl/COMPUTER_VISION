@@ -32,7 +32,7 @@
   </ImportGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Debug|x64'" Label="QtSettings">
     <QtInstall>6.5.0</QtInstall>
-    <QtModules>core;gui;testlib;widgets;multimedia;sql;statemachine;charts;designer;uitools;uiplugin</QtModules>
+    <QtModules>core;gui;testlib;widgets;multimedia;sql;statemachine;charts;datavisualization;designer;uitools;uiplugin</QtModules>
     <QtBuildConfig>debug</QtBuildConfig>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Release|x64'" Label="QtSettings">
@@ -104,8 +104,10 @@
     </QtMoc>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="CascadeClassifier.cpp" />
     <ClCompile Include="util.cpp" />
     <ClInclude Include="bayesian_filter.hpp" />
+    <ClInclude Include="CascadeClassifier.h" />
     <ClInclude Include="util.h" />
     <None Include="HaarCascadeFeatures.db" />
     <QtRcc Include="COMPUTER_VISION.qrc" />

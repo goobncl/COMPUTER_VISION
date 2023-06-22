@@ -86,6 +86,15 @@ struct Rect {
     }
 };
 
+struct ImgPlane {
+    Size sz;
+    unsigned char* data;
+    int* sum;
+    int* sqsum;
+    double varNFact;
+    ImgPlane() : sz(Size(0, 0)), data(NULL), sum(NULL), sqsum(NULL), varNFact(0.f) {}
+};
+
 struct Feature {
     Bool tilted;
     struct {

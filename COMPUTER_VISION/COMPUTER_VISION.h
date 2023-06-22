@@ -41,7 +41,6 @@ private:
     Ui::COMPUTER_VISIONClass ui;
         
     struct Data {
-
         int minNodesPerTree;
         int maxNodesPerTree;
         Size origWinSz;
@@ -90,9 +89,9 @@ private:
     QVector<DTreeNode> readNodes(QSqlQuery& query);
     QVector<float> readLeaves(QSqlQuery& query);
     QVector<Stump> readStumps(QSqlQuery& query);
-    QVector<Feature> readFeatures(QSqlQuery& query);
-    
+    QVector<Feature> readFeatures(QSqlQuery& query);    
     bool loadDataFromDB();
+
     void setData();
     void initImgProc();
     void initComponents();

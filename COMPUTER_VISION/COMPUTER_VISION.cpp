@@ -454,7 +454,7 @@ void COMPUTER_VISION::initImgProc()
     image = (unsigned char*)malloc(sizeof(unsigned char) * imgSz.width * imgSz.height);
     rbuf = (unsigned char*)malloc(sizeof(unsigned char) * sz0.width * sz0.height);
     sbuf = (int*)malloc(sizeof(int) * sbufSz.width * (sbufSz.height * 2));
-    imageProcessor = new ImgProc(image, this);
+    imageProcessor = new ImgProc(this);
 }
 
 
@@ -697,7 +697,7 @@ void COMPUTER_VISION::calcHaarFeature()
     QFutureWatcher<void> watcher;
     QList<QFuture<void>> futures;
     
-    for (size_t i = 4; i < nscales; i++) {
+    for (size_t i = 10; i < nscales; i++) {
         
         futures.append(QtConcurrent::run([this, i] {
             

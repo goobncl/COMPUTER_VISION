@@ -2,8 +2,8 @@
 #include "ImageProcessor.h"
 
 
-ImgProc::ImgProc(unsigned char* sharedImageArray, QObject* parent)
-    : QObject(parent), targetImageArray(sharedImageArray), inputImage(Q_NULLPTR), outputImage(Q_NULLPTR), width(0), height(0)
+ImgProc::ImgProc(QObject* parent)
+    : QObject(parent)
 {
     moveToThread(&workerThread);
     workerThread.start();
@@ -20,10 +20,6 @@ void ImgProc::setImageAndProcess(unsigned char* inputImage, int width, int heigh
     {
         QMutexLocker locker(&mutex);
 
-        this->inputImage = inputImage;
-        this->width = width;
-        this->height = height;
-
         if (inputImage == Q_NULLPTR)
         {
             return;
@@ -36,6 +32,9 @@ void ImgProc::setImageAndProcess(unsigned char* inputImage, int width, int heigh
             break;
         case AlgType::Blur:
             gaussianBlur(inputImage, width, height);
+            break;
+        case AlgType::Face:
+
             break;
         default:
             break;
