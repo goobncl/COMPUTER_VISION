@@ -314,55 +314,29 @@ void CascadeClassifier::calcImgPyramid(unsigned char* image)
 }
 
 void CascadeClassifier::calcHaarFeature()
-{
-	// [1]: Without parallel
-	//{
-	//	int nscales = scaleData.size();
-	//
-	//	for (size_t i = 10; i < nscales; i++) {
-	//		const ScaleData& s = scaleData.at(i);
-	//		double scaleFactor = s.scale;
-	//		int* pSum = imgPyramid[i].sum;
-	//		int* pSqsum = imgPyramid[i].sqsum;
-	//		int width = imgPyramid[i].sz.width;
-	//		int height = imgPyramid[i].sz.height;
-	//		int rangeX = s.szi.width - data.origWinSz.width;
-	//		int rangeY = s.szi.height - data.origWinSz.height;
-	//		int step = s.ystep;
-	//
-	//		for (int y = 0; y <= rangeY; y += step) {
-	//			for (int x = 0; x <= rangeX; x += step) {
-	//				imgPyramid[i].varNFact = calcNormFactor(pSum, pSqsum, x, y, width);
-	//			}
-	//		}
-	//	}
-	//}
+{	
+	std::for_each(
+		std::execution::par,
+		std::begin(scaleData) + 10,
+		std::end(scaleData),
+		[&](const ScaleData& s) {
 
-	// [2]: With parallel
-	{
-		std::for_each(
-			std::execution::par,
-			std::begin(scaleData) + 10,
-			std::end(scaleData),
-			[&](const ScaleData& s) {
+			size_t i = &s - &scaleData[0];
 
-				size_t i = &s - &scaleData[0];
+			double scaleFactor = s.scale;
+			int* pSum = imgPyramid[i].sum;
+			int* pSqsum = imgPyramid[i].sqsum;
+			int width = imgPyramid[i].sz.width;
+			int height = imgPyramid[i].sz.height;
+			int rangeX = s.szi.width - data.origWinSz.width;
+			int rangeY = s.szi.height - data.origWinSz.height;
+			int step = s.ystep;
 
-				double scaleFactor = s.scale;
-				int* pSum = imgPyramid[i].sum;
-				int* pSqsum = imgPyramid[i].sqsum;
-				int width = imgPyramid[i].sz.width;
-				int height = imgPyramid[i].sz.height;
-				int rangeX = s.szi.width - data.origWinSz.width;
-				int rangeY = s.szi.height - data.origWinSz.height;
-				int step = s.ystep;
-
-				for (int y = 0; y <= rangeY; y += step) {
-					for (int x = 0; x <= rangeX; x += step) {
-						imgPyramid[i].varNFact = calcNormFactor(pSum, pSqsum, x, y, width);
-					}
+			for (int y = 0; y <= rangeY; y += step) {
+				for (int x = 0; x <= rangeX; x += step) {
+					imgPyramid[i].varNFact = calcNormFactor(pSum, pSqsum, x, y, width);
 				}
 			}
-		);
-	}
+		}
+	);
 }
