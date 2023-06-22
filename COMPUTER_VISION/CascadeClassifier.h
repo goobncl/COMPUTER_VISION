@@ -11,9 +11,7 @@ public:
 	std::vector<Rect> candidates;
 	CascadeClassifier();
 	~CascadeClassifier();
-	void calcImgPyramid(unsigned char* image);
-	void calcHaarFeature();
-	void groupRectangles(std::vector<Rect>& rectList, int threshold, double eps);
+	void objectDetect(unsigned char* image);	
 
 private:
 	QSqlDatabase db;
@@ -33,7 +31,7 @@ private:
 	Size maxObjSz;
 	std::vector<double> scales;
 	std::vector<ScaleData> scaleData;
-	std::vector<ImgPlane> imgPyramid;	
+	std::vector<ImgPlane> imgPyramid;
 
 	std::vector<Stage> readStages(QSqlQuery& query);
 	std::vector<DTree> readClassifiers(QSqlQuery& query);
@@ -47,9 +45,12 @@ private:
 	void calcScales();
 	void initScaleData();
 	void initImgProc();
+	void calcImgPyramid(unsigned char* image);
 	void clearImgPyramid();
 	double calcNormFactor(int* pSum, int* pSqsum, int x, int y, int width);
 	int predictOrderedStump(int* ptr, int width, int height, double varNFact);
+	void calcHaarFeature();
 	bool compRect(const Rect& r1, const Rect& r2);
 	int partition(const std::vector<Rect>& rectList, std::vector<int>& labels);
+	void groupRectangles(int threshold, double eps);	
 };

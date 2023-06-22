@@ -12,6 +12,13 @@ CascadeClassifier::~CascadeClassifier()
 	clearImgPyramid();
 }
 
+void CascadeClassifier::objectDetect(unsigned char* image)
+{
+	calcImgPyramid(image);
+	calcHaarFeature();
+	groupRectangles(10, 0.2);
+}
+
 std::vector<Stage> CascadeClassifier::readStages(QSqlQuery& query)
 {
 	std::vector<Stage> stages;
@@ -237,6 +244,45 @@ void CascadeClassifier::initImgProc()
 	}
 }
 
+void CascadeClassifier::calcImgPyramid(unsigned char* image)
+{
+	std::for_each(
+		std::execution::par,
+		std::begin(scaleData),
+		std::end(scaleData),
+		[&](const ScaleData& s) {
+
+			size_t i = &s - &scaleData[0];
+
+			int new_w = s.szi.width;
+			int new_h = s.szi.height;
+			imgPyramid[i].sz.width = new_w;
+			imgPyramid[i].sz.height = new_h;
+
+			downSampling(
+				image,
+				imgPyramid[i].data,
+				new_w,
+				new_h
+			);
+			integral(
+				imgPyramid[i].data,
+				imgPyramid[i].sum,
+				new_w,
+				new_h,
+				0
+			);
+			integralSquare(
+				imgPyramid[i].data,
+				imgPyramid[i].sqsum,
+				new_w,
+				new_h,
+				0
+			);
+		}
+	);
+}
+
 void CascadeClassifier::clearImgPyramid()
 {
 	int n = imgPyramid.size();
@@ -289,6 +335,61 @@ int CascadeClassifier::predictOrderedStump(int* ptr, int width, int height, doub
 	}
 
 	return 1;
+}
+
+void CascadeClassifier::calcHaarFeature()
+{
+	std::mutex mutex;
+
+	std::for_each(
+		std::execution::par,
+		std::begin(scaleData) + 10,
+		std::end(scaleData),
+		[&](const ScaleData& s) {
+
+			size_t i = &s - &scaleData[0];
+
+			double scaleFactor = s.scale;
+			int* pSum = imgPyramid[i].sum;
+			int* pSqsum = imgPyramid[i].sqsum;
+			int width = imgPyramid[i].sz.width;
+			int height = imgPyramid[i].sz.height;
+			int rangeX = s.szi.width - data.origWinSz.width;
+			int rangeY = s.szi.height - data.origWinSz.height;
+			int step = s.ystep;
+
+			for (int y = 0; y <= rangeY; y += step) {
+				for (int x = 0; x <= rangeX; x += step) {
+					imgPyramid[i].varNFact = calcNormFactor(
+						pSum,
+						pSqsum,
+						x,
+						y,
+						width
+					);
+					int result = predictOrderedStump(
+						&pSum[y * width + x],
+						width,
+						height,
+						imgPyramid[i].varNFact
+					);
+
+					if (result > 0) {
+						std::lock_guard<std::mutex> lock(mutex);
+						candidates.push_back(Rect(
+							doubleRound(x * scaleFactor),
+							doubleRound(y * scaleFactor),
+							doubleRound(24 * scaleFactor),
+							doubleRound(24 * scaleFactor)
+						));
+					}
+					else if (result == 0) {
+						x += step;
+					}
+				}
+			}
+		}
+	);
 }
 
 bool CascadeClassifier::compRect(const Rect& r1, const Rect& r2)
@@ -380,108 +481,14 @@ int CascadeClassifier::partition(const std::vector<Rect>& rectList, std::vector<
 	return nclasses;
 }
 
-void CascadeClassifier::calcImgPyramid(unsigned char* image)
+void CascadeClassifier::groupRectangles(int threshold, double eps)
 {
-	std::for_each(
-		std::execution::par,
-		std::begin(scaleData),
-		std::end(scaleData),
-		[&](const ScaleData& s) {
-
-			size_t i = &s - &scaleData[0];
-
-			int new_w = s.szi.width;
-			int new_h = s.szi.height;
-			imgPyramid[i].sz.width = new_w;
-			imgPyramid[i].sz.height = new_h;
-
-			downSampling(
-				image, 
-				imgPyramid[i].data, 
-				new_w, 
-				new_h
-			);
-			integral(
-				imgPyramid[i].data, 
-				imgPyramid[i].sum, 
-				new_w, 
-				new_h, 
-				0
-			);
-			integralSquare(
-				imgPyramid[i].data, 
-				imgPyramid[i].sqsum, 
-				new_w, 
-				new_h, 
-				0
-			);
-		}
-	);	
-}
-
-void CascadeClassifier::calcHaarFeature()
-{	
-	std::mutex mutex;
-
-	std::for_each(
-		std::execution::par,
-		std::begin(scaleData) + 10,
-		std::end(scaleData),
-		[&](const ScaleData& s) {
-
-			size_t i = &s - &scaleData[0];
-
-			double scaleFactor = s.scale;
-			int* pSum = imgPyramid[i].sum;
-			int* pSqsum = imgPyramid[i].sqsum;
-			int width = imgPyramid[i].sz.width;
-			int height = imgPyramid[i].sz.height;
-			int rangeX = s.szi.width - data.origWinSz.width;
-			int rangeY = s.szi.height - data.origWinSz.height;
-			int step = s.ystep;
-
-			for (int y = 0; y <= rangeY; y += step) {
-				for (int x = 0; x <= rangeX; x += step) {
-					imgPyramid[i].varNFact = calcNormFactor(
-						pSum, 
-						pSqsum, 
-						x, 
-						y, 
-						width
-					);
-					int result = predictOrderedStump(
-						&pSum[y * width + x],
-						width, 
-						height, 
-						imgPyramid[i].varNFact
-					);
-
-					if (result > 0) {
-						std::lock_guard<std::mutex> lock(mutex);
-						candidates.push_back(Rect(
-							doubleRound(x * scaleFactor),
-							doubleRound(y * scaleFactor),
-							doubleRound(24 * scaleFactor),
-							doubleRound(24 * scaleFactor)
-						));
-					}
-					else if (result == 0) {
-						x += step;
-					}
-				}
-			}
-		}
-	);
-}
-
-void CascadeClassifier::groupRectangles(std::vector<Rect>& rectList, int threshold, double eps)
-{
-	if (rectList.empty()) {
+	if (candidates.empty()) {
 		return;
 	}
 
 	std::vector<int> labels;
-	int nclasses = partition(rectList, labels);
+	int nclasses = partition(candidates, labels);
 	std::vector<Rect> rrects(nclasses);
 	std::vector<int> rweights(nclasses, 0);
 	int nlabels = (int)labels.size();
@@ -489,10 +496,10 @@ void CascadeClassifier::groupRectangles(std::vector<Rect>& rectList, int thresho
 
 	for (i = 0; i < nlabels; i++) {
 		int cls = labels[i];
-		rrects[cls].x += rectList[i].x;
-		rrects[cls].y += rectList[i].y;
-		rrects[cls].width += rectList[i].width;
-		rrects[cls].height += rectList[i].height;
+		rrects[cls].x += candidates[i].x;
+		rrects[cls].y += candidates[i].y;
+		rrects[cls].width += candidates[i].width;
+		rrects[cls].height += candidates[i].height;
 		rweights[cls]++;
 	}
 
@@ -505,7 +512,7 @@ void CascadeClassifier::groupRectangles(std::vector<Rect>& rectList, int thresho
 						 doubleRound(r.height * s));
 	}
 
-	rectList.clear();
+	candidates.clear();
 
 	for (i = 0; i < nclasses; i++) {
 		Rect r1 = rrects[i];
@@ -536,7 +543,7 @@ void CascadeClassifier::groupRectangles(std::vector<Rect>& rectList, int thresho
 		}
 
 		if (j == nclasses) {
-			rectList.push_back(r1);
+			candidates.push_back(r1);
 		}
 	}	
 }
