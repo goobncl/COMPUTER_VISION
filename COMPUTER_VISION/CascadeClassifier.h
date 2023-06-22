@@ -10,9 +10,9 @@ class CascadeClassifier
 public:
 	CascadeClassifier();
 	~CascadeClassifier();
+	void calcImgPyramid(unsigned char* image);
 
 private:
-	unsigned char* image;
 	QSqlDatabase db;
 	struct Data {
 		Size origWinSz;
@@ -46,5 +46,4 @@ private:
 	void initScaleData();
 	void initImgProc();
 	void clearImgPyramid();
-	void calcImgPyramid();
 };

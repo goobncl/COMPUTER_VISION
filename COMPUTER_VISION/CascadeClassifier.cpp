@@ -248,17 +248,18 @@ void CascadeClassifier::clearImgPyramid()
 	imgPyramid.clear();
 }
 
-void CascadeClassifier::calcImgPyramid()
+void CascadeClassifier::calcImgPyramid(unsigned char* image)
 {
-	{
-		int nscales = scaleData.size();
+	std::for_each(
+		std::execution::par,
+		std::begin(scaleData),
+		std::end(scaleData),
+		[&](const ScaleData& s) {
 
-		for (size_t i = 0; i < nscales; i++) {
+			size_t i = &s - &scaleData[0];
 
-			const ScaleData& s = scaleData[i];
 			int new_w = s.szi.width;
 			int new_h = s.szi.height;
-
 			imgPyramid[i].sz.width = new_w;
 			imgPyramid[i].sz.height = new_h;
 
@@ -266,28 +267,5 @@ void CascadeClassifier::calcImgPyramid()
 			integral(imgPyramid[i].data, imgPyramid[i].sum, new_w, new_h, 0);
 			integralSquare(imgPyramid[i].data, imgPyramid[i].sqsum, new_w, new_h, 0);
 		}
-	}
-
-	//{
-	//	std::transform(
-	//		std::execution::par,
-	//		scaleData.begin(),
-	//		scaleData.end(),
-	//		imgPyramid.begin(),
-	//		[&](const ScaleData& s) {
-	//
-	//			int new_w = s.szi.width;
-	//			int new_h = s.szi.height;
-	//			ImgPlane ip;
-	//			ip.sz.width = new_w;
-	//			ip.sz.height = new_h;
-	//
-	//			downSampling(image, ip.data, new_w, new_h);
-	//			integral(ip.data, ip.sum, new_w, new_h, 0);
-	//			integralSquare(ip.data, ip.sqsum, new_w, new_h, 0);
-	//
-	//			return ip;
-	//		}
-	//	);
-	//}
+	);	
 }

@@ -28,13 +28,12 @@ void ImgProc::setImageAndProcess(unsigned char* inputImage, int width, int heigh
         switch (type)
         {
         case AlgType::Clahe:
+        case AlgType::Face:
             clahe(inputImage, width, height);
+            faceDetector.calcImgPyramid(inputImage);
             break;
         case AlgType::Blur:
             gaussianBlur(inputImage, width, height);
-            break;
-        case AlgType::Face:
-
             break;
         default:
             break;

@@ -957,11 +957,10 @@ void COMPUTER_VISION::updateFrame()
     procImg();
     displayImg(); 
 
-    calcImgPyramid();
-    calcHaarFeature();
-    groupRectangles(faces, 10, 0.2);
-
-    drawFaces();
+    //calcImgPyramid();
+    //calcHaarFeature();
+    //groupRectangles(faces, 10, 0.2);
+    //drawFaces();
 }
 
 void COMPUTER_VISION::drawFaces()
