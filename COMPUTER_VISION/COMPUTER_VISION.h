@@ -35,11 +35,53 @@ public:
     ~COMPUTER_VISION();
 
 private:
+    Ui::COMPUTER_VISIONClass ui;    
     unsigned char* image;
-    unsigned char* rbuf;
-    int* sbuf;
-    Ui::COMPUTER_VISIONClass ui;
-        
+    Size imgSz;        
+    ImgProc* imageProcessor;
+    const std::vector<Rect>* faces;
+    QTimer* timer;
+    cv::VideoCapture cap;
+    QLineSeries* series;
+    QChartView* fpsTimeSeries;
+    QPushButton* claheBtn;
+    QPushButton* blurBtn;
+    QPushButton* faceBtn;
+    QLabel* displayLabel;        
+    bool claheEnabled;
+    bool blurEnabled;
+    bool faceEnabled;
+    
+    void initImgProc();
+    void initComponents();
+    void customizeAxis(QChart* chart);
+    void setAxisStyle(QValueAxis* axis);
+    void initStatusBar();
+    void initFpsTimeSeries();
+    void initComps();
+    void setCam();
+    void setConn();
+    
+
+    
+    Size clacSz0(Size oriSz);
+    QImage normMat(cv::Mat& cvImage);
+    void displayLayer(ImgLayer& layer, int layerIndex);    
+    void displayPyramid();
+    void drawFaces();
+    void computeOptFeatures();
+    void computeChannels(int scaleIdx, unsigned char* img);
+    double getFPS();
+    void acqFrame();
+    void procImg();
+    void displayImg(); 
+    void updateFrame();
+    void verifyMatEqual(const cv::Mat& mat1, const cv::Mat& mat2, const QString& mat_name);
+    void verifyIntegral(int scaleIdx);
+    void saveMatToCsv(const cv::Mat& mat, const QString& filename);
+    bool setWindow(int* ptr, int scaleIdx);
+
+#if 1:
     struct Data {
         int minNodesPerTree;
         int maxNodesPerTree;
@@ -53,68 +95,23 @@ private:
         QVector<OptFeature> optFeatures;
     };
     Data data;
-    const std::vector<Rect>* faces;
-    
+    unsigned char* rbuf;
+    int* sbuf;
     int sqofs;
     int nofs[4];
     Rect normrect;
     Size sz0;
-    Size imgSz;
-    Size minObjSz;
-    Size maxObjSz;
     Size sbufSz;
     QVector<double> scales;
     QVector<ScaleData> scaleData;
     QVector<QLabel*> layerLabels;
     QVector<ImgLayer> imgPyramid;
-    
-    QTimer* timer;
-    cv::VideoCapture cap;
-
-    QLineSeries* series;
-    QChartView* fpsTimeSeries;
-    QPushButton* claheBtn;
-    QPushButton* blurBtn;
-    QPushButton* faceBtn;
-    QLabel* displayLabel;
-    
-    bool claheEnabled;
-    bool blurEnabled;
-    bool faceEnabled;
-    ImgProc* imageProcessor;
 
     void setData();
-    void initImgProc();
-    void initComponents();
+    void initLayerLabels();
     QLabel* createNumLabel(QLabel* label, int i);
     QGraphicsDropShadowEffect* createDropShadowEffect();
-    void initLayerLabels();
-    void customizeAxis(QChart* chart);
-    void setAxisStyle(QValueAxis* axis);
-    void initFpsTimeSeries();
-    void initStatusBar();
-
-    void initComps();
-    void setCam();
-    void setConn();
-
-    Size clacSz0(Size oriSz);
-    QImage normMat(cv::Mat& cvImage);
-    void displayLayer(ImgLayer& layer, int layerIndex);    
-    void displayPyramid();
-    void drawFaces();
-
-    void computeOptFeatures();
-    void computeChannels(int scaleIdx, unsigned char* img);
-    double getFPS();
-    void acqFrame();
-    void procImg();
-    void displayImg(); 
-    void updateFrame();
-    void verifyMatEqual(const cv::Mat& mat1, const cv::Mat& mat2, const QString& mat_name);
-    void verifyIntegral(int scaleIdx);
-    void saveMatToCsv(const cv::Mat& mat, const QString& filename);
-    bool setWindow(int* ptr, int scaleIdx);
+#endif
 
 private slots:
     void onClaheBtnClicked();

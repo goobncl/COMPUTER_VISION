@@ -11,7 +11,6 @@ COMPUTER_VISION::COMPUTER_VISION(QWidget* parent)
 {
     ui.setupUi(this);
 
-    setData();
     initImgProc();
     initComps();
     setCam();
@@ -24,8 +23,6 @@ COMPUTER_VISION::~COMPUTER_VISION()
     delete timer;
     delete imageProcessor;
     free(image);
-    free(rbuf);
-    free(sbuf);
 }
 
 bool COMPUTER_VISION::eventFilter(QObject* obj, QEvent* event)
@@ -198,13 +195,9 @@ void COMPUTER_VISION::computeOptFeatures()
 void COMPUTER_VISION::initImgProc()
 {
     imgSz = Size(FRAME_W, FRAME_H);
-    minObjSz = Size(30, 30);
-    maxObjSz = imgSz;
     sbufSz = Size(0, 0);
 
     image = (unsigned char*)malloc(sizeof(unsigned char) * imgSz.width * imgSz.height);
-    rbuf = (unsigned char*)malloc(sizeof(unsigned char) * sz0.width * sz0.height);
-    sbuf = (int*)malloc(sizeof(int) * sbufSz.width * (sbufSz.height * 2));
     imageProcessor = new ImgProc(this);
 }
 
