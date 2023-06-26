@@ -8,10 +8,10 @@
 class CascadeClassifier
 {
 public:
-	std::vector<Rect> candidates;
+	
 	CascadeClassifier();
 	~CascadeClassifier();
-	void objectDetect(unsigned char* image);	
+	const std::vector<Rect>& objectDetect(unsigned char* image);
 
 private:
 	QSqlDatabase db;
@@ -32,6 +32,7 @@ private:
 	std::vector<double> scales;
 	std::vector<ScaleData> scaleData;
 	std::vector<ImgPlane> imgPyramid;
+	std::vector<Rect> candidates;
 
 	std::vector<Stage> readStages(QSqlQuery& query);
 	std::vector<DTree> readClassifiers(QSqlQuery& query);

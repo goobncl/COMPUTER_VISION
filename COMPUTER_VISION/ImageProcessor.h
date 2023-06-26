@@ -26,7 +26,7 @@ public:
     explicit ImgProc(QObject* parent = Q_NULLPTR);
     ~ImgProc();
     
-    void setImageAndProcess(unsigned char* inputImage, int width, int height, AlgType type);
+    std::any setImageAndProcess(unsigned char* inputImage, int width, int height, AlgType type);
 
 private:
     QThread workerThread;

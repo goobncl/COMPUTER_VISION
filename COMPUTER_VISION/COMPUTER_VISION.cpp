@@ -5,7 +5,8 @@
 COMPUTER_VISION::COMPUTER_VISION(QWidget* parent)
     : QMainWindow(parent),
     claheEnabled(false),
-    blurEnabled(false)
+    blurEnabled(false),
+    faceEnabled(false)
 {
     ui.setupUi(this);
 
@@ -45,6 +46,7 @@ void COMPUTER_VISION::initComponents()
     displayLabel = findChild<QLabel*>("videoLabel");
     claheBtn = findChild<QPushButton*>("claheBtn");
     blurBtn = findChild<QPushButton*>("blurBtn");
+    faceBtn = findChild<QPushButton*>("faceBtn");
 }
 
 QGraphicsDropShadowEffect* COMPUTER_VISION::createDropShadowEffect()
@@ -167,6 +169,7 @@ void COMPUTER_VISION::setConn()
     connect(timer, &QTimer::timeout, this, &COMPUTER_VISION::updateFrame);
     connect(claheBtn, &QPushButton::clicked, this, &COMPUTER_VISION::onClaheBtnClicked);
     connect(blurBtn, &QPushButton::clicked, this, &COMPUTER_VISION::onBlurBtnClicked);
+    connect(faceBtn, &QPushButton::clicked, this, &COMPUTER_VISION::onFaceBtnClicked);
 
     timer->start(0);
 }
@@ -335,6 +338,22 @@ void COMPUTER_VISION::procImg()
             ImgProc::AlgType::Blur
         );
     }
+
+    if (faceEnabled) {
+        std::any result = imageProcessor->setImageAndProcess(
+            image,
+            FRAME_W,
+            FRAME_H,
+            ImgProc::AlgType::Face
+        );
+
+        if (result.has_value()) {
+            const std::vector<Rect>& faces = std::any_cast<const std::vector<Rect>&>(result);
+            if (!faces.empty()) {
+                drawFaces(faces);
+            }
+        }
+    }
 }
 
 void COMPUTER_VISION::displayImg() {
@@ -416,20 +435,15 @@ void COMPUTER_VISION::updateFrame()
     acqFrame();
     procImg();
     displayImg(); 
-
-    //calcImgPyramid();
-    //calcHaarFeature();
-    //groupRectangles(faces, 10, 0.2);
-    //drawFaces();
 }
 
-void COMPUTER_VISION::drawFaces()
+void COMPUTER_VISION::drawFaces(const std::vector<Rect>& faces)
 {
     if (faces.empty()) {
         return;
     }
 
-    QPixmap pixmap = displayLabel->pixmap(); 
+    QPixmap pixmap = displayLabel->pixmap();
     QPainter painter(&pixmap);
 
     QPen pen;
@@ -437,8 +451,7 @@ void COMPUTER_VISION::drawFaces()
     pen.setColor(Qt::green);
     painter.setPen(pen);
 
-    for (int i = 0; i < faces.size(); ++i) {
-        Rect face = faces[i];
+    for (const Rect& face : faces) {
         painter.drawRect(face.x, face.y, face.width, face.height);
     }
 
@@ -474,6 +487,21 @@ void COMPUTER_VISION::onBlurBtnClicked()
 	}
 	
     blurBtn->setFont(font);
+}
+
+void COMPUTER_VISION::onFaceBtnClicked()
+{
+    faceEnabled = !faceEnabled;
+    QFont font = faceBtn->font();
+
+    if (faceEnabled) {
+        font.setWeight(QFont::Bold);
+    }
+    else {
+        font.setWeight(QFont::Normal);
+    }
+
+    faceBtn->setFont(font);
 }
 
 void COMPUTER_VISION::onLayerClicked(int layerIndex) {

@@ -588,6 +588,19 @@
 </string>
     </property>
    </widget>
+   <widget class="QPushButton" name="faceBtn">
+    <property name="geometry">
+     <rect>
+      <x>920</x>
+      <y>500</y>
+      <width>121</width>
+      <height>41</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>FACE</string>
+    </property>
+   </widget>
   </widget>
  </widget>
  <layoutdefault spacing="6" margin="11"/>

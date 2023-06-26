@@ -2,6 +2,7 @@
 
 #include <fstream>
 #include <execution>
+#include <any>
 #include <QObject>
 #include <QThread>
 #include <QMutex>

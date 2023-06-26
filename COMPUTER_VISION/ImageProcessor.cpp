@@ -15,28 +15,29 @@ ImgProc::~ImgProc()
     workerThread.wait();
 }
 
-void ImgProc::setImageAndProcess(unsigned char* inputImage, int width, int height, AlgType type)
+std::any ImgProc::setImageAndProcess(unsigned char* inputImage, int width, int height, AlgType type)
 {
     {
         QMutexLocker locker(&mutex);
 
         if (inputImage == Q_NULLPTR)
         {
-            return;
+            return std::any();
         }
 
         switch (type)
         {
-        case AlgType::Clahe:
-        case AlgType::Face:
-            clahe(inputImage, width, height);
-            faceDetector.objectDetect(inputImage);
+        case AlgType::Clahe:        
+            clahe(inputImage, width, height); 
             break;
         case AlgType::Blur:
             gaussianBlur(inputImage, width, height);
             break;
+        case AlgType::Face:
+            return faceDetector.objectDetect(inputImage);
         default:
             break;
         }
     }
+    return std::any();
 }

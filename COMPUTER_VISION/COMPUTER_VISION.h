@@ -67,9 +67,6 @@ private:
     QVector<QLabel*> layerLabels;
     QVector<ImgLayer> imgPyramid;
     
-    QVector<Rect> faces;
-    QMutex facesMutex;
-    
     QTimer* timer;
     cv::VideoCapture cap;
 
@@ -77,10 +74,12 @@ private:
     QChartView* fpsTimeSeries;
     QPushButton* claheBtn;
     QPushButton* blurBtn;
+    QPushButton* faceBtn;
     QLabel* displayLabel;
     
     bool claheEnabled;
     bool blurEnabled;
+    bool faceEnabled;
     ImgProc* imageProcessor;
 
     void setData();
@@ -102,7 +101,7 @@ private:
     QImage normMat(cv::Mat& cvImage);
     void displayLayer(ImgLayer& layer, int layerIndex);    
     void displayPyramid();
-    void drawFaces();
+    void drawFaces(const std::vector<Rect>& faces);
 
     void computeOptFeatures();
     void computeChannels(int scaleIdx, unsigned char* img);
@@ -119,5 +118,6 @@ private:
 private slots:
     void onClaheBtnClicked();
     void onBlurBtnClicked();
+    void onFaceBtnClicked();
     void onLayerClicked(int layerIndex);
 };
