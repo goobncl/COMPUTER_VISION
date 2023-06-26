@@ -53,6 +53,7 @@ private:
         QVector<OptFeature> optFeatures;
     };
     Data data;
+    const std::vector<Rect>* faces;
     
     int sqofs;
     int nofs[4];
@@ -101,7 +102,7 @@ private:
     QImage normMat(cv::Mat& cvImage);
     void displayLayer(ImgLayer& layer, int layerIndex);    
     void displayPyramid();
-    void drawFaces(const std::vector<Rect>& faces);
+    void drawFaces();
 
     void computeOptFeatures();
     void computeChannels(int scaleIdx, unsigned char* img);

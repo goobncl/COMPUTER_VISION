@@ -6,7 +6,8 @@ COMPUTER_VISION::COMPUTER_VISION(QWidget* parent)
     : QMainWindow(parent),
     claheEnabled(false),
     blurEnabled(false),
-    faceEnabled(false)
+    faceEnabled(false),
+    faces(NULL)
 {
     ui.setupUi(this);
 
@@ -151,7 +152,6 @@ void COMPUTER_VISION::initStatusBar()
 void COMPUTER_VISION::initComps()
 {
     initComponents();
-    initLayerLabels();
     initFpsTimeSeries();
     initStatusBar();
 }
@@ -306,14 +306,12 @@ bool COMPUTER_VISION::setWindow(int* ptr, int scaleIdx)
 
     double area = normrect.area();
     double nf = area * valsqsum - (double)valsum * valsum;
-    if (nf > 0.)
-    {
+    if (nf > 0.) {
         nf = std::sqrt(nf);
         int varNormFact = (float)(1. / nf);
         return area * varNormFact < 1e-1;
     }
-    else
-    {
+    else {
         int varNormFact = 1.f;
         return false;
     }
@@ -348,10 +346,7 @@ void COMPUTER_VISION::procImg()
         );
 
         if (result.has_value()) {
-            const std::vector<Rect>& faces = std::any_cast<const std::vector<Rect>&>(result);
-            if (!faces.empty()) {
-                drawFaces(faces);
-            }
+            faces = std::any_cast<const std::vector<Rect>*>(result);
         }
     }
 }
@@ -435,11 +430,15 @@ void COMPUTER_VISION::updateFrame()
     acqFrame();
     procImg();
     displayImg(); 
+
+    if (faceEnabled) {
+        drawFaces();
+    }
 }
 
-void COMPUTER_VISION::drawFaces(const std::vector<Rect>& faces)
+void COMPUTER_VISION::drawFaces()
 {
-    if (faces.empty()) {
+    if ((!faces || faces->empty())) {
         return;
     }
 
@@ -451,7 +450,7 @@ void COMPUTER_VISION::drawFaces(const std::vector<Rect>& faces)
     pen.setColor(Qt::green);
     painter.setPen(pen);
 
-    for (const Rect& face : faces) {
+    for (const Rect& face : *faces) {
         painter.drawRect(face.x, face.y, face.width, face.height);
     }
 

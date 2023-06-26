@@ -11,7 +11,7 @@ public:
 	
 	CascadeClassifier();
 	~CascadeClassifier();
-	const std::vector<Rect>& objectDetect(unsigned char* image);
+	const std::vector<Rect>* objectDetect(unsigned char* image);
 
 private:
 	QSqlDatabase db;

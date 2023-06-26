@@ -12,13 +12,13 @@ CascadeClassifier::~CascadeClassifier()
 	clearImgPyramid();
 }
 
-const std::vector<Rect>& CascadeClassifier::objectDetect(unsigned char* image)
+const std::vector<Rect>* CascadeClassifier::objectDetect(unsigned char* image)
 {
 	calcImgPyramid(image);
 	calcHaarFeature();
 	groupRectangles(10, 0.2);
 
-	return candidates;
+	return &candidates;
 }
 
 std::vector<Stage> CascadeClassifier::readStages(QSqlQuery& query)
