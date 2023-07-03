@@ -25,75 +25,12 @@ COMPUTER_VISION::~COMPUTER_VISION()
     free(image);
 }
 
-bool COMPUTER_VISION::eventFilter(QObject* obj, QEvent* event)
-{
-    if (event->type() == QEvent::MouseButtonPress) {
-        for (size_t i = 0; i < layerLabels.size(); ++i) {
-            if (obj == layerLabels[i]) {
-                onLayerClicked(i);
-                return true;
-            }
-        }
-    }
-
-    return QObject::eventFilter(obj, event);
-}
-
 void COMPUTER_VISION::initComponents()
 {
     displayLabel = findChild<QLabel*>("videoLabel");
     claheBtn = findChild<QPushButton*>("claheBtn");
     blurBtn = findChild<QPushButton*>("blurBtn");
     faceBtn = findChild<QPushButton*>("faceBtn");
-}
-
-QGraphicsDropShadowEffect* COMPUTER_VISION::createDropShadowEffect()
-{
-    QGraphicsDropShadowEffect* effect = new QGraphicsDropShadowEffect();
-    effect->setBlurRadius(2);
-    effect->setXOffset(1);
-    effect->setYOffset(1);
-    effect->setColor(QColor("black"));
-
-    return effect;
-}
-
-void COMPUTER_VISION::initLayerLabels()
-{
-    int nLayers = scales.size();
-    for (size_t i = 0; i < nLayers; ++i) {
-        QString objectName = "layerLabel_" + QString::number(i).rightJustified(2, '0');
-        QLabel* label = findChild<QLabel*>(objectName);
-
-        if (label) {
-            layerLabels.push_back(label);
-            label->installEventFilter(this);
-            QLabel* numLabel = createNumLabel(label, i);
-            QGraphicsDropShadowEffect* effect = createDropShadowEffect();
-            numLabel->setGraphicsEffect(effect);
-        }
-    }
-}
-
-QLabel* COMPUTER_VISION::createNumLabel(QLabel* label, int i)
-{
-    QLabel* numLabel = new QLabel(label);
-    QString labelText = "[" + QString::number(i + 1) + "] ";
-    labelText += QString::number(scaleData[i].szi.width);
-    labelText += " x ";
-    labelText += QString::number(scaleData[i].szi.height);
-    numLabel->setText(labelText);
-
-    numLabel->setAlignment(Qt::AlignTop | Qt::AlignLeft);
-    numLabel->setContentsMargins(5, 5, 5, 5);
-    numLabel->setStyleSheet("QLabel {"
-        " color : yellow;"
-        " border: none;"
-        " font-weight: bold;"
-        " font-size: 10px;"
-        "}");
-
-    return numLabel;
 }
 
 void COMPUTER_VISION::initFpsTimeSeries()
@@ -171,31 +108,9 @@ void COMPUTER_VISION::setConn()
     timer->start(0);
 }
 
-void COMPUTER_VISION::setData()
-{
-    data.minNodesPerTree = 1;
-    data.maxNodesPerTree = 1;
-    data.origWinSz = Size(24, 24);
-    normrect = Rect(1, 1, data.origWinSz.width - 2, data.origWinSz.height - 2);
-}
-
-void COMPUTER_VISION::computeOptFeatures()
-{
-    int sstep = sbufSz.width;
-    CV_SUM_OFS(nofs[0], nofs[1], nofs[2], nofs[3], 0, normrect, sstep);
-    size_t nfeatures = data.features.size();
-    QVector<Feature>& ff = data.features;
-    data.optFeatures.resize(nfeatures);
-    OptFeature* optfeaturesPtr = &(data.optFeatures)[0];
-    for (size_t fi = 0; fi < nfeatures; fi++) {
-        optfeaturesPtr[fi].setOffsets(ff[fi], sstep);
-    }
-}
-
 void COMPUTER_VISION::initImgProc()
 {
     imgSz = Size(FRAME_W, FRAME_H);
-    sbufSz = Size(0, 0);
 
     image = (unsigned char*)malloc(sizeof(unsigned char) * imgSz.width * imgSz.height);
     imageProcessor = new ImgProc(this);
@@ -228,85 +143,6 @@ void COMPUTER_VISION::acqFrame()
     {
         QMutexLocker locker(&imageProcessor->mutex);
         memcpy(image, grayFrame.data, FRAME_W * FRAME_H);
-    }
-}
-
-void COMPUTER_VISION::verifyMatEqual(const cv::Mat& mat1, const cv::Mat& mat2, const QString& mat_name)
-{
-    double diff = cv::norm(mat1, mat2, cv::NORM_INF);
-    if (diff != 0) {
-        qDebug() << mat_name << ": X";
-    }
-}
-
-void COMPUTER_VISION::verifyIntegral(int scaleIdx)
-{
-    const ScaleData& s = scaleData.at(scaleIdx);
-
-    cv::Mat sbuf_sum(s.szi.height, s.szi.width, CV_32S, sbuf + s.layer_offset);
-    cv::Mat sbuf_sqsum(s.szi.height, s.szi.width, CV_32S, sbuf + s.layer_offset + sqofs);
-    cv::Mat rbuf_img(s.szi.height, s.szi.width, CV_8U, rbuf);
-    cv::Mat sum, sqsum;
-
-    cv::integral(rbuf_img, sum, sqsum, cv::noArray(), CV_32S, CV_32S);
-
-    sum = sum(cv::Rect(1, 1, s.szi.width, s.szi.height));
-    sqsum = sqsum(cv::Rect(1, 1, s.szi.width, s.szi.height));
-
-# if 0:
-    if (scaleIdx == 0) {
-        saveMatToCsv(sbuf_sum, "my_sum.csv");
-        saveMatToCsv(sbuf_sqsum, "my_sqsum.csv");
-    }
-    saveMatToCsv(sbuf_sum, "my_sum.csv");
-    saveMatToCsv(sbuf_sqsum, "my_sqsum.csv");
-    saveMatToCsv(sum, "sum.csv");
-    saveMatToCsv(sqsum, "sqsum.csv");
-# endif
-
-    verifyMatEqual(sbuf_sum, sum, "sum");
-    verifyMatEqual(sbuf_sqsum, sqsum, "sqsum");
-}
-
-void COMPUTER_VISION::saveMatToCsv(const cv::Mat& mat, const QString& filename)
-{
-    std::ofstream outputFile(filename.toStdString());
-    if (!outputFile) {
-        return;
-    }
-    outputFile << cv::format(mat, cv::Formatter::FMT_CSV);
-}
-
-void COMPUTER_VISION::computeChannels(int scaleIdx, unsigned char* img)
-{
-    const ScaleData& s = scaleData.at(scaleIdx);
-    sqofs = sbufSz.area();
-    integral(img, sbuf, s.szi.width, s.szi.height, s.layer_offset);
-    integralSquare(img, sbuf, s.szi.width, s.szi.height, (s.layer_offset + sqofs));
-# if 0:    
-    verifyIntegral(scaleIdx);
-# endif
-}
-
-bool COMPUTER_VISION::setWindow(int* ptr, int scaleIdx)
-{
-    const ScaleData& s = scaleData.at(scaleIdx);
-
-    const int* pwin = ptr + s.layer_offset;
-    const int* pq = (const int*)(pwin + sqofs);
-    int valsum = CALC_SUM_OFS(nofs, pwin);
-    unsigned valsqsum = (unsigned)(CALC_SUM_OFS(nofs, pq));
-
-    double area = normrect.area();
-    double nf = area * valsqsum - (double)valsum * valsum;
-    if (nf > 0.) {
-        nf = std::sqrt(nf);
-        int varNormFact = (float)(1. / nf);
-        return area * varNormFact < 1e-1;
-    }
-    else {
-        int varNormFact = 1.f;
-        return false;
     }
 }
 
@@ -367,54 +203,6 @@ void COMPUTER_VISION::displayImg() {
         axisX->setRange(timeNow - 1000, timeNow);
 
         statusBar()->showMessage(QString("FPS: %1").arg(fps, 0, 'f', 8));
-    }
-}
-
-Size COMPUTER_VISION::clacSz0(Size oriSz)
-{
-    int alignedSizeWidth = alignSize(oriSz.width, 16);
-    return Size(alignedSizeWidth, oriSz.height);
-}
-
-QImage COMPUTER_VISION::normMat(cv::Mat& cvImage)
-{
-    double minVal, maxVal;
-    cv::minMaxLoc(cvImage, &minVal, &maxVal);
-    cv::Mat normalized;
-    cvImage.convertTo(normalized, CV_32F, 1.0 / (maxVal - minVal), -minVal / (maxVal - minVal));
-    normalized.convertTo(normalized, CV_8UC1, 255.0);
-
-    return QImage(normalized.data, normalized.cols, normalized.rows, normalized.step, QImage::Format_Grayscale8).copy();
-}
-
-void COMPUTER_VISION::displayLayer(ImgLayer& layer, int layerIndex)
-{
-    QImage image;
-    switch (layer.state) {
-    case LayerState::DATA:
-    {
-        cv::Mat cvImage(layer.sz.height, layer.sz.width, CV_8UC1, layer.data);
-        image = QImage(cvImage.data, cvImage.cols, cvImage.rows, cvImage.step, QImage::Format_Grayscale8);
-    }
-    break;
-    case LayerState::SUM:
-    case LayerState::SQSUM:
-    {
-        cv::Mat cvImage(layer.sz.height, layer.sz.width, CV_32S, layer.state == LayerState::SUM ? layer.sum : layer.sqsum);
-        image = normMat(cvImage);
-    }
-    break;
-    }
-
-    QLabel* label = layerLabels[layerIndex];
-    label->setPixmap(QPixmap::fromImage(image.scaled(label->width(), label->height(), Qt::IgnoreAspectRatio)));
-}
-
-void COMPUTER_VISION::displayPyramid()
-{
-    int nLayers = imgPyramid.size();
-    for (size_t i = 0; i < nLayers; ++i) {
-        displayLayer(imgPyramid[i], i);
     }
 }
 
@@ -496,6 +284,128 @@ void COMPUTER_VISION::onFaceBtnClicked()
     faceBtn->setFont(font);
 }
 
+#if 0:
+
+bool COMPUTER_VISION::eventFilter(QObject* obj, QEvent* event)
+{
+    if (event->type() == QEvent::MouseButtonPress) {
+        for (size_t i = 0; i < layerLabels.size(); ++i) {
+            if (obj == layerLabels[i]) {
+                onLayerClicked(i);
+                return true;
+            }
+        }
+    }
+
+    return QObject::eventFilter(obj, event);
+}
+
+void COMPUTER_VISION::setData()
+{
+    data.minNodesPerTree = 1;
+    data.maxNodesPerTree = 1;
+    data.origWinSz = Size(24, 24);
+    normrect = Rect(1, 1, data.origWinSz.width - 2, data.origWinSz.height - 2);
+}
+
+void COMPUTER_VISION::initLayerLabels()
+{
+    int nLayers = scales.size();
+    for (size_t i = 0; i < nLayers; ++i) {
+        QString objectName = "layerLabel_" + QString::number(i).rightJustified(2, '0');
+        QLabel* label = findChild<QLabel*>(objectName);
+
+        if (label) {
+            layerLabels.push_back(label);
+            label->installEventFilter(this);
+            QLabel* numLabel = createNumLabel(label, i);
+            QGraphicsDropShadowEffect* effect = createDropShadowEffect();
+            numLabel->setGraphicsEffect(effect);
+        }
+    }
+}
+
+QLabel* COMPUTER_VISION::createNumLabel(QLabel* label, int i)
+{
+    QLabel* numLabel = new QLabel(label);
+    QString labelText = "[" + QString::number(i + 1) + "] ";
+    labelText += QString::number(scaleData[i].szi.width);
+    labelText += " x ";
+    labelText += QString::number(scaleData[i].szi.height);
+    numLabel->setText(labelText);
+
+    numLabel->setAlignment(Qt::AlignTop | Qt::AlignLeft);
+    numLabel->setContentsMargins(5, 5, 5, 5);
+    numLabel->setStyleSheet("QLabel {"
+        " color : yellow;"
+        " border: none;"
+        " font-weight: bold;"
+        " font-size: 10px;"
+        "}");
+
+    return numLabel;
+}
+
+QGraphicsDropShadowEffect* COMPUTER_VISION::createDropShadowEffect()
+{
+    QGraphicsDropShadowEffect* effect = new QGraphicsDropShadowEffect();
+    effect->setBlurRadius(2);
+    effect->setXOffset(1);
+    effect->setYOffset(1);
+    effect->setColor(QColor("black"));
+
+    return effect;
+}
+
+Size COMPUTER_VISION::clacSz0(Size oriSz)
+{
+    int alignedSizeWidth = alignSize(oriSz.width, 16);
+    return Size(alignedSizeWidth, oriSz.height);
+}
+
+void COMPUTER_VISION::computeChannels(int scaleIdx, unsigned char* img)
+{
+    const ScaleData& s = scaleData.at(scaleIdx);
+    sqofs = sbufSz.area();
+    integral(img, sbuf, s.szi.width, s.szi.height, s.layer_offset);
+    integralSquare(img, sbuf, s.szi.width, s.szi.height, (s.layer_offset + sqofs));
+}
+
+void COMPUTER_VISION::computeOptFeatures()
+{
+    int sstep = sbufSz.width;
+    CV_SUM_OFS(nofs[0], nofs[1], nofs[2], nofs[3], 0, normrect, sstep);
+    size_t nfeatures = data.features.size();
+    QVector<Feature>& ff = data.features;
+    data.optFeatures.resize(nfeatures);
+    OptFeature* optfeaturesPtr = &(data.optFeatures)[0];
+    for (size_t fi = 0; fi < nfeatures; fi++) {
+        optfeaturesPtr[fi].setOffsets(ff[fi], sstep);
+    }
+}
+
+bool COMPUTER_VISION::setWindow(int* ptr, int scaleIdx)
+{
+    const ScaleData& s = scaleData.at(scaleIdx);
+
+    const int* pwin = ptr + s.layer_offset;
+    const int* pq = (const int*)(pwin + sqofs);
+    int valsum = CALC_SUM_OFS(nofs, pwin);
+    unsigned valsqsum = (unsigned)(CALC_SUM_OFS(nofs, pq));
+
+    double area = normrect.area();
+    double nf = area * valsqsum - (double)valsum * valsum;
+    if (nf > 0.) {
+        nf = std::sqrt(nf);
+        int varNormFact = (float)(1. / nf);
+        return area * varNormFact < 1e-1;
+    }
+    else {
+        int varNormFact = 1.f;
+        return false;
+    }
+}
+
 void COMPUTER_VISION::onLayerClicked(int layerIndex) {
     ImgLayer& layer = imgPyramid[layerIndex];
     switch (layer.state) {
@@ -510,3 +420,94 @@ void COMPUTER_VISION::onLayerClicked(int layerIndex) {
         break;
     }
 }
+
+void COMPUTER_VISION::verifyMatEqual(const cv::Mat& mat1, const cv::Mat& mat2, const QString& mat_name)
+{
+    double diff = cv::norm(mat1, mat2, cv::NORM_INF);
+    if (diff != 0) {
+        qDebug() << mat_name << ": X";
+    }
+}
+
+void COMPUTER_VISION::verifyIntegral(int scaleIdx)
+{
+    const ScaleData& s = scaleData.at(scaleIdx);
+
+    cv::Mat sbuf_sum(s.szi.height, s.szi.width, CV_32S, sbuf + s.layer_offset);
+    cv::Mat sbuf_sqsum(s.szi.height, s.szi.width, CV_32S, sbuf + s.layer_offset + sqofs);
+    cv::Mat rbuf_img(s.szi.height, s.szi.width, CV_8U, rbuf);
+    cv::Mat sum, sqsum;
+
+    cv::integral(rbuf_img, sum, sqsum, cv::noArray(), CV_32S, CV_32S);
+
+    sum = sum(cv::Rect(1, 1, s.szi.width, s.szi.height));
+    sqsum = sqsum(cv::Rect(1, 1, s.szi.width, s.szi.height));
+
+# if 0:
+    if (scaleIdx == 0) {
+        saveMatToCsv(sbuf_sum, "my_sum.csv");
+        saveMatToCsv(sbuf_sqsum, "my_sqsum.csv");
+    }
+    saveMatToCsv(sbuf_sum, "my_sum.csv");
+    saveMatToCsv(sbuf_sqsum, "my_sqsum.csv");
+    saveMatToCsv(sum, "sum.csv");
+    saveMatToCsv(sqsum, "sqsum.csv");
+# endif
+
+    verifyMatEqual(sbuf_sum, sum, "sum");
+    verifyMatEqual(sbuf_sqsum, sqsum, "sqsum");
+}
+
+void COMPUTER_VISION::saveMatToCsv(const cv::Mat& mat, const QString& filename)
+{
+    std::ofstream outputFile(filename.toStdString());
+    if (!outputFile) {
+        return;
+    }
+    outputFile << cv::format(mat, cv::Formatter::FMT_CSV);
+}
+
+void COMPUTER_VISION::displayLayer(ImgLayer& layer, int layerIndex)
+{
+    QImage image;
+    switch (layer.state) {
+    case LayerState::DATA:
+    {
+        cv::Mat cvImage(layer.sz.height, layer.sz.width, CV_8UC1, layer.data);
+        image = QImage(cvImage.data, cvImage.cols, cvImage.rows, cvImage.step, QImage::Format_Grayscale8);
+    }
+    break;
+    case LayerState::SUM:
+    case LayerState::SQSUM:
+    {
+        cv::Mat cvImage(layer.sz.height, layer.sz.width, CV_32S, layer.state == LayerState::SUM ? layer.sum : layer.sqsum);
+        image = normMat(cvImage);
+    }
+    break;
+    }
+
+    QLabel* label = layerLabels[layerIndex];
+    label->setPixmap(QPixmap::fromImage(image.scaled(label->width(), label->height(), Qt::IgnoreAspectRatio)));
+}
+
+void COMPUTER_VISION::displayPyramid()
+{
+    int nLayers = imgPyramid.size();
+    for (size_t i = 0; i < nLayers; ++i) {
+        displayLayer(imgPyramid[i], i);
+    }
+}
+
+QImage COMPUTER_VISION::normMat(cv::Mat& cvImage)
+{
+    double minVal, maxVal;
+    cv::minMaxLoc(cvImage, &minVal, &maxVal);
+    cv::Mat normalized;
+    cvImage.convertTo(normalized, CV_32F, 1.0 / (maxVal - minVal), -minVal / (maxVal - minVal));
+    normalized.convertTo(normalized, CV_8UC1, 255.0);
+
+    return QImage(normalized.data, normalized.cols, normalized.rows, normalized.step, QImage::Format_Grayscale8).copy();
+}
+}
+
+#endif

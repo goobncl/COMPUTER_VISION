@@ -27,9 +27,6 @@ class COMPUTER_VISION : public QMainWindow
 {
     Q_OBJECT
 
-protected:
-    bool eventFilter(QObject* obj, QEvent* event) override;
-
 public:
     COMPUTER_VISION(QWidget* parent = Q_NULLPTR);
     ~COMPUTER_VISION();
@@ -60,28 +57,25 @@ private:
     void initFpsTimeSeries();
     void initComps();
     void setCam();
-    void setConn();
-    
-
-    
-    Size clacSz0(Size oriSz);
-    QImage normMat(cv::Mat& cvImage);
-    void displayLayer(ImgLayer& layer, int layerIndex);    
-    void displayPyramid();
-    void drawFaces();
-    void computeOptFeatures();
-    void computeChannels(int scaleIdx, unsigned char* img);
+    void setConn();        
+    void drawFaces();     
     double getFPS();
     void acqFrame();
     void procImg();
     void displayImg(); 
     void updateFrame();
-    void verifyMatEqual(const cv::Mat& mat1, const cv::Mat& mat2, const QString& mat_name);
-    void verifyIntegral(int scaleIdx);
-    void saveMatToCsv(const cv::Mat& mat, const QString& filename);
-    bool setWindow(int* ptr, int scaleIdx);
+    
 
-#if 1:
+private slots:
+    void onClaheBtnClicked();
+    void onBlurBtnClicked();
+    void onFaceBtnClicked();    
+
+#if 0:
+protected:
+    bool eventFilter(QObject* obj, QEvent* event) override;
+
+private:
     struct Data {
         int minNodesPerTree;
         int maxNodesPerTree;
@@ -111,11 +105,19 @@ private:
     void initLayerLabels();
     QLabel* createNumLabel(QLabel* label, int i);
     QGraphicsDropShadowEffect* createDropShadowEffect();
-#endif
+    Size clacSz0(Size oriSz);
+    void computeChannels(int scaleIdx, unsigned char* img);
+    void computeOptFeatures();
+    bool setWindow(int* ptr, int scaleIdx);
+    void verifyMatEqual(const cv::Mat& mat1, const cv::Mat& mat2, const QString& mat_name);
+    void verifyIntegral(int scaleIdx);
+    void saveMatToCsv(const cv::Mat& mat, const QString& filename);
+    void displayLayer(ImgLayer& layer, int layerIndex);
+    void displayPyramid();
+    QImage normMat(cv::Mat& cvImage);
 
 private slots:
-    void onClaheBtnClicked();
-    void onBlurBtnClicked();
-    void onFaceBtnClicked();
     void onLayerClicked(int layerIndex);
+
+#endif
 };
