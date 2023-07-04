@@ -93,20 +93,15 @@ void integral(unsigned char* src, int* dst_sum, int* dst_sqsum, int width, int h
     }
 }
 
-int getPixelVal(int* src_sum, int x, int y, int width) {
-    if (x < 0 || y < 0) return 0;
-    return src_sum[y * width + x];
-}
-
 int calcAreaSum(int* src_sum, int topLeftX, int topLeftY, int width) {
 
-    int bottomRightX = topLeftX + 23;
-    int bottomRightY = topLeftY + 23;
+    int bottomRightX = topLeftX + 24;
+    int bottomRightY = topLeftY + 24;
 
-    int p0 = getPixelVal(src_sum, bottomRightX, bottomRightY, width);
-    int p1 = getPixelVal(src_sum, bottomRightX, topLeftY - 1, width);
-    int p2 = getPixelVal(src_sum, topLeftX - 1, bottomRightY, width);
-    int p3 = getPixelVal(src_sum, topLeftX - 1, topLeftY - 1, width);
+    int p0 = src_sum[bottomRightY * width + bottomRightX];
+    int p1 = src_sum[topLeftY * width + bottomRightX];
+    int p2 = src_sum[bottomRightY * width + topLeftX];
+    int p3 = src_sum[topLeftY * width + topLeftX];
 
     return (p0 - p1 - p2 + p3);
 }
