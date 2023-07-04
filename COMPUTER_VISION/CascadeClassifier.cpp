@@ -248,59 +248,6 @@ void CascadeClassifier::initImgProc()
 
 void CascadeClassifier::calcImgPyramid(unsigned char* image)
 {
-	//{
-	//	size_t nscales = scaleData.size();
-	//
-	//	for (size_t i = 0; i < nscales; i++) {
-	//		
-	//		const ScaleData& s = scaleData[i];
-	//
-	//		int new_w = s.szi.width;
-	//		int new_h = s.szi.height;
-	//		imgPyramid[i].sz.width = new_w;
-	//		imgPyramid[i].sz.height = new_h;
-	//
-	//		downSampling(
-	//			image,
-	//			imgPyramid[i].data,
-	//			(new_w - 1),
-	//			(new_h - 1)
-	//		);
-	//		
-	//		integral(
-	//			imgPyramid[i].data,
-	//			imgPyramid[i].sum,
-	//			imgPyramid[i].sqsum,
-	//			new_w,
-	//			new_h,
-	//			0
-	//		);
-	//
-	//		if (true) {
-	//			cv::Mat ori((new_h - 1), (new_w - 1), CV_8U, imgPyramid[i].data);
-	//			cv::Mat sum(new_h, new_w, CV_32S, imgPyramid[i].sum);
-	//			cv::Mat sqsum(new_h, new_w, CV_32S, imgPyramid[i].sqsum);
-	//			
-	//			saveMatToCsv(ori, "ori.csv");
-	//			saveMatToCsv(sum, "sum.csv");
-	//			saveMatToCsv(sqsum, "sqsum.csv");
-	//			
-	//			cv::Mat cvSum(new_h, new_w, CV_32S);
-	//			cv::Mat cvSqsum(new_h, new_w, CV_32S);
-	//
-	//			cv::integral(ori, cvSum, cvSqsum, cv::noArray(), CV_32S, CV_32S);
-	//
-	//			if (!verifyMatEqual(sum, cvSum)) {
-	//				printf("");
-	//			}
-	//
-	//			if (!verifyMatEqual(sqsum, cvSqsum)) {
-	//				printf("");
-	//			}
-	//		}
-	//	}
-	//}
-
 	std::for_each(
 		std::execution::par,
 		std::begin(scaleData),
