@@ -54,4 +54,5 @@ private:
 	bool compRect(const Rect& r1, const Rect& r2);
 	int partition(const std::vector<Rect>& rectList, std::vector<int>& labels);
 	void groupRectangles(int threshold, double eps);	
+	void saveMatToCsv(const cv::Mat& mat, const std::string& filename);
 };

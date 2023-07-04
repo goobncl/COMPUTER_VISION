@@ -240,49 +240,92 @@ void CascadeClassifier::initImgProc()
 	imgPyramid.resize(nscales);
 
 	for (size_t i = 0; i < nscales; i++) {
-		imgPyramid[i].data = (unsigned char*)malloc(sizeof(unsigned char) * sz0.width * sz0.height);
-		imgPyramid[i].sum = (int*)malloc(sizeof(int) * sz0.width * sz0.height);
-		imgPyramid[i].sqsum = (int*)malloc(sizeof(int) * sz0.width * sz0.height);
+		imgPyramid[i].data = (unsigned char*)calloc(sz0.width * sz0.height, sizeof(unsigned char));
+		imgPyramid[i].sum = (int*)calloc(sz0.width * sz0.height, sizeof(int));
+		imgPyramid[i].sqsum = (int*)calloc(sz0.width * sz0.height, sizeof(int));
 	}
 }
 
 void CascadeClassifier::calcImgPyramid(unsigned char* image)
 {
-	std::for_each(
-		std::execution::par,
-		std::begin(scaleData),
-		std::end(scaleData),
-		[&](const ScaleData& s) {
-
-			size_t i = &s - &scaleData[0];
-
+	{
+		size_t nscales = scaleData.size();
+	
+		for (size_t i = 0; i < nscales; i++) {
+			
+			const ScaleData& s = scaleData[i];
+	
 			int new_w = s.szi.width;
 			int new_h = s.szi.height;
 			imgPyramid[i].sz.width = new_w;
 			imgPyramid[i].sz.height = new_h;
-
+	
 			downSampling(
 				image,
 				imgPyramid[i].data,
-				new_w,
-				new_h
+				(new_w - 1),
+				(new_h - 1)
 			);
-			integral(
-				imgPyramid[i].data,
-				imgPyramid[i].sum,
-				new_w,
-				new_h,
-				0
-			);
-			integralSquare(
-				imgPyramid[i].data,
-				imgPyramid[i].sqsum,
-				new_w,
-				new_h,
-				0
-			);
+
+			if (i == 28) {
+				cv::Mat temp((new_h - 1), (new_w - 1), CV_8U, imgPyramid[i].data);
+				saveMatToCsv(temp, "temp.csv");
+				printf("");
+			}
+
+			//integral(
+			//	imgPyramid[i].data,
+			//	imgPyramid[i].sum,
+			//	new_w,
+			//	new_h,
+			//	0
+			//);
+			//
+			//integralSquare(
+			//	imgPyramid[i].data,
+			//	imgPyramid[i].sqsum,
+			//	new_w,
+			//	new_h,
+			//	0
+			//);
 		}
-	);
+	}
+
+	//std::for_each(
+	//	std::execution::par,
+	//	std::begin(scaleData),
+	//	std::end(scaleData),
+	//	[&](const ScaleData& s) {
+	//
+	//		size_t i = &s - &scaleData[0];
+	//
+	//		int new_w = s.szi.width;
+	//		int new_h = s.szi.height;
+	//		imgPyramid[i].sz.width = new_w;
+	//		imgPyramid[i].sz.height = new_h;
+	//
+	//		downSampling(
+	//			image,
+	//			imgPyramid[i].data,
+	//			new_w,
+	//			new_h
+	//		);
+	//		integral(
+	//			imgPyramid[i].data,
+	//			imgPyramid[i].sum,
+	//			new_w,
+	//			new_h,
+	//			0
+	//		);
+	//		integralSquare(
+	//			imgPyramid[i].data,
+	//			imgPyramid[i].sqsum,
+	//			new_w,
+	//			new_h,
+	//			0
+	//		);
+	//	}
+	//);
 }
 
 void CascadeClassifier::clearImgPyramid()
@@ -548,4 +591,13 @@ void CascadeClassifier::groupRectangles(int threshold, double eps)
 			candidates.push_back(r1);
 		}
 	}	
+}
+
+void CascadeClassifier::saveMatToCsv(const cv::Mat& mat, const std::string& filename)
+{
+	std::ofstream outputFile(filename);
+	if (!outputFile) {
+		return;
+	}
+	outputFile << cv::format(mat, cv::Formatter::FMT_CSV);
 }
