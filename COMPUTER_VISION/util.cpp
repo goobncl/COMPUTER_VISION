@@ -78,45 +78,35 @@ void downSampling(unsigned char* src, unsigned char* dst, int new_width, int new
     }
 }
 
-void integral(unsigned char* src, int* dst, int width, int height, int layer_offset) {
-    for (int y = 0; y < height; ++y) {
-        for (int x = 0; x < width; ++x) {
-            int sum = src[y * width + x];
-            if (y > 0) sum += dst[(y - 1) * width + x + layer_offset];
-            if (x > 0) sum += dst[y * width + (x - 1) + layer_offset];
-            if (y > 0 && x > 0) sum -= dst[(y - 1) * width + (x - 1) + layer_offset];
-            dst[y * width + x + layer_offset] = sum;
+void integral(unsigned char* src, int* dst_sum, int* dst_sqsum, int width, int height, int layer_offset) {
+    for (int y = 0; y < height - 1; ++y) {
+        for (int x = 0; x < width - 1; ++x) {
+
+            int val = src[y * (width - 1) + x];
+            int sum = val + dst_sum[(y + 1) * width + x] + dst_sum[y * width + (x + 1)] - dst_sum[y * width + x];
+            dst_sum[(y + 1) * width + (x + 1)] = sum;
+
+            int sqVal = val * val;
+            int sqSum = sqVal + dst_sqsum[(y + 1) * width + x] + dst_sqsum[y * width + (x + 1)] - dst_sqsum[y * width + x];
+            dst_sqsum[(y + 1) * width + (x + 1)] = sqSum;
         }
     }
 }
 
-void integralSquare(unsigned char* src, int* dst, int width, int height, int layer_offset) {
-    for (int y = 0; y < height; ++y) {
-        for (int x = 0; x < width; ++x) {
-            int value = src[y * width + x];
-            int square = value * value;
-            if (y > 0) square += dst[(y - 1) * width + x + layer_offset];
-            if (x > 0) square += dst[y * width + (x - 1) + layer_offset];
-            if (y > 0 && x > 0) square -= dst[(y - 1) * width + (x - 1) + layer_offset];
-            dst[y * width + x + layer_offset] = square;
-        }
-    }
-}
-
-int getPixelVal(int* src, int x, int y, int width) {
+int getPixelVal(int* src_sum, int x, int y, int width) {
     if (x < 0 || y < 0) return 0;
-    return src[y * width + x];
+    return src_sum[y * width + x];
 }
 
-int calcAreaSum(int* src, int topLeftX, int topLeftY, int width) {
+int calcAreaSum(int* src_sum, int topLeftX, int topLeftY, int width) {
 
     int bottomRightX = topLeftX + 23;
     int bottomRightY = topLeftY + 23;
 
-    int p0 = getPixelVal(src, bottomRightX, bottomRightY, width);
-    int p1 = getPixelVal(src, bottomRightX, topLeftY - 1, width);
-    int p2 = getPixelVal(src, topLeftX - 1, bottomRightY, width);
-    int p3 = getPixelVal(src, topLeftX - 1, topLeftY - 1, width);
+    int p0 = getPixelVal(src_sum, bottomRightX, bottomRightY, width);
+    int p1 = getPixelVal(src_sum, bottomRightX, topLeftY - 1, width);
+    int p2 = getPixelVal(src_sum, topLeftX - 1, bottomRightY, width);
+    int p3 = getPixelVal(src_sum, topLeftX - 1, topLeftY - 1, width);
 
     return (p0 - p1 - p2 + p3);
 }

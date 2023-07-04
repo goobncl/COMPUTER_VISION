@@ -266,28 +266,38 @@ void CascadeClassifier::calcImgPyramid(unsigned char* image)
 				(new_w - 1),
 				(new_h - 1)
 			);
+			
+			integral(
+				imgPyramid[i].data,
+				imgPyramid[i].sum,
+				imgPyramid[i].sqsum,
+				new_w,
+				new_h,
+				0
+			);
 
-			if (i == 28) {
-				cv::Mat temp((new_h - 1), (new_w - 1), CV_8U, imgPyramid[i].data);
-				saveMatToCsv(temp, "temp.csv");
-				printf("");
+			if (true) {
+				cv::Mat ori((new_h - 1), (new_w - 1), CV_8U, imgPyramid[i].data);
+				cv::Mat sum(new_h, new_w, CV_32S, imgPyramid[i].sum);
+				cv::Mat sqsum(new_h, new_w, CV_32S, imgPyramid[i].sqsum);
+				
+				saveMatToCsv(ori, "ori.csv");
+				saveMatToCsv(sum, "sum.csv");
+				saveMatToCsv(sqsum, "sqsum.csv");
+				
+				cv::Mat cvSum(new_h, new_w, CV_32S);
+				cv::Mat cvSqsum(new_h, new_w, CV_32S);
+
+				cv::integral(ori, cvSum, cvSqsum, cv::noArray(), CV_32S, CV_32S);
+
+				if (!verifyMatEqual(sum, cvSum)) {
+					printf("");
+				}
+
+				if (!verifyMatEqual(sqsum, cvSqsum)) {
+					printf("");
+				}
 			}
-
-			//integral(
-			//	imgPyramid[i].data,
-			//	imgPyramid[i].sum,
-			//	new_w,
-			//	new_h,
-			//	0
-			//);
-			//
-			//integralSquare(
-			//	imgPyramid[i].data,
-			//	imgPyramid[i].sqsum,
-			//	new_w,
-			//	new_h,
-			//	0
-			//);
 		}
 	}
 
@@ -600,4 +610,10 @@ void CascadeClassifier::saveMatToCsv(const cv::Mat& mat, const std::string& file
 		return;
 	}
 	outputFile << cv::format(mat, cv::Formatter::FMT_CSV);
+}
+
+bool CascadeClassifier::verifyMatEqual(const cv::Mat& mat1, const cv::Mat& mat2)
+{
+	double diff = cv::norm(mat1, mat2, cv::NORM_INF);
+	return (diff == 0) ? true : false;
 }

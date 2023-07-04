@@ -55,4 +55,5 @@ private:
 	int partition(const std::vector<Rect>& rectList, std::vector<int>& labels);
 	void groupRectangles(int threshold, double eps);	
 	void saveMatToCsv(const cv::Mat& mat, const std::string& filename);
+	bool verifyMatEqual(const cv::Mat& mat1, const cv::Mat& mat2);
 };

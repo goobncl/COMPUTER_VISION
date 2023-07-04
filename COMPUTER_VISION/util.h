@@ -11,9 +11,8 @@ double doubleAbs(double n);
 double doubleRound(double number);
 int doubleToInt(double n);
 void downSampling(unsigned char* src, unsigned char* dst, int new_width, int new_height);
-void integral(unsigned char* src, int* dst, int width, int height, int layer_offset);
-void integralSquare(unsigned char* src, int* dst, int width, int height, int layer_offset);
-int getPixelVal(int* src, int x, int y, int width);
-int calcAreaSum(int* src, int topLeftX, int topLeftY, int width);
+void integral(unsigned char* src, int* dst_sum, int* dst_sqsum, int width, int height, int layer_offset);
+int getPixelVal(int* src_sum, int x, int y, int width);
+int calcAreaSum(int* src_sum, int topLeftX, int topLeftY, int width);
 
 #endif // UTIL_H
