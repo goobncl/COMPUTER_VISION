@@ -109,9 +109,7 @@ private:
     void computeChannels(int scaleIdx, unsigned char* img);
     void computeOptFeatures();
     bool setWindow(int* ptr, int scaleIdx);
-    void verifyMatEqual(const cv::Mat& mat1, const cv::Mat& mat2, const QString& mat_name);
     void verifyIntegral(int scaleIdx);
-    void saveMatToCsv(const cv::Mat& mat, const QString& filename);
     void displayLayer(ImgLayer& layer, int layerIndex);
     void displayPyramid();
     QImage normMat(cv::Mat& cvImage);

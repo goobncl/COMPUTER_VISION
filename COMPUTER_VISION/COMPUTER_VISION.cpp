@@ -421,14 +421,6 @@ void COMPUTER_VISION::onLayerClicked(int layerIndex) {
     }
 }
 
-void COMPUTER_VISION::verifyMatEqual(const cv::Mat& mat1, const cv::Mat& mat2, const QString& mat_name)
-{
-    double diff = cv::norm(mat1, mat2, cv::NORM_INF);
-    if (diff != 0) {
-        qDebug() << mat_name << ": X";
-    }
-}
-
 void COMPUTER_VISION::verifyIntegral(int scaleIdx)
 {
     const ScaleData& s = scaleData.at(scaleIdx);
@@ -456,15 +448,6 @@ void COMPUTER_VISION::verifyIntegral(int scaleIdx)
 
     verifyMatEqual(sbuf_sum, sum, "sum");
     verifyMatEqual(sbuf_sqsum, sqsum, "sqsum");
-}
-
-void COMPUTER_VISION::saveMatToCsv(const cv::Mat& mat, const QString& filename)
-{
-    std::ofstream outputFile(filename.toStdString());
-    if (!outputFile) {
-        return;
-    }
-    outputFile << cv::format(mat, cv::Formatter::FMT_CSV);
 }
 
 void COMPUTER_VISION::displayLayer(ImgLayer& layer, int layerIndex)
