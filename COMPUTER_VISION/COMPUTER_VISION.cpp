@@ -480,17 +480,6 @@ void COMPUTER_VISION::displayPyramid()
         displayLayer(imgPyramid[i], i);
     }
 }
-
-QImage COMPUTER_VISION::normMat(cv::Mat& cvImage)
-{
-    double minVal, maxVal;
-    cv::minMaxLoc(cvImage, &minVal, &maxVal);
-    cv::Mat normalized;
-    cvImage.convertTo(normalized, CV_32F, 1.0 / (maxVal - minVal), -minVal / (maxVal - minVal));
-    normalized.convertTo(normalized, CV_8UC1, 255.0);
-
-    return QImage(normalized.data, normalized.cols, normalized.rows, normalized.step, QImage::Format_Grayscale8).copy();
-}
 }
 
 #endif

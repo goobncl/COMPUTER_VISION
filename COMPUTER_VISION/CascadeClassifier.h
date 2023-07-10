@@ -34,6 +34,10 @@ private:
 	std::vector<ImgPlane> imgPyramid;
 	std::vector<Rect> candidates;
 
+	cv::Mat rbuf;
+	cv::Mat sbuf;
+	Size sbufSize;
+
 	std::vector<Stage> readStages(QSqlQuery& query);
 	std::vector<DTree> readClassifiers(QSqlQuery& query);
 	std::vector<DTreeNode> readNodes(QSqlQuery& query);
@@ -56,4 +60,10 @@ private:
 	void groupRectangles(int threshold, double eps);	
 	void saveMatToCsv(const cv::Mat& mat, const std::string& filename);
 	bool verifyMatEqual(const cv::Mat& mat1, const cv::Mat& mat2);
+
+	void setMetadata();
+	void calcSbuf(unsigned char* image);
+	void displaySbuf();
+	void computeChannels(int scaleIdx, cv::InputArray img);
+	cv::Mat normMat(const cv::Mat& input);
 };

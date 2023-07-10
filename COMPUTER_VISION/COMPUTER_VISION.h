@@ -112,7 +112,6 @@ private:
     void verifyIntegral(int scaleIdx);
     void displayLayer(ImgLayer& layer, int layerIndex);
     void displayPyramid();
-    QImage normMat(cv::Mat& cvImage);
 
 private slots:
     void onLayerClicked(int layerIndex);

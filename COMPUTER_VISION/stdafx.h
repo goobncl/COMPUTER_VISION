@@ -3,6 +3,7 @@
 #include <fstream>
 #include <execution>
 #include <any>
+#include <algorithm>
 #include <QObject>
 #include <QThread>
 #include <QMutex>

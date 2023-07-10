@@ -5,6 +5,7 @@ CascadeClassifier::CascadeClassifier()
 {
 	setData();
 	initImgProc();
+	setMetadata();
 }
 
 CascadeClassifier::~CascadeClassifier()
@@ -14,9 +15,10 @@ CascadeClassifier::~CascadeClassifier()
 
 const std::vector<Rect>* CascadeClassifier::objectDetect(unsigned char* image)
 {
-	calcImgPyramid(image);
-	calcHaarFeature();
-	groupRectangles(10, 0.2);
+	//calcImgPyramid(image);
+	//calcHaarFeature();
+	//groupRectangles(10, 0.2);
+	calcSbuf(image);
 
 	return &candidates;
 }
@@ -266,7 +268,7 @@ void CascadeClassifier::calcImgPyramid(unsigned char* image)
 				imgPyramid[i].data,
 				(new_w - 1),
 				(new_h - 1)
-			);
+			);			
 			integral(
 				imgPyramid[i].data,
 				imgPyramid[i].sum,
@@ -557,4 +559,157 @@ bool CascadeClassifier::verifyMatEqual(const cv::Mat& mat1, const cv::Mat& mat2)
 {
 	double diff = cv::norm(mat1, mat2, cv::NORM_INF);
 	return (diff == 0) ? true : false;
+}
+
+void CascadeClassifier::setMetadata()
+{
+	size_t nscales = scales.size();
+	Size prevBufSize = sbufSize;
+
+	sbufSize.width = std::max(
+		sbufSize.width, 
+		(int)alignSize(cvRound(640 / scales[0]) + 31, 32)
+	);
+
+	int layer_dy = 0;
+	Point layer_ofs(0, 0);
+	Point s_layer_ofs(0, 0);
+	for (size_t i = 0; i < nscales; i++) {
+		
+		ScaleData& s = scaleData.at(i);
+		
+		if (i == 0) {
+			layer_dy = s.szi.height;
+		}
+
+		if (layer_ofs.x + s.szi.width > sbufSize.width) {
+			layer_ofs = Point(0, layer_ofs.y + layer_dy);
+			layer_dy = s.szi.height;
+		}
+
+		s.layer_offset = layer_ofs.y * sbufSize.width + layer_ofs.x;
+		layer_ofs.x += s.szi.width;
+	}
+
+	layer_ofs.y += layer_dy;
+	sbufSize.height = std::max(sbufSize.height, layer_ofs.y);
+
+	rbuf.create(sz0.height, sz0.width, CV_8U);
+	sbuf.create(sbufSize.height * 2, sbufSize.width, CV_32S);
+}	
+
+void CascadeClassifier::calcSbuf(unsigned char* image)
+{
+	// Linear version
+	{
+		size_t nscales = scales.size();
+		cv::Mat img(480, 640, CV_8U, image);
+		
+		for (size_t i = 0; i < nscales; i++) {
+			const ScaleData& s = scaleData.at(i);
+			cv::Mat dst(s.szi.height - 1, s.szi.width - 1, CV_8U, rbuf.ptr());
+			cv::resize(
+				img,
+				dst,
+				dst.size(),
+				1. / s.scale,
+				1. / s.scale,
+				cv::INTER_LINEAR_EXACT
+			);
+			computeChannels((int)i, dst);
+			displaySbuf();
+		}
+	}
+
+	// Parallel version
+	{
+		//size_t nscales = scales.size();
+		//cv::Mat img(480, 640, CV_8U, image);		
+		//std::vector<ScaleData> scaleDataVec(scaleData.begin(), scaleData.end());
+		//
+		//std::for_each(
+		//	std::execution::par,
+		//	std::begin(scaleDataVec),
+		//	std::end(scaleDataVec),
+		//	[&](const ScaleData& s) {		
+		//		cv::Mat dst(s.szi.height - 1, s.szi.width - 1, CV_8U, rbuf.ptr());
+		//		cv::resize(
+		//			img,
+		//			dst,
+		//			dst.size(),
+		//			1. / s.scale,
+		//			1. / s.scale,
+		//			cv::INTER_LINEAR_EXACT
+		//		);
+		//		size_t scaleIdx = &s - &scaleDataVec[0];
+		//		computeChannels(static_cast<int>(scaleIdx), dst);
+		//	}
+		//);		
+		//displaySbuf();
+	}
+}
+
+void CascadeClassifier::displaySbuf()
+{
+	cv::Mat normed = normMat(sbuf);
+
+	cv::Rect topHalfROI(0, 0, normed.cols, normed.rows / 2);
+	cv::Rect bottomHalfROI(0, normed.rows / 2, normed.cols, normed.rows / 2);
+	cv::Mat topHalf = normed(topHalfROI);
+	cv::Mat bottomHalf = normed(bottomHalfROI);
+
+	cv::Mat concatenated;
+	cv::hconcat(topHalf, bottomHalf, concatenated);
+
+	cv::namedWindow("SBUF", cv::WINDOW_NORMAL);
+	double ratio = static_cast<double>(concatenated.cols) / concatenated.rows;
+	int new_h = 1800;
+	int new_w = static_cast<int>(new_h * ratio);
+	cv::resizeWindow("SBUF", new_w, new_h);
+	cv::imshow("SBUF", concatenated);
+
+	cv::waitKey(0);
+}
+
+void CascadeClassifier::computeChannels(int scaleIdx, cv::InputArray img)
+{
+	const ScaleData& s = scaleData.at(scaleIdx);
+	int sqofs = sbufSize.area();
+	
+	cv::Mat sum(
+		s.szi.height, 
+		s.szi.width, 
+		CV_32S, 
+		sbuf.ptr<int>() + s.layer_offset, 
+		sbuf.step
+	);
+	
+	cv::Mat sqsum(
+		s.szi.height, 
+		s.szi.width, 
+		CV_32S, 
+		sum.ptr<int>() + sqofs, 
+		sbuf.step
+	);
+	
+	cv::integral(
+		img,
+		sum,
+		sqsum,
+		cv::noArray(),
+		CV_32S,
+		CV_32S
+	);
+}
+
+cv::Mat CascadeClassifier::normMat(const cv::Mat& input)
+{
+	double min, max;
+	cv::minMaxLoc(input, &min, &max);
+
+	cv::Mat normed;
+	input.convertTo(normed, CV_32F, 1.0 / (max - min), -min / (max - min));
+	normed.convertTo(normed, CV_8U, 255.0);
+
+	return normed;
 }
