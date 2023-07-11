@@ -35,6 +35,8 @@ private:
 	std::vector<Rect> candidates;
 
 	cv::Mat rbuf;
+	unsigned char* t_rbuf;
+	int* t_sbuf;
 	cv::Mat sbuf;
 	Size sbufSize;
 
@@ -63,7 +65,9 @@ private:
 
 	void setMetadata();
 	void calcSbuf(unsigned char* image);
-	void displaySbuf();
+	void t_calcSbuf(unsigned char* image);	
 	void computeChannels(int scaleIdx, cv::InputArray img);
+	void t_computeChannels(int scaleIdx, int sqofs);
 	cv::Mat normMat(const cv::Mat& input);
+	void displayBuf(int* buff, int h, int w);
 };

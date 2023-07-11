@@ -78,7 +78,7 @@ void downSampling(unsigned char* src, unsigned char* dst, int new_width, int new
     }
 }
 
-void integral(unsigned char* src, int* dst_sum, int* dst_sqsum, int width, int height, int layer_offset) {
+void integral(unsigned char* src, int* dst_sum, int* dst_sqsum, int width, int height, int offset) {
     for (int y = 0; y < height - 1; ++y) {
         for (int x = 0; x < width - 1; ++x) {
 
@@ -89,6 +89,21 @@ void integral(unsigned char* src, int* dst_sum, int* dst_sqsum, int width, int h
             int sqVal = val * val;
             int sqSum = sqVal + dst_sqsum[(y + 1) * width + x] + dst_sqsum[y * width + (x + 1)] - dst_sqsum[y * width + x];
             dst_sqsum[(y + 1) * width + (x + 1)] = sqSum;
+        }
+    }
+}
+
+void t_integral(unsigned char* src, int* dst_sum, int* dst_sqsum, int width, int height, int offset) {
+    for (int y = 0; y < height - 1; ++y) {
+        for (int x = 0; x < width - 1; ++x) {
+
+            int val = src[y * (512 - 1) + x];
+            int sum = val + dst_sum[offset + (y + 1) * 512 + x] + dst_sum[offset + y * 512 + (x + 1)] - dst_sum[offset + y * 512 + x];
+            dst_sum[offset + (y + 1) * 512 + (x + 1)] = sum;
+
+            int sqVal = val * val;
+            int sqSum = sqVal + dst_sqsum[offset + (y + 1) * 512 + x] + dst_sqsum[offset + y * 512 + (x + 1)] - dst_sqsum[offset + y * 512 + x];
+            dst_sqsum[offset + (y + 1) * 512 + (x + 1)] = sqSum;
         }
     }
 }
